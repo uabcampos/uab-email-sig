@@ -15,15 +15,16 @@ function addEventListeners() {
     elements.forEach(id => {
         const element = document.getElementById(id);
         element.addEventListener('input', () => {
-            validateField(element);
             updatePreview();
         });
-
-        // Trigger a live update on checkbox changes
-        if (id === 'phone-office' || id === 'phone-mobile') {
-            document.getElementById(id + '-enable').addEventListener('change', updatePreview);
-        }
     });
+
+    // Trigger a live update on checkbox changes and typing for phone numbers
+    document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
+    document.getElementById('phone-office').addEventListener('input', updatePreview);
+
+    document.getElementById('phone-mobile-enable').addEventListener('change', updatePreview);
+    document.getElementById('phone-mobile').addEventListener('input', updatePreview);
 
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
@@ -155,7 +156,7 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.2';
+    versionElement.innerText = 'Version 1.4.3';
 }
 
 addEventListeners();
