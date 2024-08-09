@@ -1,3 +1,4 @@
+// Function to validate individual fields
 function validateField(field) {
     // Clear any previous error messages
     clearError(field);
@@ -19,11 +20,16 @@ function validateField(field) {
         case 'email':
             validateEmail(field);
             break;
+        case 'phone-office':
+        case 'phone-mobile':
+            validatePhoneNumber(field);
+            break;
         default:
             break;
     }
 }
 
+// Function to clear error messages
 function clearError(field) {
     const errorElement = document.getElementById(`${field.id}-error`);
     if (errorElement) { // Only clear the error if the element exists
@@ -32,6 +38,7 @@ function clearError(field) {
     }
 }
 
+// Function to display error messages
 function displayError(field, message) {
     const errorElement = document.getElementById(`${field.id}-error`);
     if (errorElement) { // Only display the error if the element exists
@@ -40,6 +47,7 @@ function displayError(field, message) {
     }
 }
 
+// Function to validate the City, State field
 function validateCityState(field) {
     const cityStateRegex = /^[a-zA-Z\s]+,\s*[A-Z]{2}$/;
     if (!cityStateRegex.test(field.value)) {
@@ -47,6 +55,7 @@ function validateCityState(field) {
     }
 }
 
+// Function to validate the ZIP Code field
 function validateZipCode(field) {
     const zipCodeRegex = /^\d{5}(-\d{4})?$/;
     if (!zipCodeRegex.test(field.value)) {
@@ -54,6 +63,7 @@ function validateZipCode(field) {
     }
 }
 
+// Function to validate the Email field
 function validateEmail(field) {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@(uab\.edu|uabmc\.edu)$/;
     if (!emailRegex.test(field.value)) {
@@ -61,6 +71,17 @@ function validateEmail(field) {
     }
 }
 
+// Function to validate Phone Number fields
+// Acceptable formats are 7 or 10 digits, regardless of formatting
+function validatePhoneNumber(field) {
+    const phoneRegex = /^\d{7}$|^\d{10}$/;
+    const digitsOnly = field.value.replace(/\D/g, ''); // Remove non-digit characters
+    if (!phoneRegex.test(digitsOnly)) {
+        displayError(field, 'Enter a valid 7 or 10 digit phone number.');
+    }
+}
+
+// Function to validate all required fields on the page
 function validateAllRequiredFields() {
     const requiredFields = document.querySelectorAll('[required]');
     requiredFields.forEach(field => {
