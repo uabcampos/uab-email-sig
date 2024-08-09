@@ -13,14 +13,18 @@ function addEventListeners() {
     ];
 
     elements.forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            validateField(document.getElementById(id));
+        const element = document.getElementById(id);
+        element.addEventListener('input', () => {
+            validateField(element);
             updatePreview();
         });
+
+        // Trigger a live update on checkbox changes
+        if (id === 'phone-office' || id === 'phone-mobile') {
+            document.getElementById(id + '-enable').addEventListener('change', updatePreview);
+        }
     });
 
-    document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
-    document.getElementById('phone-mobile-enable').addEventListener('change', updatePreview);
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
     document.getElementById('copy-button').addEventListener('click', copyToClipboard);
