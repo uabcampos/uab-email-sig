@@ -8,6 +8,7 @@ function validateField(field) {
         return;
     }
 
+    // Validate specific fields based on their ID
     switch (field.id) {
         case 'city-state':
             validateCityState(field);
@@ -20,6 +21,22 @@ function validateField(field) {
             break;
         default:
             break;
+    }
+}
+
+function clearError(field) {
+    const errorElement = document.getElementById(`${field.id}-error`);
+    if (errorElement) { // Only clear the error if the element exists
+        errorElement.innerText = '';
+        errorElement.style.display = 'none';
+    }
+}
+
+function displayError(field, message) {
+    const errorElement = document.getElementById(`${field.id}-error`);
+    if (errorElement) { // Only display the error if the element exists
+        errorElement.innerText = message;
+        errorElement.style.display = 'block';
     }
 }
 
@@ -44,14 +61,9 @@ function validateEmail(field) {
     }
 }
 
-function displayError(field, message) {
-    const errorElement = document.getElementById(`${field.id}-error`);
-    errorElement.innerText = message;
-    errorElement.style.display = 'block';
-}
-
-function clearError(field) {
-    const errorElement = document.getElementById(`${field.id}-error`);
-    errorElement.innerText = '';
-    errorElement.style.display = 'none';
+function validateAllRequiredFields() {
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        validateField(field); // Validate each required field
+    });
 }
