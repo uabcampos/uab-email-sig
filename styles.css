@@ -86,10 +86,14 @@ input[type="checkbox"] {
     border: 1px solid #ddd;
     border-radius: 4px;
     margin-top: 20px;
-    font-family: 'proxima-nova', Arial, sans-serif;
-    white-space: pre-line;
-    height: 350px; /* Increased height by 50px */
-    overflow-y: auto;
+    font-family: Arial, sans-serif;
+    white-space: pre-line; /* Ensures white spaces and line breaks are treated correctly */
+    line-height: 1.2; /* Adjust line height to reduce spacing */
+}
+
+#signature-preview * {
+    margin: 0; /* Remove any default margins */
+    padding: 0; /* Remove any default padding */
 }
 
 #copy-button {
