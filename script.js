@@ -80,12 +80,24 @@ function updatePreview() {
     const credentials = document.getElementById('credentials').value || 'Ph.D., MPH';
     const title = document.getElementById('title').value || 'Program Director II';
 
-    document.getElementById('preview-name').innerText = name;
-    document.getElementById('preview-credentials').innerText = credentials ? ', ' + credentials : '';
-    document.getElementById('preview-title').innerText = title;
+    const phoneContent = document.getElementById('preview-phone').innerHTML.trim();
+    const pronounsContent = document.getElementById('preview-pronouns').innerHTML.trim();
 
-    document.getElementById('preview-abbr-name').innerText = name;
-    document.getElementById('preview-abbr-title').innerText = title;
+    let previewContent = `<strong>${name}${credentials ? ', ' + credentials : ''} | ${title}</strong><br>
+        Department of Medicine | Heersink School of Medicine<br>
+        Division of Preventive Medicine<br>
+        UAB | The University of Alabama at Birmingham<br>
+        <span id="preview-address">MT 509H | 1717 11th Avenue South | Birmingham, AL 35294-4410</span>`;
+
+    if (phoneContent || pronounsContent) {
+        previewContent += `<br>${phoneContent}<br>${pronounsContent}`;
+    }
+
+    previewContent += `<br><br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>`;
+
+    document.getElementById('signature-preview').innerHTML = previewContent;
+
+    cleanUpPreview();
 }
 
 function updateAddress() {
@@ -96,6 +108,8 @@ function updateAddress() {
 
     const fullAddress = `${room} | ${street} | ${cityState} ${zip}`;
     document.getElementById('preview-address').innerText = fullAddress;
+
+    cleanUpPreview();
 }
 
 function updatePhone() {
@@ -140,6 +154,8 @@ function updatePhone() {
     } else {
         document.getElementById('preview-abbr-phone').innerHTML = emailText;
     }
+
+    cleanUpPreview();
 }
 
 function updatePronouns() {
@@ -148,6 +164,8 @@ function updatePronouns() {
 
     document.getElementById('preview-pronouns').innerText = pronounsText;
     document.getElementById('preview-abbr-pronouns').innerText = pronounsText;
+
+    cleanUpPreview();
 }
 
 function validateField(field, errorElementId) {
@@ -184,4 +202,15 @@ function copyToClipboard() {
 
     // Clear the selection after copying
     selection.removeAllRanges();
+}
+
+// Remove unnecessary blank lines before the URL
+function cleanUpPreview() {
+    const previewElement = document.getElementById('signature-preview');
+    const previewHtml = previewElement.innerHTML;
+
+    // Remove any extra <br> tags if there are multiple in a row
+    const cleanedHtml = previewHtml.replace(/(<br>\s*){2,}/g, '<br>');
+
+    previewElement.innerHTML = cleanedHtml;
 }
