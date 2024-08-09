@@ -12,22 +12,27 @@ function addEventListeners() {
         'email', 'pronouns'
     ];
 
+    // Attach input event listeners to all form elements
     elements.forEach(id => {
         const element = document.getElementById(id);
         element.addEventListener('input', () => {
-            validateField(element);
-            updatePreview();
+            validateField(element); // Validate the field as the user types
+            updatePreview(); // Update the preview as the user types
         });
     });
 
+    // Attach change event listeners for enabling/disabling phone numbers
     document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
     document.getElementById('phone-office').addEventListener('input', updatePreview);
 
     document.getElementById('phone-mobile-enable').addEventListener('change', updatePreview);
     document.getElementById('phone-mobile').addEventListener('input', updatePreview);
 
+    // Event listeners for switching between Standard and Abbreviated versions
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
+
+    // Event listener for copying the signature to the clipboard
     document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 }
 
@@ -36,7 +41,7 @@ let currentVersion = 'standard';
 function validateAllRequiredFields() {
     const requiredFields = document.querySelectorAll('[required]');
     requiredFields.forEach(field => {
-        validateField(field);
+        validateField(field); // Validate each required field
     });
 }
 
@@ -57,8 +62,9 @@ function selectVersion(version) {
 }
 
 function updatePreview() {
+    // Collect input values from all fields or use placeholders if empty
     const name = document.getElementById('name').value || document.getElementById('name').placeholder;
-    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : '';
+    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : ''; // Handle credentials
     const title = document.getElementById('title').value || document.getElementById('title').placeholder;
     const room = document.getElementById('room').value || document.getElementById('room').placeholder;
     const street = document.getElementById('street').value || document.getElementById('street').placeholder;
@@ -66,18 +72,20 @@ function updatePreview() {
     const zip = document.getElementById('zip').value || document.getElementById('zip').placeholder;
     const fullAddress = `${room} | ${street} | ${cityState} ${zip}`;
 
+    // Check if phone numbers are enabled and collect their values
     const phoneOfficeEnabled = document.getElementById('phone-office-enable').checked;
     const phoneMobileEnabled = document.getElementById('phone-mobile-enable').checked;
 
     const phoneOffice = phoneOfficeEnabled ? formatPhoneNumber(document.getElementById('phone-office').value) : '';
     const phoneMobile = phoneMobileEnabled ? formatPhoneNumber(document.getElementById('phone-mobile').value) : '';
     const email = document.getElementById('email').value || document.getElementById('email').placeholder;
-    const pronouns = document.getElementById('pronouns').value ? `Pronouns: ${document.getElementById('pronouns').value}` : '';
+    const pronouns = document.getElementById('pronouns').value ? `Pronouns: ${document.getElementById('pronouns').value}` : ''; // Handle pronouns
 
     const contactInfo = generateContactInfo(phoneOffice, phoneMobile, email);
 
     let previewContent;
 
+    // Build the signature preview content based on the selected version
     if (currentVersion === 'standard') {
         previewContent = `
             <strong style="color: #002c17;">${name}${credentials} | ${title}</strong><br>
@@ -97,13 +105,14 @@ function updatePreview() {
         `;
     }
 
-    // Inject the HTML into the preview directly, preserving line breaks
+    // Inject the generated HTML into the preview element
     document.getElementById('signature-preview').innerHTML = previewContent.trim();
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
     let contactInfo = '';
 
+    // Format the contact information based on provided phone numbers and email
     if (phoneOffice && phoneMobile) {
         contactInfo = `O: ${phoneOffice}, M: ${phoneMobile} | <a href="mailto:${email}">${email}</a>`;
     } else if (phoneOffice) {
@@ -121,7 +130,7 @@ function formatPhoneNumber(phoneNumber) {
     if (!phoneNumber) return '';
     phoneNumber = phoneNumber.replace(/\D/g, '');
     if (phoneNumber.length === 7) {
-        phoneNumber = '205' + phoneNumber;
+        phoneNumber = '205' + phoneNumber; // Assume default area code if not provided
     }
     if (phoneNumber.length === 10) {
         return `${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)}`;
@@ -156,7 +165,8 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.5';
+    versionElement.innerText = 'Version 1.4.5'; // Update version number as needed
 }
 
+// Initialize event listeners and setup on page load
 addEventListeners();
