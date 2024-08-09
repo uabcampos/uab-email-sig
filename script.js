@@ -118,6 +118,14 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function validateField(field) {
+    // Check if the field is required and is empty
+    if (field.hasAttribute('required') && !field.value) {
+        displayError(field, 'This field is required.');
+        return;
+    } else {
+        clearError(field);
+    }
+
     switch (field.id) {
         case 'city-state':
             validateCityState(field);
@@ -131,6 +139,17 @@ function validateField(field) {
         default:
             break;
     }
+}
+
+function displayError(field, message) {
+    const errorElement = document.getElementById(`${field.id}-error`);
+    errorElement.innerText = message;
+    errorElement.style.display = 'block';
+}
+
+function clearError(field) {
+    const errorElement = document.getElementById(`${field.id}-error`);
+    errorElement.style.display = 'none';
 }
 
 function copyToClipboard() {
