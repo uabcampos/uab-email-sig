@@ -80,20 +80,29 @@ input[type="checkbox"] {
     display: none;
 }
 
+/* General styling for signature preview */
 #signature-preview {
     background-color: #f9f9f9;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
     margin-top: 20px;
-    font-family: Arial, sans-serif;
-    white-space: pre-line; /* Ensures white spaces and line breaks are treated correctly */
-    line-height: .9; /* Adjust line height to reduce spacing */
+    font-family: 'Proxima Nova', Arial, sans-serif; /* Ensure your font is applied */
+    white-space: pre-line; 
+    line-height: .9; 
 }
 
-#signature-preview * {
-    margin: 0; /* Remove any default margins */
-    padding: 0; /* Remove any default padding */
+/* Mobile-specific styling */
+@media (max-width: 1000px) {
+    #signature-preview {
+        font-size: 14px; /* Adjust font size for smaller screens */
+    }
+}
+
+@media (max-width: 600px) {
+    #signature-preview {
+        font-size: 12px; /* Further reduce font size for very small screens */
+    }
 }
 
 #copy-button {
