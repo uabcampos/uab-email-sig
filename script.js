@@ -1,13 +1,13 @@
 document.getElementById('name').addEventListener('input', function() {
-    document.getElementById('preview-name').innerText = this.value;
+    updatePreview();
 });
 
 document.getElementById('credentials').addEventListener('input', function() {
-    document.getElementById('preview-credentials').innerText = this.value;
+    updatePreview();
 });
 
 document.getElementById('title').addEventListener('input', function() {
-    document.getElementById('preview-title').innerText = this.value;
+    updatePreview();
 });
 
 document.getElementById('room').addEventListener('input', function() {
@@ -33,3 +33,21 @@ document.getElementById('phone').addEventListener('input', function() {
 document.getElementById('email').addEventListener('input', function() {
     document.getElementById('preview-email').innerText = this.value;
 });
+
+function updatePreview() {
+    const name = document.getElementById('name').value;
+    const credentials = document.getElementById('credentials').value;
+    const title = document.getElementById('title').value;
+
+    document.getElementById('preview-name').innerText = name;
+    document.getElementById('preview-credentials').innerText = credentials;
+    document.getElementById('preview-title').innerText = title;
+
+    if (name && credentials) {
+        document.getElementById('preview-name').innerText = name + ', ' + credentials;
+    } else if (name) {
+        document.getElementById('preview-name').innerText = name;
+    } else if (credentials) {
+        document.getElementById('preview-name').innerText = credentials;
+    }
+}
