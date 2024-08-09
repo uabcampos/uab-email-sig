@@ -3,7 +3,7 @@ function validateField(field) {
     clearError(field);
 
     // Check if the field is required and is empty
-    if (field.hasAttribute('required') && !field.value) {
+    if (field.hasAttribute('required') && !field.value.trim()) {
         displayError(field, 'This field is required.');
         return;
     }
@@ -52,5 +52,6 @@ function displayError(field, message) {
 
 function clearError(field) {
     const errorElement = document.getElementById(`${field.id}-error`);
+    errorElement.innerText = '';
     errorElement.style.display = 'none';
 }
