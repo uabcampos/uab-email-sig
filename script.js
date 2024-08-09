@@ -88,8 +88,8 @@ function updatePreview() {
         `;
     }
 
-    // Inject the cleaned-up HTML into the preview
-    document.getElementById('signature-preview').innerHTML = cleanUpHtml(previewContent);
+    // Inject the constructed HTML directly into the preview
+    document.getElementById('signature-preview').innerHTML = previewContent;
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
@@ -118,12 +118,6 @@ function formatPhoneNumber(phoneNumber) {
         return `${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)}`;
     }
     return phoneNumber;
-}
-
-function cleanUpHtml(htmlContent) {
-    // Ensure that only intended line breaks are preserved
-    htmlContent = htmlContent.replace(/(<br>\s*){2,}/g, '<br><br>');
-    return htmlContent.trim();
 }
 
 function validateField(field) {
