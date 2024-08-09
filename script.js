@@ -40,31 +40,6 @@ function validateAllRequiredFields() {
     });
 }
 
-function validateField(field) {
-    // Clear any previous error messages
-    clearError(field);
-
-    // Check if the field is required and is empty
-    if (field.hasAttribute('required') && !field.value.trim()) {
-        displayError(field, 'This field is required.');
-        return;
-    }
-
-    switch (field.id) {
-        case 'city-state':
-            validateCityState(field);
-            break;
-        case 'zip':
-            validateZipCode(field);
-            break;
-        case 'email':
-            validateEmail(field);
-            break;
-        default:
-            break;
-    }
-}
-
 function selectVersion(version) {
     currentVersion = version;
     const standardButton = document.getElementById('btn-standard');
@@ -105,7 +80,7 @@ function updatePreview() {
 
     if (currentVersion === 'standard') {
         previewContent = `
-            <strong>${name}${credentials} | ${title}</strong><br>
+            <strong style="color: #002c17;">${name}${credentials} | ${title}</strong><br>
             Department of Medicine | Heersink School of Medicine<br>
             Division of Preventive Medicine<br>
             UAB | The University of Alabama at Birmingham<br>
@@ -115,7 +90,7 @@ function updatePreview() {
         `;
     } else {
         previewContent = `
-            <strong>${name}${credentials} | ${title}</strong><br>
+            <strong style="color: #002c17;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br><br>
             <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
@@ -181,7 +156,7 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.4';
+    versionElement.innerText = 'Version 1.4.5';
 }
 
 addEventListeners();
