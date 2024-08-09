@@ -161,26 +161,27 @@ function validateField(field, errorElementId) {
 }
 
 function copyToClipboard() {
-    const signature = document.getElementById('signature-preview').innerHTML;
-    const tempElement = document.createElement('div');
-    tempElement.innerHTML = signature;
-    document.body.appendChild(tempElement);
-    
+    const signature = document.getElementById('signature-preview');
     const range = document.createRange();
-    range.selectNodeContents(tempElement);
-    
+    range.selectNodeContents(signature);
+
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
-    
-    document.execCommand('copy');
-    document.body.removeChild(tempElement);
-    
-    const copySuccess = document.getElementById('copy-success');
-    copySuccess.innerText = 'Signature copied to clipboard!';
-    copySuccess.style.display = 'block';
 
-    setTimeout(() => {
-        copySuccess.style.display = 'none';
-    }, 3000);
+    try {
+        document.execCommand('copy');
+        const copySuccess = document.getElementById('copy-success');
+        copySuccess.innerText = 'Signature copied to clipboard!';
+        copySuccess.style.display = 'block';
+
+        setTimeout(() => {
+            copySuccess.style.display = 'none';
+        }, 3000);
+    } catch (err) {
+        console.error('Failed to copy signature: ', err);
+    }
+
+    // Clear the selection after copying
+    selection.removeAllRanges();
 }
