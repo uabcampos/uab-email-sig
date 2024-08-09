@@ -1,133 +1,72 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
-    color: #333;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOPM Email Signature Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>DOPM Email Signature Generator</h1>
 
-.container {
-    max-width: 1200px; 
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+        <div class="row">
+            <div class="column">
+                <!-- Form elements go here -->
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="John Doe" required>
 
-h1 {
-    font-size: 24px;
-    color: #002c17;
-    text-align: center;
-    margin-bottom: 20px;
-}
+                <label for="credentials">Credentials:</label>
+                <input type="text" id="credentials" placeholder="Ph.D., MPH">
 
-.version-selection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
+                <label for="title">Role/Title:</label>
+                <input type="text" id="title" placeholder="Program Director II" required>
 
-.column {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
+                <label for="room">Room:</label>
+                <input type="text" id="room" placeholder="MT634" required>
 
-.column-left, .column-right {
-    width: 48%;
-}
+                <label for="street">Street Address:</label>
+                <input type="text" id="street" placeholder="1717 11th Avenue South" required>
 
-label {
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: bold;
-}
+                <label for="city-state">City, State:</label>
+                <input type="text" id="city-state" placeholder="Birmingham, AL" required>
+                <span id="city-state-error" class="error"></span>
 
-input[type="text"],
-input[type="email"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
+                <label for="zip">Zip Code:</label>
+                <input type="text" id="zip" placeholder="35294-4410" required>
+                <span id="zip-error" class="error"></span>
 
-input[type="checkbox"] {
-    margin-right: 5px;
-}
+                <label for="phone-office">Office Phone:</label>
+                <input type="text" id="phone-office" placeholder="205.975.1234">
+                <input type="checkbox" id="phone-office-enable"> Enable
 
-.version-button {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin: 0 10px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+                <label for="phone-mobile">Mobile Phone:</label>
+                <input type="text" id="phone-mobile" placeholder="205.123.4567">
+                <input type="checkbox" id="phone-mobile-enable"> Enable
 
-.version-button.active {
-    background-color: #002c17;
-    color: white;
-    border: none;
-}
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" placeholder="johndoe@uabmc.edu" required>
+                <span id="email-error" class="error"></span>
 
-.error-message {
-    color: red;
-    font-size: 12px;
-    display: none;
-}
+                <label for="pronouns">Preferred Pronouns:</label>
+                <input type="text" id="pronouns" placeholder="He/Him">
+            </div>
+            <div class="column">
+                <div id="signature-preview" class="signature-preview">
+                    <!-- Signature preview will be injected here -->
+                </div>
+                <button id="copy-button" class="copy-button">Copy to Clipboard</button>
+                <div id="copy-success" class="copy-success"></div>
+            </div>
+        </div>
+    </div>
 
-#signature-preview {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 20px;
-    font-family: Arial, sans-serif;
-    white-space: pre-line;
-    height: 300px;
-    overflow-y: auto;
-}
+    <footer class="footer">
+        <p id="version-number">Version 1.4.1</p>
+        <p>This email signature generator is unofficial and not endorsed by the University of Alabama at Birmingham. It is based on the latest guidance from UAB and has been specifically tailored for the Division of Preventive Medicine. For more information, visit the UAB branding toolkit.</p>
+    </footer>
 
-#copy-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #002c17;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
-}
-
-#copy-button:hover {
-    background-color: #004d2b;
-}
-
-#copy-success {
-    color: green;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
-}
-
-.footer {
-    margin-top: 30px;
-    font-size: 12px;
-    color: #555;
-    text-align: center;
-}
-
-.footer a {
-    color: #002c17;
-    text-decoration: none;
-}
-
-.footer a:hover {
-    text-decoration: underline;
-}
+    <script src="validation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
