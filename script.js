@@ -69,21 +69,21 @@ function updatePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${fullAddress}<br>
             ${contactInfo}<br>
-            ${pronouns}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            ${pronouns}<br><br>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
             <strong>${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}<br>
-            ${pronouns}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            ${pronouns}<br><br>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
 
     // Inject the cleaned-up HTML into the preview
-    document.getElementById('signature-preview').innerHTML = previewContent.trim();
+    document.getElementById('signature-preview').innerHTML = cleanUpHtml(previewContent);
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
@@ -115,9 +115,8 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function cleanUpHtml(htmlContent) {
-    // Keep the clean up process less aggressive to preserve spacing
-    // Only collapse multiple <br> tags into one
-    htmlContent = htmlContent.replace(/(<br>\s*){2,}/g, '<br><br>');
+    // Replace multiple <br> tags with a single one, but preserve intentional double <br> for spacing
+    htmlContent = htmlContent.replace(/(<br>\s*){3,}/g, '<br><br>');
     return htmlContent.trim();
 }
 
