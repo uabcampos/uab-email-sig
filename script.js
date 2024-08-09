@@ -70,7 +70,7 @@ function updatePreview() {
             ${fullAddress}<br>
             ${contactInfo}<br>
             ${pronouns}<br>
-            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
@@ -78,7 +78,7 @@ function updatePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}<br>
             ${pronouns}<br>
-            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
 
