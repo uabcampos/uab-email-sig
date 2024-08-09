@@ -18,32 +18,40 @@
             <div id="standard-fields">
                 <label for="name">Name:</label>
                 <input type="text" id="name" placeholder="Chris Campos" required>
+                <span id="name-error" class="error-message"></span>
                 
                 <label for="credentials">Credentials:</label>
                 <input type="text" id="credentials" placeholder="PhD, MPH">
 
                 <label for="title">Role/Title:</label>
                 <input type="text" id="title" placeholder="Communications Specialist" required>
+                <span id="title-error" class="error-message"></span>
 
                 <label for="room">Room:</label>
                 <input type="text" id="room" placeholder="MT 509H" required>
+                <span id="room-error" class="error-message"></span>
 
                 <label for="street">Street Address:</label>
                 <input type="text" id="street" placeholder="1717 11th Avenue South" required>
+                <span id="street-error" class="error-message"></span>
 
                 <label for="city-state">City, State:</label>
                 <input type="text" id="city-state" placeholder="Birmingham, AL" required>
+                <span id="city-state-error" class="error-message"></span>
 
                 <label for="zip">Zip Code:</label>
                 <input type="text" id="zip" placeholder="35294-4410" required>
+                <span id="zip-error" class="error-message"></span>
             </div>
 
             <div id="abbreviated-fields" style="display: none;">
                 <label for="name">Name:</label>
                 <input type="text" id="abbr-name" placeholder="Chris Campos" required>
+                <span id="abbr-name-error" class="error-message"></span>
                 
                 <label for="title">Role/Title:</label>
                 <input type="text" id="abbr-title" placeholder="Communications Specialist" required>
+                <span id="abbr-title-error" class="error-message"></span>
             </div>
 
             <label for="phone-office">Office Phone Number:</label>
@@ -56,6 +64,7 @@
 
             <label for="email">Email Address:</label>
             <input type="email" id="email" placeholder="ccampos@uabmc.edu" required>
+            <span id="email-error" class="error-message"></span>
 
             <label for="pronouns">Preferred Pronouns:</label>
             <input type="text" id="pronouns" placeholder="They/Them">
@@ -69,7 +78,7 @@
                     Division of Preventive Medicine<br>
                     UAB | The University of Alabama at Birmingham<br>
                     <span id="preview-address">MT 509H | 1717 11th Avenue South | Birmingham, AL 35294-4410</span><br>
-                    <span id="preview-phone"></span> <span id="preview-email-wrapper">| <a href="mailto:ccampos@uabmc.edu" id="preview-email">ccampos@uabmc.edu</a></span><br>
+                    <span id="preview-phone"></span><br>
                     <span id="preview-pronouns"></span><br>
                     <br>
                     <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
@@ -78,15 +87,18 @@
                     <strong><span id="preview-abbr-name">Chris Campos</span> | <span id="preview-abbr-title">Communications Specialist</span></strong><br>
                     UAB | The University of Alabama at Birmingham<br>
                     <span id="preview-abbr-phone"></span><br>
+                    <span id="preview-abbr-pronouns"></span><br>
                     <br>
                     <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
                 </p>
             </div>
+            <button id="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <span id="copy-success" class="copy-message"></span>
         </div>
     </div>
     <footer>
         <div class="footer-box">
-            <p>This email signature generator is unofficial and not endorsed by the University of Alabama at Birmingham. It is based on the latest guidance from UAB and has been specifically tailored for the Division of Preventive Medicine. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
+            <p>This email signature generator is unofficial and not endorsed by the University of Alabama at Birmingham. It is based on the latest guidance from UAB for the Division of Preventive Medicine. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
         </div>
     </footer>
     <script src="script.js"></script>
