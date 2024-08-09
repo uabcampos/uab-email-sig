@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addEventListeners();
     validateAllRequiredFields(); // Validate all required fields on page load
     selectVersion('standard'); // Default to the standard version on load
+    displayVersion(); // Display the version number in the footer
 });
 
 function addEventListeners() {
@@ -146,6 +147,11 @@ function copyToClipboard() {
     }
 
     selection.removeAllRanges();
+}
+
+function displayVersion() {
+    const versionElement = document.getElementById('version-number');
+    versionElement.innerText = 'Version 1.4.1';
 }
 
 addEventListeners();
