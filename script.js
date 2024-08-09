@@ -43,12 +43,17 @@ document.getElementById('phone-mobile-enable').addEventListener('change', functi
 });
 
 document.getElementById('email').addEventListener('input', function() {
-    document.getElementById('preview-email').innerText = this.value;
-    document.getElementById('preview-email').href = 'mailto:' + this.value;
+    updatePhone();
 });
 
 document.getElementById('pronouns').addEventListener('input', function() {
-    document.getElementById('preview-pronouns').innerText = this.value ? 'Pronouns: ' + this.value : '';
+    updatePronouns();
+});
+
+document.getElementsByName('version').forEach((elem) => {
+    elem.addEventListener('change', function() {
+        toggleVersion();
+    });
 });
 
 function updatePreview() {
@@ -59,6 +64,9 @@ function updatePreview() {
     document.getElementById('preview-name').innerText = name;
     document.getElementById('preview-credentials').innerText = credentials ? ', ' + credentials : '';
     document.getElementById('preview-title').innerText = title;
+
+    document.getElementById('preview-abbr-name').innerText = name;
+    document.getElementById('preview-abbr-title').innerText = title;
 }
 
 function updateAddress() {
@@ -77,11 +85,14 @@ function updatePhone() {
 
     const phoneOffice = document.getElementById('phone-office').value;
     const phoneMobile = document.getElementById('phone-mobile').value;
+    const email = document.getElementById('email').value;
 
     let phoneText = '';
+    let phoneAbbrText = '';
 
     if (phoneOfficeEnabled && phoneOffice) {
         phoneText = `O: ${phoneOffice}`;
+        phoneAbbrText = `O: ${phoneOffice}`;
     }
 
     if (phoneMobileEnabled && phoneMobile) {
@@ -90,7 +101,38 @@ function updatePhone() {
         } else {
             phoneText = `M: ${phoneMobile}`;
         }
+
+        if (phoneAbbrText) {
+            phoneAbbrText += `, M: ${phoneMobile}`;
+       
+
+ } else {
+            phoneAbbrText = `M: ${phoneMobile}`;
+        }
     }
 
     document.getElementById('preview-phone').innerText = phoneText;
+    document.getElementById('preview-abbr-phone').innerText = phoneAbbrText;
+
+    if (phoneText || phoneAbbrText) {
+        document.getElementById('preview-email-wrapper').innerText = `| ${email}`;
+    } else {
+        document.getElementById('preview-email-wrapper').innerText = email;
+    }
+}
+
+function updatePronouns() {
+    const pronouns = document.getElementById('pronouns').value;
+    document.getElementById('preview-pronouns').innerText = pronouns ? `Pronouns: ${pronouns}` : '';
+}
+
+function toggleVersion() {
+    const standardVersion = document.getElementById('standard-version').checked;
+    const abbreviatedVersion = document.getElementById('abbreviated-version').checked;
+
+    document.getElementById('standard-fields').style.display = standardVersion ? 'block' : 'none';
+    document.getElementById('abbreviated-fields').style.display = abbreviatedVersion ? 'block' : 'none';
+
+    document.getElementById('preview-standard').style.display = standardVersion ? 'block' : 'none';
+    document.getElementById('preview-abbreviated').style.display = abbreviatedVersion ? 'block' : 'none';
 }
