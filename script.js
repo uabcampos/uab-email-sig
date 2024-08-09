@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize preview and validation on page load
     updatePreview();
     validateForm();
 });
@@ -127,7 +126,6 @@ function validateField(field, errorElementId) {
 }
 
 function validateForm() {
-    // Trigger validation for all fields
     const requiredFields = document.querySelectorAll('[required]');
     requiredFields.forEach(field => {
         validateField(field, `${field.id}-error`);
@@ -189,7 +187,6 @@ function copyToClipboard() {
         console.error('Failed to copy signature: ', err);
     }
 
-    // Clear the selection after copying
     selection.removeAllRanges();
 }
 
