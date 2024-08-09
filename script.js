@@ -73,6 +73,7 @@ function selectVersion(version) {
         document.getElementById('abbreviated-fields').style.display = 'none';
         document.getElementById('preview-standard').style.display = 'block';
         document.getElementById('preview-abbreviated').style.display = 'none';
+        updatePreview(); // Update preview for the standard version
     } else if (version === 'abbreviated') {
         document.getElementById('btn-abbreviated').classList.add('selected');
         document.getElementById('btn-standard').classList.remove('selected');
@@ -80,6 +81,7 @@ function selectVersion(version) {
         document.getElementById('abbreviated-fields').style.display = 'block';
         document.getElementById('preview-standard').style.display = 'none';
         document.getElementById('preview-abbreviated').style.display = 'block';
+        updateAbbreviatedPreview(); // Update preview for the abbreviated version
     }
 }
 
@@ -104,6 +106,27 @@ function updatePreview() {
     previewContent += `<br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>`;
 
     document.getElementById('signature-preview').innerHTML = previewContent;
+
+    cleanUpPreview();
+}
+
+function updateAbbreviatedPreview() {
+    const name = document.getElementById('name').value || 'John Doe';
+    const credentials = document.getElementById('credentials').value || 'Ph.D., MPH';
+    const title = document.getElementById('title').value || 'Program Director II';
+
+    const phoneContent = document.getElementById('preview-abbr-phone').innerHTML.trim();
+    const pronounsContent = document.getElementById('preview-abbr-pronouns').innerHTML.trim();
+
+    let previewContent = `<strong>${name}${credentials ? ', ' + credentials : ''} | ${title}</strong><br>`;
+
+    if (phoneContent || pronounsContent) {
+        previewContent += `${phoneContent}<br>${pronounsContent}<br>`;
+    }
+
+    previewContent += `<a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>`;
+
+    document.getElementById('preview-abbreviated').innerHTML = previewContent;
 
     cleanUpPreview();
 }
