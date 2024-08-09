@@ -50,16 +50,28 @@ document.getElementById('pronouns').addEventListener('input', function() {
     updatePronouns();
 });
 
-document.getElementsByName('version').forEach((elem) => {
-    elem.addEventListener('change', function() {
-        toggleVersion();
-    });
-});
+function selectVersion(version) {
+    if (version === 'standard') {
+        document.getElementById('btn-standard').classList.add('selected');
+        document.getElementById('btn-abbreviated').classList.remove('selected');
+        document.getElementById('standard-fields').style.display = 'block';
+        document.getElementById('abbreviated-fields').style.display = 'none';
+        document.getElementById('preview-standard').style.display = 'block';
+        document.getElementById('preview-abbreviated').style.display = 'none';
+    } else if (version === 'abbreviated') {
+        document.getElementById('btn-abbreviated').classList.add('selected');
+        document.getElementById('btn-standard').classList.remove('selected');
+        document.getElementById('standard-fields').style.display = 'none';
+        document.getElementById('abbreviated-fields').style.display = 'block';
+        document.getElementById('preview-standard').style.display = 'none';
+        document.getElementById('preview-abbreviated').style.display = 'block';
+    }
+}
 
 function updatePreview() {
-    const name = document.getElementById('name').value;
+    const name = document.getElementById('name').value || document.getElementById('abbr-name').value;
     const credentials = document.getElementById('credentials').value;
-    const title = document.getElementById('title').value;
+    const title = document.getElementById('title').value || document.getElementById('abbr-title').value;
 
     document.getElementById('preview-name').innerText = name;
     document.getElementById('preview-credentials').innerText = credentials ? ', ' + credentials : '';
@@ -104,9 +116,7 @@ function updatePhone() {
 
         if (phoneAbbrText) {
             phoneAbbrText += `, M: ${phoneMobile}`;
-       
-
- } else {
+        } else {
             phoneAbbrText = `M: ${phoneMobile}`;
         }
     }
@@ -124,15 +134,4 @@ function updatePhone() {
 function updatePronouns() {
     const pronouns = document.getElementById('pronouns').value;
     document.getElementById('preview-pronouns').innerText = pronouns ? `Pronouns: ${pronouns}` : '';
-}
-
-function toggleVersion() {
-    const standardVersion = document.getElementById('standard-version').checked;
-    const abbreviatedVersion = document.getElementById('abbreviated-version').checked;
-
-    document.getElementById('standard-fields').style.display = standardVersion ? 'block' : 'none';
-    document.getElementById('abbreviated-fields').style.display = abbreviatedVersion ? 'block' : 'none';
-
-    document.getElementById('preview-standard').style.display = standardVersion ? 'block' : 'none';
-    document.getElementById('preview-abbreviated').style.display = abbreviatedVersion ? 'block' : 'none';
 }
