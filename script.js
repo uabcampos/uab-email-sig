@@ -76,9 +76,9 @@ function selectVersion(version) {
 }
 
 function updatePreview() {
-    const name = document.getElementById('name').value || document.getElementById('abbr-name').value;
-    const credentials = document.getElementById('credentials').value;
-    const title = document.getElementById('title').value || document.getElementById('abbr-title').value;
+    const name = document.getElementById('name').value || 'John Doe';
+    const credentials = document.getElementById('credentials').value || 'Ph.D., MPH';
+    const title = document.getElementById('title').value || 'Program Director II';
 
     document.getElementById('preview-name').innerText = name;
     document.getElementById('preview-credentials').innerText = credentials ? ', ' + credentials : '';
@@ -89,10 +89,10 @@ function updatePreview() {
 }
 
 function updateAddress() {
-    const room = document.getElementById('room').value;
-    const street = document.getElementById('street').value;
-    const cityState = document.getElementById('city-state').value;
-    const zip = document.getElementById('zip').value;
+    const room = document.getElementById('room').value || 'MT634';
+    const street = document.getElementById('street').value || '1717 11th Avenue South';
+    const cityState = document.getElementById('city-state').value || 'Birmingham, AL';
+    const zip = document.getElementById('zip').value || '35294-4410';
 
     const fullAddress = `${room} | ${street} | ${cityState} ${zip}`;
     document.getElementById('preview-address').innerText = fullAddress;
@@ -104,7 +104,7 @@ function updatePhone() {
 
     const phoneOffice = document.getElementById('phone-office').value;
     const phoneMobile = document.getElementById('phone-mobile').value;
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value || 'johndoe@uabmc.edu';
 
     let phoneText = '';
     let phoneAbbrText = '';
