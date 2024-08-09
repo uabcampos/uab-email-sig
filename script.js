@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    updatePreview();
     addEventListeners();
+    selectVersion('standard'); // Default to the standard version on load
 });
 
 function addEventListeners() {
@@ -21,31 +21,22 @@ function addEventListeners() {
     document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 }
 
+let currentVersion = 'standard';
+
 function selectVersion(version) {
+    currentVersion = version;
     const standardButton = document.getElementById('btn-standard');
     const abbreviatedButton = document.getElementById('btn-abbreviated');
-    const standardFields = document.getElementById('standard-fields');
-    const abbreviatedFields = document.getElementById('abbreviated-fields');
-    const standardPreview = document.getElementById('preview-standard');
-    const abbreviatedPreview = document.getElementById('preview-abbreviated');
 
     if (version === 'standard') {
         standardButton.classList.add('active');
         abbreviatedButton.classList.remove('active');
-        standardFields.style.display = 'block';
-        abbreviatedFields.style.display = 'none';
-        standardPreview.style.display = 'block';
-        abbreviatedPreview.style.display = 'none';
     } else {
         abbreviatedButton.classList.add('active');
         standardButton.classList.remove('active');
-        standardFields.style.display = 'none';
-        abbreviatedFields.style.display = 'block';
-        standardPreview.style.display = 'none';
-        abbreviatedPreview.style.display = 'block';
     }
 
-    updatePreview();
+    updatePreview(); // Update the preview immediately after selecting the version
 }
 
 function updatePreview() {
@@ -68,27 +59,29 @@ function updatePreview() {
 
     const contactInfo = generateContactInfo(phoneOffice, phoneMobile, email);
 
-    const standardPreviewContent = `
-        <strong>${name}${credentials} | ${title}</strong><br>
-        Department of Medicine | Heersink School of Medicine<br>
-        Division of Preventive Medicine<br>
-        UAB | The University of Alabama at Birmingham<br>
-        <span id="preview-address">${fullAddress}</span><br>
-        ${contactInfo}<br>
-        ${pronouns}<br>
-        <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
-    `.trim();
+    let previewContent;
 
-    const abbreviatedPreviewContent = `
-        <strong>${name}${credentials} | ${title}</strong><br>
-        ${contactInfo}<br>
-        ${pronouns}<br>
-        <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
-    `.trim();
+    if (currentVersion === 'standard') {
+        previewContent = `
+            <strong>${name}${credentials} | ${title}</strong><br>
+            Department of Medicine | Heersink School of Medicine<br>
+            Division of Preventive Medicine<br>
+            UAB | The University of Alabama at Birmingham<br>
+            ${fullAddress}<br>
+            ${contactInfo}<br>
+            ${pronouns}<br>
+            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+        `;
+    } else {
+        previewContent = `
+            <strong>${name}${credentials} | ${title}</strong><br>
+            ${contactInfo}<br>
+            ${pronouns}<br>
+            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+        `;
+    }
 
-    document.getElementById('signature-preview').innerHTML = cleanUpHtml(
-        standardPreviewContent
-    );
+    document.getElementById('signature-preview').innerHTML = cleanUpHtml(previewContent);
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
