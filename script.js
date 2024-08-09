@@ -15,11 +15,11 @@ function addEventListeners() {
     elements.forEach(id => {
         const element = document.getElementById(id);
         element.addEventListener('input', () => {
+            validateField(element);
             updatePreview();
         });
     });
 
-    // Trigger a live update on checkbox changes and typing for phone numbers
     document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
     document.getElementById('phone-office').addEventListener('input', updatePreview);
 
@@ -38,6 +38,31 @@ function validateAllRequiredFields() {
     requiredFields.forEach(field => {
         validateField(field);
     });
+}
+
+function validateField(field) {
+    // Clear any previous error messages
+    clearError(field);
+
+    // Check if the field is required and is empty
+    if (field.hasAttribute('required') && !field.value.trim()) {
+        displayError(field, 'This field is required.');
+        return;
+    }
+
+    switch (field.id) {
+        case 'city-state':
+            validateCityState(field);
+            break;
+        case 'zip':
+            validateZipCode(field);
+            break;
+        case 'email':
+            validateEmail(field);
+            break;
+        default:
+            break;
+    }
 }
 
 function selectVersion(version) {
@@ -156,7 +181,7 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.3';
+    versionElement.innerText = 'Version 1.4.4';
 }
 
 addEventListeners();
