@@ -40,21 +40,21 @@ function selectVersion(version) {
 }
 
 function updatePreview() {
-    const name = document.getElementById('name').value || 'John Doe';
-    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : '';
-    const title = document.getElementById('title').value || 'Program Director II';
-    const room = document.getElementById('room').value || 'MT634';
-    const street = document.getElementById('street').value || '1717 11th Avenue South';
-    const cityState = document.getElementById('city-state').value || 'Birmingham, AL';
-    const zip = document.getElementById('zip').value || '35294-4410';
+    const name = document.getElementById('name').value || document.getElementById('name').placeholder;
+    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : document.getElementById('credentials').placeholder ? `, ${document.getElementById('credentials').placeholder}` : '';
+    const title = document.getElementById('title').value || document.getElementById('title').placeholder;
+    const room = document.getElementById('room').value || document.getElementById('room').placeholder;
+    const street = document.getElementById('street').value || document.getElementById('street').placeholder;
+    const cityState = document.getElementById('city-state').value || document.getElementById('city-state').placeholder;
+    const zip = document.getElementById('zip').value || document.getElementById('zip').placeholder;
     const fullAddress = `${room} | ${street} | ${cityState} ${zip}`;
 
     const phoneOfficeEnabled = document.getElementById('phone-office-enable').checked;
     const phoneMobileEnabled = document.getElementById('phone-mobile-enable').checked;
 
-    const phoneOffice = phoneOfficeEnabled ? formatPhoneNumber(document.getElementById('phone-office').value) : '';
-    const phoneMobile = phoneMobileEnabled ? formatPhoneNumber(document.getElementById('phone-mobile').value) : '';
-    const email = document.getElementById('email').value || 'johndoe@uabmc.edu';
+    const phoneOffice = phoneOfficeEnabled ? formatPhoneNumber(document.getElementById('phone-office').value || document.getElementById('phone-office').placeholder) : '';
+    const phoneMobile = phoneMobileEnabled ? formatPhoneNumber(document.getElementById('phone-mobile').value || document.getElementById('phone-mobile').placeholder) : '';
+    const email = document.getElementById('email').value || document.getElementById('email').placeholder;
     const pronouns = document.getElementById('pronouns').value ? `Pronouns: ${document.getElementById('pronouns').value}` : '';
 
     const contactInfo = generateContactInfo(phoneOffice, phoneMobile, email);
@@ -75,6 +75,7 @@ function updatePreview() {
     } else {
         previewContent = `
             <strong>${name}${credentials} | ${title}</strong><br>
+            UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}<br>
             ${pronouns}<br>
             <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
