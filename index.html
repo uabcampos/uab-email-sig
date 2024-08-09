@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Signature Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-column">
+            <h2>Email Signature Generator</h2>
+            <form id="signature-form">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="Chris Campos">
+                
+                <label for="title">Role/Title:</label>
+                <input type="text" id="title" placeholder="Communications Specialist">
+
+                <label for="location">Room/Location:</label>
+                <input type="text" id="location" placeholder="MT 509H | 1717 11th Avenue South">
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" placeholder="205-975-7908">
+
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" placeholder="ccampos@uabmc.edu">
+            </form>
+        </div>
+        <div class="preview-column">
+            <h2>Signature Preview</h2>
+            <div id="signature-preview">
+                <p><strong><span id="preview-name">Chris Campos</span></strong><br>
+                <span id="preview-title">Communications Specialist</span><br>
+                Department of Medicine | Heersink School of Medicine<br>
+                Division of Preventive Medicine<br>
+                UAB | The University of Alabama at Birmingham<br>
+                <span id="preview-location">MT 509H | 1717 11th Avenue South</span><br>
+                Birmingham, AL 35294-4410<br>
+                <span id="preview-phone">205-975-7908</span> | <span id="preview-email">ccampos@uabmc.edu</span><br>
+                <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
