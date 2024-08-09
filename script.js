@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     addEventListeners();
+    validateAllRequiredFields(); // Validate all required fields on page load
     selectVersion('standard'); // Default to the standard version on load
 });
 
@@ -25,6 +26,13 @@ function addEventListeners() {
 }
 
 let currentVersion = 'standard';
+
+function validateAllRequiredFields() {
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        validateField(field);
+    });
+}
 
 function selectVersion(version) {
     currentVersion = version;
