@@ -1,3 +1,9 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize validation and preview on page load
+    updatePreview();
+    validateForm();
+});
+
 document.getElementById('name').addEventListener('input', function() {
     validateField(this, 'name-error');
     updatePreview();
@@ -23,16 +29,17 @@ document.getElementById('street').addEventListener('input', function() {
 });
 
 document.getElementById('city-state').addEventListener('input', function() {
-    validateField(this, 'city-state-error');
+    validateCityState(this);
     updateAddress();
 });
 
 document.getElementById('zip').addEventListener('input', function() {
-    validateField(this, 'zip-error');
+    validateZipCode(this);
     updateAddress();
 });
 
 document.getElementById('phone-office').addEventListener('input', function() {
+    validatePhoneNumber(this);
     updatePhone();
 });
 
@@ -41,6 +48,7 @@ document.getElementById('phone-office-enable').addEventListener('change', functi
 });
 
 document.getElementById('phone-mobile').addEventListener('input', function() {
+    validatePhoneNumber(this);
     updatePhone();
 });
 
@@ -49,7 +57,7 @@ document.getElementById('phone-mobile-enable').addEventListener('change', functi
 });
 
 document.getElementById('email').addEventListener('input', function() {
-    validateField(this, 'email-error');
+    validateEmail(this);
     updatePhone();
 });
 
@@ -93,7 +101,7 @@ function updatePreview() {
         previewContent += `<br>${phoneContent}<br>${pronounsContent}`;
     }
 
-    previewContent += `<br><br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>`;
+    previewContent += `<br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>`;
 
     document.getElementById('signature-preview').innerHTML = previewContent;
 
@@ -116,9 +124,12 @@ function updatePhone() {
     const phoneOfficeEnabled = document.getElementById('phone-office-enable').checked;
     const phoneMobileEnabled = document.getElementById('phone-mobile-enable').checked;
 
-    const phoneOffice = document.getElementById('phone-office').value;
-    const phoneMobile = document.getElementById('phone-mobile').value;
+    let phoneOffice = document.getElementById('phone-office').value;
+    let phoneMobile = document.getElementById('phone-mobile').value;
     const email = document.getElementById('email').value || 'johndoe@uabmc.edu';
+
+    phoneOffice = formatPhoneNumber(phoneOffice);
+    phoneMobile = formatPhoneNumber(phoneMobile);
 
     let phoneText = '';
     let phoneAbbrText = '';
@@ -172,6 +183,68 @@ function validateField(field, errorElementId) {
     const errorMessage = document.getElementById(errorElementId);
     if (field.validity.valueMissing) {
         errorMessage.innerText = 'This field is required.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
+}
+
+function validateForm() {
+    // Trigger validation for all fields
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        validateField(field, `${field.id}-error`);
+    });
+}
+
+function validateCityState(field) {
+    const errorMessage = document.getElementById('city-state-error');
+    const cityStateRegex = /^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*,\s*[A-Z]{2}$/;
+    if (!cityStateRegex.test(field.value)) {
+        errorMessage.innerText = 'Enter a valid City, ST format.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
+}
+
+function validateZipCode(field) {
+    const errorMessage = document.getElementById('zip-error');
+    const zipCodeRegex = /^\d{5}(?:-\d{4})?$/;
+    if (!zipCodeRegex.test(field.value)) {
+        errorMessage.innerText = 'Enter a valid ZIP code.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
+}
+
+function validatePhoneNumber(field) {
+    let phoneNumber = field.value.replace(/\D/g, '');
+    if (phoneNumber.length === 7) {
+        phoneNumber = '205' + phoneNumber;
+    }
+    if (phoneNumber.length === 10) {
+        field.value = formatPhoneNumber(phoneNumber);
+    }
+}
+
+function formatPhoneNumber(phoneNumber) {
+    if (!phoneNumber) return '';
+    phoneNumber = phoneNumber.replace(/\D/g, '');
+    if (phoneNumber.length === 10) {
+        return `${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)}`;
+    }
+    return phoneNumber;
+}
+
+function validateEmail(field) {
+    const errorMessage = document.getElementBy
+
+Id('email-error');
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(uab\.edu|uabmc\.edu)$/;
+    if (!emailRegex.test(field.value)) {
+        errorMessage.innerText = 'Enter a valid UAB or UABMC email address.';
         errorMessage.style.display = 'block';
     } else {
         errorMessage.style.display = 'none';
