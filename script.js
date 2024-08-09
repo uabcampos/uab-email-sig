@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     updatePreview();
-    validateForm();
     addEventListeners();
 });
 
@@ -19,7 +18,7 @@ function addEventListeners() {
     document.getElementById('phone-mobile-enable').addEventListener('change', updatePreview);
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
-    document.getElementById('copy-button').addEventListener('click', copyToClipboard);  // Added event listener for copy to clipboard button
+    document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 }
 
 function selectVersion(version) {
@@ -87,8 +86,9 @@ function updatePreview() {
         <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
     `.trim();
 
-    document.getElementById('preview-standard').innerHTML = cleanUpHtml(standardPreviewContent);
-    document.getElementById('preview-abbreviated').innerHTML = cleanUpHtml(abbreviatedPreviewContent);
+    document.getElementById('signature-preview').innerHTML = cleanUpHtml(
+        standardPreviewContent
+    );
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
