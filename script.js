@@ -155,7 +155,7 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.1';
+    versionElement.innerText = 'Version 1.4.2';
 }
 
 addEventListeners();
