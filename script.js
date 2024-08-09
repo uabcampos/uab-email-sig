@@ -82,7 +82,8 @@ function updatePreview() {
         `;
     }
 
-    document.getElementById('signature-preview').innerHTML = cleanUpHtml(previewContent);
+    // Inject the cleaned-up HTML into the preview
+    document.getElementById('signature-preview').innerHTML = previewContent.trim();
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
@@ -114,10 +115,10 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function cleanUpHtml(htmlContent) {
-    // Replace multiple <br> tags or trailing <br> with a single one
-    htmlContent = htmlContent.replace(/(<br>\s*)+/g, '<br>');
-    // Remove any <br> at the start or end of the content
-    return htmlContent.trim().replace(/^<br>|<br>$/g, '');
+    // Keep the clean up process less aggressive to preserve spacing
+    // Only collapse multiple <br> tags into one
+    htmlContent = htmlContent.replace(/(<br>\s*){2,}/g, '<br><br>');
+    return htmlContent.trim();
 }
 
 function validateField(field, errorElementId) {
