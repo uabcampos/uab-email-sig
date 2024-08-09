@@ -95,6 +95,21 @@ input[type="text"], input[type="email"] {
     margin-top: 10px;
 }
 
+/* Add spacing between the preview and the button */
+#copy-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #002c17;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#copy-button:hover {
+    background-color: #00482a;
+}
+
 footer {
     margin-top: 20px;
 }
