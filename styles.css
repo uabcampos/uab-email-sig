@@ -88,7 +88,7 @@ input[type="checkbox"] {
     margin-top: 20px;
     font-family: Arial, sans-serif;
     white-space: pre-line; /* Ensures white spaces and line breaks are treated correctly */
-    line-height: 1.2; /* Adjust line height to reduce spacing */
+    line-height: .9; /* Adjust line height to reduce spacing */
 }
 
 #signature-preview * {
