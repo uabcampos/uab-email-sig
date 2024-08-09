@@ -1,4 +1,5 @@
 document.getElementById('name').addEventListener('input', function() {
+    validateField(this, 'name-error');
     updatePreview();
 });
 
@@ -7,22 +8,27 @@ document.getElementById('credentials').addEventListener('input', function() {
 });
 
 document.getElementById('title').addEventListener('input', function() {
+    validateField(this, 'title-error');
     updatePreview();
 });
 
 document.getElementById('room').addEventListener('input', function() {
+    validateField(this, 'room-error');
     updateAddress();
 });
 
 document.getElementById('street').addEventListener('input', function() {
+    validateField(this, 'street-error');
     updateAddress();
 });
 
 document.getElementById('city-state').addEventListener('input', function() {
+    validateField(this, 'city-state-error');
     updateAddress();
 });
 
 document.getElementById('zip').addEventListener('input', function() {
+    validateField(this, 'zip-error');
     updateAddress();
 });
 
@@ -43,6 +49,7 @@ document.getElementById('phone-mobile-enable').addEventListener('change', functi
 });
 
 document.getElementById('email').addEventListener('input', function() {
+    validateField(this, 'email-error');
     updatePhone();
 });
 
@@ -101,6 +108,7 @@ function updatePhone() {
 
     let phoneText = '';
     let phoneAbbrText = '';
+    let emailText = `<a href="mailto:${email}">${email}</a>`;
 
     if (phoneOfficeEnabled && phoneOffice) {
         phoneText = `O: ${phoneOffice}`;
@@ -121,17 +129,58 @@ function updatePhone() {
         }
     }
 
-    document.getElementById('preview-phone').innerText = phoneText;
-    document.getElementById('preview-abbr-phone').innerText = phoneAbbrText;
-
-    if (phoneText || phoneAbbrText) {
-        document.getElementById('preview-email-wrapper').innerText = `| ${email}`;
+    if (phoneText) {
+        document.getElementById('preview-phone').innerHTML = `${phoneText} | ${emailText}`;
     } else {
-        document.getElementById('preview-email-wrapper').innerText = email;
+        document.getElementById('preview-phone').innerHTML = emailText;
+    }
+
+    if (phoneAbbrText) {
+        document.getElementById('preview-abbr-phone').innerHTML = `${phoneAbbrText} | ${emailText}`;
+    } else {
+        document.getElementById('preview-abbr-phone').innerHTML = emailText;
     }
 }
 
 function updatePronouns() {
     const pronouns = document.getElementById('pronouns').value;
-    document.getElementById('preview-pronouns').innerText = pronouns ? `Pronouns: ${pronouns}` : '';
+    const pronounsText = pronouns ? `Pronouns: ${pronouns}` : '';
+
+    document.getElementById('preview-pronouns').innerText = pronounsText;
+    document.getElementById('preview-abbr-pronouns').innerText = pronounsText;
+}
+
+function validateField(field, errorElementId) {
+    const errorMessage = document.getElementById(errorElementId);
+    if (field.validity.valueMissing) {
+        errorMessage.innerText = 'This field is required.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
+}
+
+function copyToClipboard() {
+    const signature = document.getElementById('signature-preview').innerHTML;
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = signature;
+    document.body.appendChild(tempElement);
+    
+    const range = document.createRange();
+    range.selectNodeContents(tempElement);
+    
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    document.execCommand('copy');
+    document.body.removeChild(tempElement);
+    
+    const copySuccess = document.getElementById('copy-success');
+    copySuccess.innerText = 'Signature copied to clipboard!';
+    copySuccess.style.display = 'block';
+
+    setTimeout(() => {
+        copySuccess.style.display = 'none';
+    }, 3000);
 }
