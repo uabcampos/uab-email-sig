@@ -76,20 +76,20 @@ function updatePreview() {
             Division of Preventive Medicine<br>
             UAB | The University of Alabama at Birmingham<br>
             ${fullAddress}<br>
-            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br><br>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
             <strong>${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
-            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br><br>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
 
     // Inject the cleaned-up HTML into the preview
-    document.getElementById('signature-preview').innerHTML = previewContent.trim();
+    document.getElementById('signature-preview').innerHTML = cleanUpHtml(previewContent);
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
@@ -118,6 +118,12 @@ function formatPhoneNumber(phoneNumber) {
         return `${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)}`;
     }
     return phoneNumber;
+}
+
+function cleanUpHtml(htmlContent) {
+    // Ensure that only intended line breaks are preserved
+    htmlContent = htmlContent.replace(/(<br>\s*){2,}/g, '<br><br>');
+    return htmlContent.trim();
 }
 
 function validateField(field) {
