@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     updatePreview();
     validateForm();
+    addEventListeners();
 });
 
 function addEventListeners() {
@@ -18,20 +19,27 @@ function addEventListeners() {
     document.getElementById('phone-mobile-enable').addEventListener('change', updatePreview);
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
+    document.getElementById('copy-button').addEventListener('click', copyToClipboard);  // Added event listener for copy to clipboard button
 }
 
 function selectVersion(version) {
+    const standardButton = document.getElementById('btn-standard');
+    const abbreviatedButton = document.getElementById('btn-abbreviated');
     const standardFields = document.getElementById('standard-fields');
     const abbreviatedFields = document.getElementById('abbreviated-fields');
     const standardPreview = document.getElementById('preview-standard');
     const abbreviatedPreview = document.getElementById('preview-abbreviated');
 
     if (version === 'standard') {
+        standardButton.classList.add('active');
+        abbreviatedButton.classList.remove('active');
         standardFields.style.display = 'block';
         abbreviatedFields.style.display = 'none';
         standardPreview.style.display = 'block';
         abbreviatedPreview.style.display = 'none';
     } else {
+        abbreviatedButton.classList.add('active');
+        standardButton.classList.remove('active');
         standardFields.style.display = 'none';
         abbreviatedFields.style.display = 'block';
         standardPreview.style.display = 'none';
@@ -130,6 +138,31 @@ function validateForm() {
     requiredFields.forEach(field => {
         validateField(field, `${field.id}-error`);
     });
+}
+
+function copyToClipboard() {
+    const signature = document.getElementById('signature-preview');
+    const range = document.createRange();
+    range.selectNodeContents(signature);
+
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    try {
+        document.execCommand('copy');
+        const copySuccess = document.getElementById('copy-success');
+        copySuccess.innerText = 'Signature copied to clipboard!';
+        copySuccess.style.display = 'block';
+
+        setTimeout(() => {
+            copySuccess.style.display = 'none';
+        }, 3000);
+    } catch (err) {
+        console.error('Failed to copy signature: ', err);
+    }
+
+    selection.removeAllRanges();
 }
 
 addEventListeners();
