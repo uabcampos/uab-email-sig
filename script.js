@@ -88,8 +88,8 @@ function updatePreview() {
         `;
     }
 
-    // Inject the constructed HTML directly into the preview
-    document.getElementById('signature-preview').innerHTML = previewContent;
+    // Inject the HTML into the preview directly, preserving line breaks
+    document.getElementById('signature-preview').innerHTML = previewContent.trim();
 }
 
 function generateContactInfo(phoneOffice, phoneMobile, email) {
