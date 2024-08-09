@@ -6,25 +6,25 @@ body {
 }
 
 .container {
-    max-width: 1200px; /* Increase the max width to fit two columns */
+    max-width: 1200px; 
     margin: 0 auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex; /* Use flexbox for the two-column layout */
-    gap: 20px; /* Space between the form and preview */
+    display: flex; 
+    justify-content: space-between; /* Space between the columns */
 }
 
 .column {
-    flex: 1;
+    width: 48%; /* Adjust the width to ensure two columns fit */
 }
 
 h1 {
     font-size: 24px;
     color: #002c17;
     text-align: center;
-    flex-basis: 100%; /* Full width for the heading */
+    width: 100%; /* Full width for the heading */
 }
 
 h2 {
@@ -40,7 +40,7 @@ label {
 
 input[type="text"],
 input[type="email"] {
-    width: calc(100% - 22px);
+    width: 100%; /* Ensure full width within the column */
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -88,7 +88,8 @@ input[type="checkbox"] {
     margin-top: 20px;
     font-family: Arial, sans-serif;
     white-space: pre-line;
-    flex: 1; /* Allow preview to take up remaining space */
+    height: 300px; /* Set a fixed height */
+    overflow-y: auto; /* Enable scrolling if the content exceeds the height */
 }
 
 #copy-button {
