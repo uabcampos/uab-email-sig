@@ -52,7 +52,7 @@ function selectVersion(version) {
 
 function updatePreview() {
     const name = document.getElementById('name').value || document.getElementById('name').placeholder;
-    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : document.getElementById('credentials').placeholder ? `, ${document.getElementById('credentials').placeholder}` : '';
+    const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : '';
     const title = document.getElementById('title').value || document.getElementById('title').placeholder;
     const room = document.getElementById('room').value || document.getElementById('room').placeholder;
     const street = document.getElementById('street').value || document.getElementById('street').placeholder;
@@ -79,16 +79,14 @@ function updatePreview() {
             Division of Preventive Medicine<br>
             UAB | The University of Alabama at Birmingham<br>
             ${fullAddress}<br>
-            ${contactInfo}<br>
-            ${pronouns}<br>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
             <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
             <strong>${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
-            ${contactInfo}<br>
-            ${pronouns}<br>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
             <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
