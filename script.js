@@ -70,7 +70,7 @@ function updatePreview() {
             ${fullAddress}<br>
             ${contactInfo}<br>
             ${pronouns}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
@@ -78,7 +78,7 @@ function updatePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}<br>
             ${pronouns}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
 
@@ -114,7 +114,10 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function cleanUpHtml(htmlContent) {
-    return htmlContent.replace(/(<br>\s*){2,}/g, '<br>').trim();
+    // Replace multiple <br> tags or trailing <br> with a single one
+    htmlContent = htmlContent.replace(/(<br>\s*)+/g, '<br>');
+    // Remove any <br> at the start or end of the content
+    return htmlContent.trim().replace(/^<br>|<br>$/g, '');
 }
 
 function validateField(field, errorElementId) {
