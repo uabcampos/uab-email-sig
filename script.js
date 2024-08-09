@@ -12,10 +12,7 @@ function addEventListeners() {
     ];
 
     elements.forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            validateField(document.getElementById(id));
-            updatePreview();
-        });
+        document.getElementById(id).addEventListener('input', updatePreview);
     });
 
     document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
