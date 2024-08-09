@@ -11,7 +11,10 @@ function addEventListeners() {
     ];
 
     elements.forEach(id => {
-        document.getElementById(id).addEventListener('input', updatePreview);
+        document.getElementById(id).addEventListener('input', () => {
+            validateField(document.getElementById(id));
+            updatePreview();
+        });
     });
 
     document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
@@ -114,28 +117,20 @@ function formatPhoneNumber(phoneNumber) {
     return phoneNumber;
 }
 
-function cleanUpHtml(htmlContent) {
-    // Keep the clean up process less aggressive to preserve spacing
-    // Only collapse multiple <br> tags into one
-    htmlContent = htmlContent.replace(/(<br>\s*){3,}/g, '<br><br>');
-    return htmlContent.trim();
-}
-
-function validateField(field, errorElementId) {
-    const errorMessage = document.getElementById(errorElementId);
-    if (field.validity.valueMissing) {
-        errorMessage.innerText = 'This field is required.';
-        errorMessage.style.display = 'block';
-    } else {
-        errorMessage.style.display = 'none';
+function validateField(field) {
+    switch (field.id) {
+        case 'city-state':
+            validateCityState(field);
+            break;
+        case 'zip':
+            validateZipCode(field);
+            break;
+        case 'email':
+            validateEmail(field);
+            break;
+        default:
+            break;
     }
-}
-
-function validateForm() {
-    const requiredFields = document.querySelectorAll('[required]');
-    requiredFields.forEach(field => {
-        validateField(field, `${field.id}-error`);
-    });
 }
 
 function copyToClipboard() {
