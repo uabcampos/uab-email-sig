@@ -234,77 +234,80 @@ function validateCityState(field) {
 
 function validateZipCode(field) {
     const errorMessage = document.getElementById('zip-error');
-    const zipCodeRegex = /^\d{5}(?:-\d{4})?$/;
+    const zip
+
+CodeRegex = /^\d{5}(?:-\d{4})?$/;
     if (!zipCodeRegex.test(field.value)) {
-        errorMessage.innerText = ‘Enter a valid ZIP code.’;
-errorMessage.style.display = ‘block’;
-} else {
-errorMessage.style.display = ‘none’;
-}
+        errorMessage.innerText = 'Enter a valid ZIP code.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
 }
 
 function validatePhoneNumber(field) {
-let phoneNumber = field.value.replace(/\D/g, ‘’);
-if (phoneNumber.length === 7) {
-phoneNumber = ‘205’ + phoneNumber;
-}
-if (phoneNumber.length === 10) {
-field.value = formatPhoneNumber(phoneNumber);
-}
+    let phoneNumber = field.value.replace(/\D/g, '');
+    if (phoneNumber.length === 7) {
+        phoneNumber = '205' + phoneNumber;
+    }
+    if (phoneNumber.length === 10) {
+        field.value = formatPhoneNumber(phoneNumber);
+    }
 }
 
 function formatPhoneNumber(phoneNumber) {
-if (!phoneNumber) return ‘’;
-phoneNumber = phoneNumber.replace(/\D/g, ‘’);
-if (phoneNumber.length === 10) {
-return ${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)};
-}
-return phoneNumber;
+    if (!phoneNumber) return '';
+    phoneNumber = phoneNumber.replace(/\D/g, '');
+    if (phoneNumber.length === 10) {
+        return `${phoneNumber.substring(0, 3)}.${phoneNumber.substring(3, 6)}.${phoneNumber.substring(6)}`;
+    }
+    return phoneNumber;
 }
 
 function validateEmail(field) {
-const errorMessage = document.getElementById(‘email-error’);
-const emailRegex = /^[a-zA-Z0-9._%+-]+@(uab.edu|uabmc.edu)$/;
-if (!emailRegex.test(field.value)) {
-errorMessage.innerText = ‘Enter a valid UAB or UABMC email address.’;
-errorMessage.style.display = ‘block’;
-} else {
-errorMessage.style.display = ‘none’;
-}
+    const errorMessage = document.getElementById('email-error');
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(uab\.edu|uabmc\.edu)$/;
+    if (!emailRegex.test(field.value)) {
+        errorMessage.innerText = 'Enter a valid UAB or UABMC email address.';
+        errorMessage.style.display = 'block';
+    } else {
+        errorMessage.style.display = 'none';
+    }
 }
 
 function copyToClipboard() {
-const signature = document.getElementById(‘signature-preview’);
-const range = document.createRange();
-range.selectNodeContents(signature);
-const selection = window.getSelection();
-selection.removeAllRanges();
-selection.addRange(range);
+    const signature = document.getElementById('signature-preview');
+    const range = document.createRange();
+    range.selectNodeContents(signature);
 
-try {
-    document.execCommand('copy');
-    const copySuccess = document.getElementById('copy-success');
-    copySuccess.innerText = 'Signature copied to clipboard!';
-    copySuccess.style.display = 'block';
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
 
-    setTimeout(() => {
-        copySuccess.style.display = 'none';
-    }, 3000);
-} catch (err) {
-    console.error('Failed to copy signature: ', err);
-}
+    try {
+        document.execCommand('copy');
+        const copySuccess = document.getElementById('copy-success');
+        copySuccess.innerText = 'Signature copied to clipboard!';
+        copySuccess.style.display = 'block';
 
-// Clear the selection after copying
-selection.removeAllRanges();
+        setTimeout(() => {
+            copySuccess.style.display = 'none';
+        }, 3000);
+    } catch (err) {
+        console.error('Failed to copy signature: ', err);
+    }
+
+    // Clear the selection after copying
+    selection.removeAllRanges();
 }
 
 // Remove unnecessary blank lines before the URL
 function cleanUpPreview() {
-const previewElement = document.getElementById(‘signature-preview’);
-const previewHtml = previewElement.innerHTML;
+    const previewElement = document.getElementById('signature-preview');
+    const previewHtml = previewElement.innerHTML;
 
-// Remove any extra <br> tags if there are multiple in a row
-const cleanedHtml = previewHtml.replace(/(<br>\s*){2,}/g, '<br>');
+    // Remove any extra <br> tags if there are multiple in a row
+    const cleanedHtml = previewHtml.replace(/(<br>\s*){2,}/g, '<br>');
 
-previewElement.innerHTML = cleanedHtml;
+    previewElement.innerHTML = cleanedHtml;
 }
