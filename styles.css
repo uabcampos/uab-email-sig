@@ -6,41 +6,46 @@ body {
 }
 
 .container {
-    max-width: 1200px; 
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex; 
-    justify-content: space-between; /* Space between the columns */
-}
-
-.column {
-    width: 48%; /* Adjust the width to ensure two columns fit */
 }
 
 h1 {
     font-size: 24px;
     color: #002c17;
     text-align: center;
-    width: 100%; /* Full width for the heading */
+    margin-bottom: 20px;
 }
 
-h2 {
-    font-size: 20px;
-    color: #002c17;
-    margin-top: 20px;
+.version-selection {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.column {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.column-left, .column-right {
+    width: 48%;
 }
 
 label {
     display: block;
     margin: 10px 0 5px;
+    font-weight: bold;
 }
 
 input[type="text"],
 input[type="email"] {
-    width: 100%; /* Ensure full width within the column */
+    width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -49,12 +54,6 @@ input[type="email"] {
 
 input[type="checkbox"] {
     margin-right: 5px;
-}
-
-.version-selection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
 }
 
 .version-button {
@@ -88,8 +87,8 @@ input[type="checkbox"] {
     margin-top: 20px;
     font-family: Arial, sans-serif;
     white-space: pre-line;
-    height: 300px; /* Set a fixed height */
-    overflow-y: auto; /* Enable scrolling if the content exceeds the height */
+    height: 300px;
+    overflow-y: auto;
 }
 
 #copy-button {
