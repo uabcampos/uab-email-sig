@@ -1,81 +1,67 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 20px;
     background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
+    color: #333;
 }
 
 .container {
-    display: flex;
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
-    flex-wrap: wrap;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.form-column, .preview-column {
-    width: 40%;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin: 10px;
+h1 {
+    font-size: 24px;
+    color: #002c17;
+    text-align: center;
 }
 
 h2 {
-    margin-top: 0;
+    font-size: 20px;
+    color: #002c17;
+    margin-top: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin: 10px 0 5px;
 }
 
-input[type="text"], input[type="email"] {
-    width: calc(100% - 20px);
+input[type="text"],
+input[type="email"] {
+    width: calc(100% - 22px);
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
-#signature-preview {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 5px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: black;
+input[type="checkbox"] {
+    margin-right: 5px;
 }
 
-#signature-preview strong {
-    color: #1E6B52;
-}
-
-#signature-preview a {
-    color: #006400;
-    text-decoration: none;
-}
-
-#signature-preview a:hover {
-    text-decoration: underline;
-}
-
-#version-selection {
+.version-selection {
     display: flex;
-    gap: 10px;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
-.version-btn {
-    padding: 10px 20px;
-    border: 1px solid black;
+.version-button {
     background-color: white;
     color: black;
+    border: 1px solid black;
+    padding: 10px 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    margin: 0 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.version-btn.selected {
+.version-button.active {
     background-color: #002c17;
     color: white;
     border: none;
@@ -85,81 +71,55 @@ input[type="text"], input[type="email"] {
     color: red;
     font-size: 12px;
     display: none;
-    margin-bottom: 10px;
 }
 
-.copy-message {
-    color: green;
-    font-size: 12px;
-    display: none;
-    margin-top: 10px;
-}
-
-/* Add spacing between the preview and the button */
-#copy-button {
+#signature-preview {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     margin-top: 20px;
-    padding: 10px 20px;
+    font-family: Arial, sans-serif;
+    white-space: pre-line;
+}
+
+#copy-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
     background-color: #002c17;
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
 }
 
 #copy-button:hover {
-    background-color: #00482a;
+    background-color: #004d2b;
 }
 
-footer {
-    margin-top: 20px;
+#copy-success {
+    color: green;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
 }
 
-.footer-box {
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-footer p {
+.footer {
+    margin-top: 30px;
     font-size: 12px;
     color: #555;
+    text-align: center;
 }
 
-footer a {
-    color: #006400;
+.footer a {
+    color: #002c17;
     text-decoration: none;
 }
 
-footer a:hover {
+.footer a:hover {
     text-decoration: underline;
-}
-
-/* Mobile optimization */
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        max-width: 100%;
-        padding: 10px;
-    }
-
-    .form-column, .preview-column {
-        width: 100%;
-        margin: 0 0 20px 0;
-        padding: 15px;
-    }
-
-    .version-btn {
-        flex: 1;
-        padding: 10px;
-    }
-
-    input[type="text"], input[type="email"] {
-        width: calc(100% - 10px);
-        padding: 8px;
-    }
-
-    footer {
-        margin-top: 10px;
-    }
 }
