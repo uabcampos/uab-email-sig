@@ -68,16 +68,14 @@ function updatePreview() {
             Division of Preventive Medicine<br>
             UAB | The University of Alabama at Birmingham<br>
             ${fullAddress}<br>
-            ${contactInfo}<br>
-            ${pronouns}<br><br>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br><br>
             <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     } else {
         previewContent = `
             <strong>${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
-            ${contactInfo}<br>
-            ${pronouns}<br><br>
+            ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br><br>
             <a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
         `;
     }
@@ -116,7 +114,8 @@ function formatPhoneNumber(phoneNumber) {
 
 function cleanUpHtml(htmlContent) {
     // Replace multiple <br> tags with a single one, but preserve intentional double <br> for spacing
-    htmlContent = htmlContent.replace(/(<br>\s*){3,}/g, '<br><br>');
+    htmlContent = htmlContent.replace(/(<br>\s*){2,}/g, '<br>');
+    htmlContent = htmlContent.replace(/(<br>)+$/, ''); // Remove trailing <br> tags
     return htmlContent.trim();
 }
 
