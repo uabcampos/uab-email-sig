@@ -59,8 +59,15 @@ input[type="text"], input[type="email"] {
     text-decoration: underline;
 }
 
-footer {
+.footer-box {
+    background-color: #fff;
+    padding: 20px;
     margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+footer {
     font-size: 12px;
     color: #555;
 }
