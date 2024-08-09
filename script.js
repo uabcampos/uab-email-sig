@@ -12,7 +12,10 @@ function addEventListeners() {
     ];
 
     elements.forEach(id => {
-        document.getElementById(id).addEventListener('input', updatePreview);
+        document.getElementById(id).addEventListener('input', () => {
+            validateField(document.getElementById(id));
+            updatePreview();
+        });
     });
 
     document.getElementById('phone-office-enable').addEventListener('change', updatePreview);
@@ -121,12 +124,13 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function validateField(field) {
+    // Clear any previous error messages
+    clearError(field);
+
     // Check if the field is required and is empty
     if (field.hasAttribute('required') && !field.value) {
         displayError(field, 'This field is required.');
         return;
-    } else {
-        clearError(field);
     }
 
     switch (field.id) {
@@ -153,6 +157,27 @@ function displayError(field, message) {
 function clearError(field) {
     const errorElement = document.getElementById(`${field.id}-error`);
     errorElement.style.display = 'none';
+}
+
+function validateCityState(field) {
+    const cityStateRegex = /^[a-zA-Z\s]+,\s*[A-Z]{2}$/;
+    if (!cityStateRegex.test(field.value)) {
+        displayError(field, 'Enter a valid City, ST format (e.g., Birmingham, AL).');
+    }
+}
+
+function validateZipCode(field) {
+    const zipCodeRegex = /^\d{5}(-\d{4})?$/;
+    if (!zipCodeRegex.test(field.value)) {
+        displayError(field, 'Enter a valid ZIP code (e.g., 35294 or 35294-4410).');
+    }
+}
+
+function validateEmail(field) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(uab\.edu|uabmc\.edu)$/;
+    if (!emailRegex.test(field.value)) {
+        displayError(field, 'Enter a valid UAB or UABMC email address.');
+    }
 }
 
 function copyToClipboard() {
