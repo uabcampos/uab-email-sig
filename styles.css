@@ -131,3 +131,18 @@ input[type="checkbox"] {
 .footer a:hover {
     text-decoration: underline;
 }
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+    .column {
+        flex-direction: column;
+    }
+
+    .column-left, .column-right {
+        width: 100%;
+    }
+
+    .column-right {
+        margin-top: 20px;
+    }
+}
