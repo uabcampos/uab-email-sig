@@ -6,18 +6,25 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px; /* Increase the max width to fit two columns */
     margin: 0 auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex; /* Use flexbox for the two-column layout */
+    gap: 20px; /* Space between the form and preview */
+}
+
+.column {
+    flex: 1;
 }
 
 h1 {
     font-size: 24px;
     color: #002c17;
     text-align: center;
+    flex-basis: 100%; /* Full width for the heading */
 }
 
 h2 {
@@ -81,6 +88,7 @@ input[type="checkbox"] {
     margin-top: 20px;
     font-family: Arial, sans-serif;
     white-space: pre-line;
+    flex: 1; /* Allow preview to take up remaining space */
 }
 
 #copy-button {
