@@ -182,24 +182,25 @@ function downloadRTF() {
     // Capture the current content of the preview
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Manually construct the first line to ensure no leading spaces
-    let lines = signaturePreview.split('<br>');
-    let firstLine = lines[0].trim().replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
+    // Manually construct the first line as a blank line
+    let blankLine = '\\line';
 
-    // Process the rest of the lines normally
-    let restOfLines = lines.slice(1).map(line => 
+    // Process the signature lines
+    let lines = signaturePreview.split('<br>');
+    let formattedLines = lines.map(line => 
         line.trim()
+            .replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
             .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
             .replace(/<\/?[^>]+(>|$)/g, '')
     ).join('\\line ');
 
-    // Combine the first line with the rest
+    // Combine the blank line with the rest of the lines
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${firstLine}\\line ${restOfLines}
+    ${blankLine}\\line ${formattedLines}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
