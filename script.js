@@ -182,17 +182,18 @@ function downloadRTF() {
     // Capture the current content of the preview
     const signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Ensure no extra spaces or tabs are present in the content
-    const signatureContent = `
-        {\\b\\cf1 ${signaturePreview.split('<br>')[0].trim()}}\\line
-        ${signaturePreview.split('<br>').slice(1).map(line => line.trim()).join('\\line ')}
-    `;
-
+    // Convert HTML to RTF format manually
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${signatureContent.replace(/^\s+/gm, '')}
+    ${signaturePreview
+        .replace(/<br>/g, '\\line ')  // Replace <br> tags with RTF line breaks
+        .replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}') // Convert bold green text
+        .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}') // Convert email links
+        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}') // Convert other links
+        .replace(/<\/?[^>]+(>|$)/g, '') // Remove any other HTML tags
+        .trim()}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
