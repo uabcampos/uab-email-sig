@@ -143,8 +143,9 @@ function copyToClipboard() {
     // Create a temporary element to hold the HTML content
     const tempElement = document.createElement('div');
     tempElement.innerHTML = `
-        <div style="font-size: 12px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif; background-color: transparent; color: black; -webkit-text-fill-color: black; -webkit-background-clip: text;">
-            ${document.getElementById('signature-preview').innerHTML}
+        <div style="font-size: 12px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif; background-color: transparent; color: black;">
+            <strong style="color: #1E6B52;">${document.getElementById('signature-preview').innerHTML.split('<br>')[0]}</strong><br>
+            ${document.getElementById('signature-preview').innerHTML.split('<br>').slice(1).join('<br>')}
         </div>
     `;
 
