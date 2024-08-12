@@ -180,21 +180,20 @@ function copyToClipboard() {
 
 function downloadRTF() {
     const signatureContent = `
-        <strong style="color: #1E6B52;">${document.getElementById('signature-preview').innerHTML.split('<br>')[0]}</strong><br>
-        ${document.getElementById('signature-preview').innerHTML.split('<br>').slice(1).join('<br>')}
+        {\\b\\cf1 John Doe | Program Director II}\\line
+        Department of Medicine | Heersink School of Medicine\\line
+        Division of Preventive Medicine\\line
+        UAB | The University of Alabama at Birmingham\\line
+        MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410\\line
+        johndoe@uabmc.edu\\line\\line
+        {\\field{\\*\\fldinst{HYPERLINK "https://uab.edu/dopm/"}}{\\fldrslt https://uab.edu/dopm/}}
     `;
 
-    // Convert HTML to RTF format
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
-    \\f0\\fs24
-    \\cf1 ${signatureContent
-        .replace(/<br>/g, '\\line ')
-        .replace(/<strong>/g, '\\b ')
-        .replace(/<\/strong>/g, '\\b0 ')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/<\/?[^>]+(>|$)/g, "")}
+    \\fs24
+    ${signatureContent}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
