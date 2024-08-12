@@ -180,18 +180,21 @@ function copyToClipboard() {
 
 function downloadRTF() {
     const signatureContent = `
-        <div style="font-size: 12px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif;">
-            <strong style="color: #1E6B52;">${document.getElementById('signature-preview').innerHTML.split('<br>')[0]}</strong><br>
-            ${document.getElementById('signature-preview').innerHTML.split('<br>').slice(1).join('<br>')}
-        </div>
+        <strong style="color: #1E6B52;">${document.getElementById('signature-preview').innerHTML.split('<br>')[0]}</strong><br>
+        ${document.getElementById('signature-preview').innerHTML.split('<br>').slice(1).join('<br>')}
     `;
 
-    const rtfContent = `
-    {\\rtf1\\ansi\\deff0
+    // Convert HTML to RTF format
+    const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
-    {\\fonttbl {\\f0 Proxima Nova;}}
-    \\fs24
-    \\f0\\cf1 ${signatureContent.replace(/<br>/g, '\\line ').replace(/<strong>/g, '\\b ').replace(/<\/strong>/g, '\\b0 ').replace(/<\/?[^>]+(>|$)/g, "")}
+    {\\fonttbl {\\f0 Arial;}}
+    \\f0\\fs24
+    \\cf1 ${signatureContent
+        .replace(/<br>/g, '\\line ')
+        .replace(/<strong>/g, '\\b ')
+        .replace(/<\/strong>/g, '\\b0 ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, "")}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
