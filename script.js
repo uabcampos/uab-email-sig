@@ -83,7 +83,7 @@ function updatePreview() {
         division = 'Division of General Internal Medicine';
         url = 'https://uab.edu/gim/';
     } else if (currentDepartment === 'gimpop') {
-        division = 'Division of General Internal Medicine and Population Science';
+        division = 'Division of General Internal Medicine & Population Science';
         url = 'https://www.uab.edu/medicine/dom/';
     }
 
