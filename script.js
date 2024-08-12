@@ -182,7 +182,7 @@ function downloadRTF() {
     // Capture the current content of the preview
     const signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Convert HTML to RTF format manually
+    // Convert HTML to RTF format manually and ensure no leading spaces
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
@@ -193,7 +193,8 @@ function downloadRTF() {
         .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}') // Convert email links
         .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}') // Convert other links
         .replace(/<\/?[^>]+(>|$)/g, '') // Remove any other HTML tags
-        .trim()}
+        .replace(/^\s+/gm, '') // Remove leading spaces from each line
+    }
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
