@@ -140,32 +140,41 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function copyToClipboard() {
-    const signature = document.getElementById('signature-preview').innerHTML;
-
-    const richText = `
-        <div style="font-size: 14px; line-height: 1.2; font-family: 'Proxima Nova', Arial, sans-serif;">
-            ${signature}
+    // Create a temporary element to hold the HTML content
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = `
+        <div style="font-size: 10px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif;">
+            ${document.getElementById('signature-preview').innerHTML}
         </div>
     `;
 
-    const tempElement = document.createElement('textarea');
-    tempElement.style.position = 'fixed';
-    tempElement.style.left = '-9999px';
-    tempElement.style.top = '0';
-    tempElement.value = richText;
-
+    // Append the element to the body
     document.body.appendChild(tempElement);
-    tempElement.select();
-    document.execCommand('copy');
+
+    // Select the content
+    const range = document.createRange();
+    range.selectNodeContents(tempElement);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    try {
+        // Execute the copy command
+        document.execCommand('copy');
+        const copySuccess = document.getElementById('copy-success');
+        copySuccess.innerText = 'Signature copied to clipboard!';
+        copySuccess.style.display = 'block';
+
+        setTimeout(() => {
+            copySuccess.style.display = 'none';
+        }, 3000);
+    } catch (err) {
+        console.error('Failed to copy signature: ', err);
+    }
+
+    // Clean up by removing the temporary element
+    selection.removeAllRanges();
     document.body.removeChild(tempElement);
-
-    const copySuccess = document.getElementById('copy-success');
-    copySuccess.innerText = 'Signature copied to clipboard!';
-    copySuccess.style.display = 'block';
-
-    setTimeout(() => {
-        copySuccess.style.display = 'none';
-    }, 3000);
 }
 
 function displayVersion() {
