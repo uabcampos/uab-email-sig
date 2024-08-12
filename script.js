@@ -185,7 +185,7 @@ function downloadRTF() {
         Division of Preventive Medicine\\line
         UAB | The University of Alabama at Birmingham\\line
         MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410\\line
-        johndoe@uabmc.edu\\line\\line
+        {\\field{\\*\\fldinst{HYPERLINK "mailto:johndoe@uabmc.edu"}}{\\fldrslt johndoe@uabmc.edu}}\\line\\line
         {\\field{\\*\\fldinst{HYPERLINK "https://uab.edu/dopm/"}}{\\fldrslt https://uab.edu/dopm/}}
     `;
 
@@ -193,7 +193,7 @@ function downloadRTF() {
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${signatureContent}
+    ${signatureContent.replace(/^\s+/gm, '')}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
