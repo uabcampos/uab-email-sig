@@ -182,17 +182,16 @@ function downloadRTF() {
     // Capture the current content of the preview
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Handle the first line separately to remove leading spaces
+    // Manually construct the first line to ensure no leading spaces
     let lines = signaturePreview.split('<br>');
-    let firstLine = lines[0].replace(/^\s+/g, '').replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
+    let firstLine = lines[0].trim().replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
 
-    // Process the rest of the lines
+    // Process the rest of the lines normally
     let restOfLines = lines.slice(1).map(line => 
-        line.replace(/^\s+/g, '')
+        line.trim()
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
             .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
             .replace(/<\/?[^>]+(>|$)/g, '')
-            .replace(/\s+$/g, '')
     ).join('\\line ');
 
     // Combine the first line with the rest
