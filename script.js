@@ -180,9 +180,12 @@ function copyToClipboard() {
 
 function downloadRTF() {
     // Capture the current content of the preview
-    const signaturePreview = document.getElementById('signature-preview').innerHTML;
+    let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Convert HTML to RTF format manually and ensure no leading spaces
+    // Trim the first line and ensure no leading spaces or tabs
+    signaturePreview = signaturePreview.replace(/^\s+/g, ''); // Remove leading spaces/tabs from the entire content
+
+    // Convert HTML to RTF format manually
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
@@ -193,7 +196,7 @@ function downloadRTF() {
         .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}') // Convert email links
         .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}') // Convert other links
         .replace(/<\/?[^>]+(>|$)/g, '') // Remove any other HTML tags
-        .replace(/^\s+/gm, '') // Remove leading spaces from each line
+        .replace(/^\s+/gm, '') // Remove any remaining leading spaces from each line
     }
     }`;
 
