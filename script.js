@@ -182,22 +182,25 @@ function downloadRTF() {
     // Capture the current content of the preview
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
-    // Trim the first line and ensure no leading spaces or tabs
-    signaturePreview = signaturePreview.replace(/^\s+/g, ''); // Remove leading spaces/tabs from the entire content
+    // Handle the first line separately to remove leading spaces
+    let lines = signaturePreview.split('<br>');
+    let firstLine = lines[0].replace(/^\s+/g, '').replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
 
-    // Convert HTML to RTF format manually
+    // Process the rest of the lines
+    let restOfLines = lines.slice(1).map(line => 
+        line.replace(/^\s+/g, '')
+            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+            .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .replace(/\s+$/g, '')
+    ).join('\\line ');
+
+    // Combine the first line with the rest
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${signaturePreview
-        .replace(/<br>/g, '\\line ')  // Replace <br> tags with RTF line breaks
-        .replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}') // Convert bold green text
-        .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}') // Convert email links
-        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}') // Convert other links
-        .replace(/<\/?[^>]+(>|$)/g, '') // Remove any other HTML tags
-        .replace(/^\s+/gm, '') // Remove any remaining leading spaces from each line
-    }
+    ${firstLine}\\line ${restOfLines}
     }`;
 
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
