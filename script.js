@@ -179,14 +179,13 @@ function copyToClipboard() {
 }
 
 function downloadRTF() {
+    // Capture the current content of the preview
+    const signaturePreview = document.getElementById('signature-preview').innerHTML;
+
+    // Ensure no extra spaces or tabs are present in the content
     const signatureContent = `
-        {\\b\\cf1 John Doe | Program Director II}\\line
-        Department of Medicine | Heersink School of Medicine\\line
-        Division of Preventive Medicine\\line
-        UAB | The University of Alabama at Birmingham\\line
-        MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410\\line
-        {\\field{\\*\\fldinst{HYPERLINK "mailto:johndoe@uabmc.edu"}}{\\fldrslt johndoe@uabmc.edu}}\\line\\line
-        {\\field{\\*\\fldinst{HYPERLINK "https://uab.edu/dopm/"}}{\\fldrslt https://uab.edu/dopm/}}
+        {\\b\\cf1 ${signaturePreview.split('<br>')[0].trim()}}\\line
+        ${signaturePreview.split('<br>').slice(1).map(line => line.trim()).join('\\line ')}
     `;
 
     const rtfContent = `{\\rtf1\\ansi\\deff0
