@@ -140,28 +140,32 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 function copyToClipboard() {
-    const signature = document.getElementById('signature-preview');
-    const range = document.createRange();
-    range.selectNodeContents(signature);
+    const signature = document.getElementById('signature-preview').innerHTML;
 
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const richText = `
+        <div style="font-size: 14px; line-height: 1.2; font-family: 'Proxima Nova', Arial, sans-serif;">
+            ${signature}
+        </div>
+    `;
 
-    try {
-        document.execCommand('copy');
-        const copySuccess = document.getElementById('copy-success');
-        copySuccess.innerText = 'Signature copied to clipboard!';
-        copySuccess.style.display = 'block';
+    const tempElement = document.createElement('textarea');
+    tempElement.style.position = 'fixed';
+    tempElement.style.left = '-9999px';
+    tempElement.style.top = '0';
+    tempElement.value = richText;
 
-        setTimeout(() => {
-            copySuccess.style.display = 'none';
-        }, 3000);
-    } catch (err) {
-        console.error('Failed to copy signature: ', err);
-    }
+    document.body.appendChild(tempElement);
+    tempElement.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempElement);
 
-    selection.removeAllRanges();
+    const copySuccess = document.getElementById('copy-success');
+    copySuccess.innerText = 'Signature copied to clipboard!';
+    copySuccess.style.display = 'block';
+
+    setTimeout(() => {
+        copySuccess.style.display = 'none';
+    }, 3000);
 }
 
 function displayVersion() {
