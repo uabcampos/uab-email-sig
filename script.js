@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     addEventListeners();
-    validateAllRequiredFields(); // Validate all required fields on page load
-    selectVersion('standard'); // Default to the standard version on load
-    displayVersion(); // Display the version number in the footer
+    validateAllRequiredFields(); 
+    selectVersion('standard'); 
+    selectDepartment('dopm'); 
+    displayVersion(); 
 });
 
 function addEventListeners() {
@@ -15,8 +16,8 @@ function addEventListeners() {
     elements.forEach(id => {
         const element = document.getElementById(id);
         element.addEventListener('input', () => {
-            validateField(element); // Validate the field as the user types
-            updatePreview(); // Update the preview as the user types
+            validateField(element);
+            updatePreview();
         });
     });
 
@@ -28,36 +29,33 @@ function addEventListeners() {
 
     document.getElementById('btn-standard').addEventListener('click', () => selectVersion('standard'));
     document.getElementById('btn-abbreviated').addEventListener('click', () => selectVersion('abbreviated'));
+
+    document.getElementById('btn-dopm').addEventListener('click', () => selectDepartment('dopm'));
+    document.getElementById('btn-gim').addEventListener('click', () => selectDepartment('gim'));
+    document.getElementById('btn-gimpop').addEventListener('click', () => selectDepartment('gimpop'));
+
     document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 }
 
 let currentVersion = 'standard';
-
-function validateAllRequiredFields() {
-    const requiredFields = document.querySelectorAll('[required]');
-    requiredFields.forEach(field => {
-        validateField(field);
-    });
-}
+let currentDepartment = 'dopm';
 
 function selectVersion(version) {
     currentVersion = version;
-    const standardButton = document.getElementById('btn-standard');
-    const abbreviatedButton = document.getElementById('btn-abbreviated');
+    document.getElementById('btn-standard').classList.toggle('active', version === 'standard');
+    document.getElementById('btn-abbreviated').classList.toggle('active', version === 'abbreviated');
+    updatePreview();
+}
 
-    if (version === 'standard') {
-        standardButton.classList.add('active');
-        abbreviatedButton.classList.remove('active');
-    } else {
-        abbreviatedButton.classList.add('active');
-        standardButton.classList.remove('active');
-    }
-
-    updatePreview(); // Update the preview immediately after selecting the version
+function selectDepartment(department) {
+    currentDepartment = department;
+    document.getElementById('btn-dopm').classList.toggle('active', department === 'dopm');
+    document.getElementById('btn-gim').classList.toggle('active', department === 'gim');
+    document.getElementById('btn-gimpop').classList.toggle('active', department === 'gimpop');
+    updatePreview();
 }
 
 function updatePreview() {
-    // Collect input values from all fields or use placeholders if empty
     const name = document.getElementById('name').value || document.getElementById('name').placeholder;
     const credentials = document.getElementById('credentials').value ? `, ${document.getElementById('credentials').value}` : '';
     const title = document.getElementById('title').value || document.getElementById('title').placeholder;
@@ -77,24 +75,36 @@ function updatePreview() {
 
     const contactInfo = generateContactInfo(phoneOffice, phoneMobile, email);
 
+    let division, url;
+    if (currentDepartment === 'dopm') {
+        division = 'Division of Preventive Medicine';
+        url = 'https://uab.edu/dopm/';
+    } else if (currentDepartment === 'gim') {
+        division = 'Division of General Internal Medicine';
+        url = 'https://uab.edu/gim/';
+    } else if (currentDepartment === 'gimpop') {
+        division = 'Division of General Internal Medicine and Population Science';
+        url = 'https://www.uab.edu/medicine/dom/';
+    }
+
     let previewContent;
 
     if (currentVersion === 'standard') {
         previewContent = `
             <strong style="color: #002c17;">${name}${credentials} | ${title}</strong><br>
             Department of Medicine | Heersink School of Medicine<br>
-            Division of Preventive Medicine<br>
+            ${division}<br>
             UAB | The University of Alabama at Birmingham<br>
             ${fullAddress}<br>
             ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <br><a href="${url}" target="_blank">${url}</a>
         `;
     } else {
         previewContent = `
             <strong style="color: #002c17;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${contactInfo}${pronouns ? `<br>${pronouns}` : ''}<br>
-            <br><a href="https://uab.edu/dopm/" target="_blank">https://uab.edu/dopm/</a>
+            <br><a href="${url}" target="_blank">${url}</a>
         `;
     }
 
@@ -156,7 +166,7 @@ function copyToClipboard() {
 
 function displayVersion() {
     const versionElement = document.getElementById('version-number');
-    versionElement.innerText = 'Version 1.4.7';
+    versionElement.innerText = 'Version 1.5.0';
 }
 
 addEventListeners();
