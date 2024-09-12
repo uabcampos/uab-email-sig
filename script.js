@@ -108,7 +108,10 @@ function downloadRTF() {
             .trim()  // Trim to remove any leftover spaces or empty lines
     ).filter(line => line !== '').join('\\line ');  // Remove empty lines
 
-    // Generate the RTF content without a blank first line and without extra spaces
+    // Add a single blank line between the signature block and the URL
+    restOfLines += '\\line ';  // Insert one blank line before the URL
+
+    // Generate the RTF content without leading spaces
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
