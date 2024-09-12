@@ -85,6 +85,18 @@ function copyToClipboard() {
 
 document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 
+// Function to toggle between Standard and Abbreviated versions
+function toggleVersion(isStandardVersion) {
+    if (isStandardVersion) {
+        document.getElementById('btn-standard').classList.add('active');
+        document.getElementById('btn-abbreviated').classList.remove('active');
+    } else {
+        document.getElementById('btn-abbreviated').classList.add('active');
+        document.getElementById('btn-standard').classList.remove('active');
+    }
+    updateSignaturePreview();  // Update preview immediately after toggling the version
+}
+
 // Function to validate and update the preview
 function validateAndUpdate(field) {
     validateField(field);  // Call validation for the field
@@ -108,6 +120,15 @@ function addValidationAndPreviewListeners() {
     // Also listen for changes in the enable checkboxes for phone numbers
     document.getElementById('phone-office-enable').addEventListener('change', updateSignaturePreview);
     document.getElementById('phone-mobile-enable').addEventListener('change', updateSignaturePreview);
+
+    // Listen for clicks on version toggle buttons
+    document.getElementById('btn-standard').addEventListener('click', function () {
+        toggleVersion(true);
+    });
+
+    document.getElementById('btn-abbreviated').addEventListener('click', function () {
+        toggleVersion(false);
+    });
 }
 
 // Function to download the signature as an RTF file
@@ -166,6 +187,5 @@ document.getElementById('download-button').addEventListener('click', downloadRTF
 // Initialize listeners on page load
 window.onload = function() {
     addValidationAndPreviewListeners();  // Add live preview listeners and validation listeners
-    document.getElementById('btn-standard').classList.add('active');  // Default to standard version on load
-    updateSignaturePreview();  // Update preview on page load
-}
+    toggleVersion(true);  // Default to standard version on load
+};
