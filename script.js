@@ -62,23 +62,25 @@ function updateSignaturePreview() {
 }
 
 // Convert image URL to Base64
-function getImageBase64(url, callback) {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        const reader = new FileReader();
-        reader.onloadend = function () {
-            callback(reader.result.replace(/^data:image\/(png|jpg);base64,/, ''));
+function getImageBase64(url) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                resolve(reader.result.replace(/^data:image\/(png|jpg);base64,/, ''));
+            };
+            reader.readAsDataURL(xhr.response);
         };
-        reader.readAsDataURL(xhr.response);
-    };
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
+        xhr.onerror = reject;
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    });
 }
 
-// Function to download the signature as an RTF file with embedded image
-function downloadRTF() {
-    console.log('Download button clicked!');  // Debugging check
+// Function to generate the RTF content with or without the image
+async function generateRTFContent() {
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
     // Split the signature content by <br> tags to handle each line
@@ -110,54 +112,39 @@ function downloadRTF() {
     // Make sure there's exactly one blank line before the URL block
     part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
 
-    // Check if the image is selected and add it to the RTF
+    // Part 4: Image block if checkbox is selected
     const addImage = document.getElementById('add-image-checkbox').checked;
+    let part4 = '';
+
     if (addImage) {
         const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
-
-        // Convert image to Base64 and embed in RTF
-        getImageBase64(imageUrl, function(base64Image) {
-            const part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
-            
-            // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
-            const rtfContent = `{\\rtf1\\ansi\\deff0
-            {\\colortbl ;\\red30\\green107\\blue82;}
-            {\\fonttbl {\\f0 Arial;}}
-            \\fs24
-            ${part1}${part2}${part3}${part4}
-            }`;
-
-            console.log('RTF content generated with image:', rtfContent);  // Debugging check
-
-            // Create a blob and download the RTF file
-            const blob = new Blob([rtfContent], { type: 'application/rtf' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'signature.rtf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    } else {
-        // No image case
-        const rtfContent = `{\\rtf1\\ansi\\deff0
-        {\\colortbl ;\\red30\\green107\\blue82;}
-        {\\fonttbl {\\f0 Arial;}}
-        \\fs24
-        ${part1}${part2}${part3}
-        }`;
-
-        console.log('RTF content generated without image:', rtfContent);  // Debugging check
-
-        // Create a blob and download the RTF file
-        const blob = new Blob([rtfContent], { type: 'application/rtf' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'signature.rtf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const base64Image = await getImageBase64(imageUrl);
+        part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
     }
+
+    // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
+    const rtfContent = `{\\rtf1\\ansi\\deff0
+    {\\colortbl ;\\red30\\green107\\blue82;}
+    {\\fonttbl {\\f0 Arial;}}
+    \\fs24
+    ${part1}${part2}${part3}${part4}
+    }`;
+
+    return rtfContent;
+}
+
+// Function to download the signature as an RTF file with embedded image
+async function downloadRTF() {
+    const rtfContent = await generateRTFContent();
+
+    // Create a blob and download the RTF file
+    const blob = new Blob([rtfContent], { type: 'application/rtf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'signature.rtf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Copy to clipboard function
