@@ -78,6 +78,7 @@ function getImageBase64(url, callback) {
 
 // Function to download the signature as an RTF file with embedded image
 function downloadRTF() {
+    console.log('Download button clicked!');  // Debugging check
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
 
     // Split the signature content by <br> tags to handle each line
@@ -126,6 +127,8 @@ function downloadRTF() {
             ${part1}${part2}${part3}${part4}
             }`;
 
+            console.log('RTF content generated with image:', rtfContent);  // Debugging check
+
             // Create a blob and download the RTF file
             const blob = new Blob([rtfContent], { type: 'application/rtf' });
             const link = document.createElement('a');
@@ -143,6 +146,8 @@ function downloadRTF() {
         \\fs24
         ${part1}${part2}${part3}
         }`;
+
+        console.log('RTF content generated without image:', rtfContent);  // Debugging check
 
         // Create a blob and download the RTF file
         const blob = new Blob([rtfContent], { type: 'application/rtf' });
@@ -252,3 +257,6 @@ window.onload = function() {
     validateAllRequiredFields();  // Validate all required fields on page load
     updateSignaturePreview();  // Update the signature preview on page load
 };
+
+// Add the event listener for the download button
+document.getElementById('download-button').addEventListener('click', downloadRTF);
