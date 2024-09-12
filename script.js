@@ -23,11 +23,13 @@ function updateSignaturePreview() {
         phoneLine = `M: ${mobilePhone}`;
     }
 
+    // Determine if the standard or abbreviated version is active
     const isStandardVersion = document.getElementById('btn-standard').classList.contains('active');
 
     let signaturePreview = '';
 
     if (isStandardVersion) {
+        // Standard version with email
         signaturePreview = `
             <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
             Department of Medicine | Heersink School of Medicine<br>
@@ -38,54 +40,17 @@ function updateSignaturePreview() {
             <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
         `;
     } else {
+        // Abbreviated version without email
         signaturePreview = `
             <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
-            ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
+            ${phoneLine}${pronouns}<br><br>
             <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
         `;
     }
 
     document.getElementById('signature-preview').innerHTML = signaturePreview;
 }
-
-// Function to validate the form and update the preview
-function validateAndUpdatePreview() {
-    // Validate all required fields before generating the preview
-    validateAllRequiredFields(); // Call the validateAllRequiredFields function from validation.js
-    updateSignaturePreview(); // If validation passes, update the preview
-}
-
-// Add event listeners for form inputs to validate them as the user types
-document.getElementById('name').addEventListener('input', () => validateField(document.getElementById('name')));
-document.getElementById('credentials').addEventListener('input', () => validateField(document.getElementById('credentials')));
-document.getElementById('title').addEventListener('input', () => validateField(document.getElementById('title')));
-document.getElementById('room').addEventListener('input', () => validateField(document.getElementById('room')));
-document.getElementById('street').addEventListener('input', () => validateField(document.getElementById('street')));
-document.getElementById('city-state').addEventListener('input', () => validateField(document.getElementById('city-state')));
-document.getElementById('zip').addEventListener('input', () => validateField(document.getElementById('zip')));
-document.getElementById('email').addEventListener('input', () => validateField(document.getElementById('email')));
-document.getElementById('phone-office').addEventListener('input', () => validateField(document.getElementById('phone-office')));
-document.getElementById('phone-mobile').addEventListener('input', () => validateField(document.getElementById('phone-mobile')));
-
-// Toggle between Standard and Abbreviated versions
-document.getElementById('btn-standard').addEventListener('click', function() {
-    document.getElementById('btn-standard').classList.add('active');
-    document.getElementById('btn-abbreviated').classList.remove('active');
-    validateAndUpdatePreview(); // Validate and update preview on standard version selection
-});
-
-document.getElementById('btn-abbreviated').addEventListener('click', function() {
-    document.getElementById('btn-abbreviated').classList.add('active');
-    document.getElementById('btn-standard').classList.remove('active');
-    validateAndUpdatePreview(); // Validate and update preview on abbreviated version selection
-});
-
-// Call validateAndUpdatePreview on page load
-window.onload = function() {
-    document.getElementById('btn-standard').classList.add('active');
-    validateAndUpdatePreview(); // Validate fields and show the standard version by default on load
-};
 
 // Function to copy the signature to clipboard
 function copyToClipboard() {
@@ -142,14 +107,6 @@ function downloadRTF() {
             .replace(/<\/?[^>]+(>|$)/g, '')  // Remove any remaining HTML tags
     ).join('\\line ');
 
-    // Check if the signature is abbreviated (without email)
-    const isAbbreviated = document.getElementById('btn-abbreviated').classList.contains('active');
-
-    // For abbreviated version, remove email from the RTF content
-    if (isAbbreviated) {
-        restOfLines = restOfLines.replace(/\| johndoe@uabmc.edu/, ''); // Replace the email with an empty string in abbreviated version
-    }
-
     // Generate the RTF content without a blank first line
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
@@ -169,3 +126,41 @@ function downloadRTF() {
 }
 
 document.getElementById('download-button').addEventListener('click', downloadRTF);
+
+// Validate the form and update the preview
+function validateAndUpdatePreview() {
+    // Validate all required fields before generating the preview
+    validateAllRequiredFields(); // Call the validateAllRequiredFields function from validation.js
+    updateSignaturePreview(); // If validation passes, update the preview
+}
+
+// Event listeners for form inputs to validate them as the user types
+document.getElementById('name').addEventListener('input', () => validateField(document.getElementById('name')));
+document.getElementById('credentials').addEventListener('input', () => validateField(document.getElementById('credentials')));
+document.getElementById('title').addEventListener('input', () => validateField(document.getElementById('title')));
+document.getElementById('room').addEventListener('input', () => validateField(document.getElementById('room')));
+document.getElementById('street').addEventListener('input', () => validateField(document.getElementById('street')));
+document.getElementById('city-state').addEventListener('input', () => validateField(document.getElementById('city-state')));
+document.getElementById('zip').addEventListener('input', () => validateField(document.getElementById('zip')));
+document.getElementById('email').addEventListener('input', () => validateField(document.getElementById('email')));
+document.getElementById('phone-office').addEventListener('input', () => validateField(document.getElementById('phone-office')));
+document.getElementById('phone-mobile').addEventListener('input', () => validateField(document.getElementById('phone-mobile')));
+
+// Toggle between Standard and Abbreviated versions
+document.getElementById('btn-standard').addEventListener('click', function() {
+    document.getElementById('btn-standard').classList.add('active');
+    document.getElementById('btn-abbreviated').classList.remove('active');
+    validateAndUpdatePreview(); // Validate and update preview on standard version selection
+});
+
+document.getElementById('btn-abbreviated').addEventListener('click', function() {
+    document.getElementById('btn-abbreviated').classList.add('active');
+    document.getElementById('btn-standard').classList.remove('active');
+    validateAndUpdatePreview(); // Validate and update preview on abbreviated version selection
+});
+
+// Call validateAndUpdatePreview on page load
+window.onload = function() {
+    document.getElementById('btn-standard').classList.add('active');
+    validateAndUpdatePreview(); // Validate fields and show the standard version by default on load
+};
