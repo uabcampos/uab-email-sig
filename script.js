@@ -123,17 +123,26 @@ document.getElementById('copy-button').addEventListener('click', copyToClipboard
 // Function to download the signature as an RTF file
 function downloadRTF() {
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
+
+    // Split the signature content by <br> tags to handle each line
     let lines = signaturePreview.split('<br>');
-    let firstLine = lines[0].replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
+
+    // Fix the first line (name and title) by removing any leading spaces and converting HTML to RTF
+    let firstLine = lines[0]
+        .replace(/^\s+/g, '')  // Remove leading spaces
+        .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Make bold and green
+        .replace(/&amp;/g, '&');  // Replace &amp; with &
+
+    // Handle the rest of the lines, removing leading spaces, stripping HTML tags, and converting links
     let restOfLines = lines.slice(1).map(line => 
-        line.replace(/^\s+/g, '')
-            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-            .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
-            .replace(/<\/?[^>]+(>|$)/g, '')
-            .replace(/\s+$/g, '')
+        line.trim()  // Trim whitespace from the line
+            .replace(/&amp;/g, '&')  // Replace &amp; with &
+            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
+            .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
+            .replace(/<\/?[^>]+(>|$)/g, '')  // Remove any remaining HTML tags
     ).join('\\line ');
 
-    // Add blank line to fix indenting
+    // Add a blank line before the signature content to fix indenting
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
@@ -142,6 +151,7 @@ function downloadRTF() {
     ${firstLine}\\line ${restOfLines}
     }`;
 
+    // Create a blob and download the RTF file
     const blob = new Blob([rtfContent], { type: 'application/rtf' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
