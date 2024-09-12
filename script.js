@@ -96,7 +96,7 @@ async function generateRTFContent() {
         line.replace(/^\s+/g, '')  // Remove any leading spaces
             .replace(/&amp;/g, '&')  // Replace &amp; with &
             .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Convert to bold and green
-            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
+            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links to clickable
             .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
             .trim()  // Trim trailing/leading spaces
     ).filter(line => line !== '').join('\\line ');
@@ -107,7 +107,7 @@ async function generateRTFContent() {
     // Part 3: URL Block (only the URL with a blank line before it)
     let part3 = lines[lines.length - 1]
         .replace(/^\s+/g, '')  // Remove any leading spaces
-        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
+        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert URL links to clickable
         .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
         .trim();  // Trim trailing/leading spaces
 
@@ -243,9 +243,7 @@ function addValidationAndPreviewListeners() {
 
     document.getElementById('btn-abbreviated').addEventListener('click', function () {
         toggleVersion(false);
-    });
-
-    // Listen for changes to the image checkbox to update the preview
+       // Listen for changes to the image checkbox to update the preview
     document.getElementById('add-image-checkbox').addEventListener('change', updateSignaturePreview);
 }
 
