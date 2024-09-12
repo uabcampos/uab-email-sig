@@ -68,8 +68,8 @@ function getImageBase64(url) {
         xhr.onload = function () {
             const reader = new FileReader();
             reader.onloadend = function () {
-                const result = reader.result.split(',')[1]; // Get base64 part
-                resolve(result);
+                const base64String = reader.result.split(',')[1]; // Get base64 part
+                resolve(base64String);
             };
             reader.readAsDataURL(xhr.response);
         };
@@ -122,9 +122,8 @@ async function generateRTFContent() {
         try {
             const base64Image = await getImageBase64(imageUrl);
             
-            // Make sure the Base64 string is split into chunks to avoid RTF format issues
-            const rtfImageData = base64Image.match(/.{1,60}/g).join('\\\n');
-            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${rtfImageData}}`;
+            // Insert Base64 image data directly into the RTF content
+            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
         } catch (error) {
             console.error('Image conversion failed:', error);
         }
