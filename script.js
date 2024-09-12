@@ -61,21 +61,22 @@ function updateSignaturePreview() {
     document.getElementById('signature-preview').innerHTML = signaturePreview;
 }
 
-// Convert image URL to Base64
-function getImageBase64(url) {
+// Convert image URL to hexadecimal
+function getImageHex(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
             const reader = new FileReader();
             reader.onloadend = function () {
-                const base64String = reader.result.split(',')[1]; // Get base64 part
-                resolve(base64String);
+                const arrayBuffer = reader.result;
+                const hexString = Array.from(new Uint8Array(arrayBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+                resolve(hexString);
             };
-            reader.readAsDataURL(xhr.response);
+            reader.readAsArrayBuffer(xhr.response);
         };
         xhr.onerror = reject;
         xhr.open('GET', url);
-        xhr.responseType = 'blob';
+        xhr.responseType = 'arraybuffer';
         xhr.send();
     });
 }
@@ -120,10 +121,10 @@ async function generateRTFContent() {
     if (addImage) {
         const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
         try {
-            const base64Image = await getImageBase64(imageUrl);
+            const hexImage = await getImageHex(imageUrl);
             
-            // Insert Base64 image data directly into the RTF content
-            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
+            // Insert hex image data directly into the RTF content
+            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${hexImage}}`;
         } catch (error) {
             console.error('Image conversion failed:', error);
         }
