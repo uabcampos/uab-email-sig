@@ -61,7 +61,101 @@ function updateSignaturePreview() {
     document.getElementById('signature-preview').innerHTML = signaturePreview;
 }
 
-// Function to copy the signature to clipboard
+// Convert image URL to Base64
+function getImageBase64(url, callback) {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            callback(reader.result.replace(/^data:image\/(png|jpg);base64,/, ''));
+        };
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+}
+
+// Function to download the signature as an RTF file with embedded image
+function downloadRTF() {
+    let signaturePreview = document.getElementById('signature-preview').innerHTML;
+
+    // Split the signature content by <br> tags to handle each line
+    let lines = signaturePreview.split('<br>');
+
+    // Part 1: Blank line at the top to separate signature from email body
+    let part1 = '\\line ';  // This will be the blank line at the top
+
+    // Part 2: Signature Block (all user information except the URL)
+    let signatureBlock = lines.slice(0, -1).map(line => 
+        line.replace(/^\s+/g, '')  // Remove any leading spaces
+            .replace(/&amp;/g, '&')  // Replace &amp; with &
+            .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Convert to bold and green
+            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
+            .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
+            .trim()  // Trim trailing/leading spaces
+    ).filter(line => line !== '').join('\\line ');
+
+    // Add a blank line after the signature block
+    let part2 = `${signatureBlock}\\line `;  // Adds a blank line after the signature block
+
+    // Part 3: URL Block (only the URL with a blank line before it)
+    let part3 = lines[lines.length - 1]
+        .replace(/^\s+/g, '')  // Remove any leading spaces
+        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
+        .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
+        .trim();  // Trim trailing/leading spaces
+
+    // Make sure there's exactly one blank line before the URL block
+    part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
+
+    // Check if the image is selected and add it to the RTF
+    const addImage = document.getElementById('add-image-checkbox').checked;
+    if (addImage) {
+        const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
+
+        // Convert image to Base64 and embed in RTF
+        getImageBase64(imageUrl, function(base64Image) {
+            const part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
+            
+            // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
+            const rtfContent = `{\\rtf1\\ansi\\deff0
+            {\\colortbl ;\\red30\\green107\\blue82;}
+            {\\fonttbl {\\f0 Arial;}}
+            \\fs24
+            ${part1}${part2}${part3}${part4}
+            }`;
+
+            // Create a blob and download the RTF file
+            const blob = new Blob([rtfContent], { type: 'application/rtf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'signature.rtf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    } else {
+        // No image case
+        const rtfContent = `{\\rtf1\\ansi\\deff0
+        {\\colortbl ;\\red30\\green107\\blue82;}
+        {\\fonttbl {\\f0 Arial;}}
+        \\fs24
+        ${part1}${part2}${part3}
+        }`;
+
+        // Create a blob and download the RTF file
+        const blob = new Blob([rtfContent], { type: 'application/rtf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'signature.rtf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Copy to clipboard function
 function copyToClipboard() {
     const signaturePreview = document.getElementById('signature-preview').innerHTML;
     const tempElement = document.createElement('div');
@@ -150,66 +244,6 @@ function addValidationAndPreviewListeners() {
     // Listen for changes to the image checkbox to update the preview
     document.getElementById('add-image-checkbox').addEventListener('change', updateSignaturePreview);
 }
-
-// Function to download the signature as an RTF file
-function downloadRTF() {
-    let signaturePreview = document.getElementById('signature-preview').innerHTML;
-
-    // Split the signature content by <br> tags to handle each line
-    let lines = signaturePreview.split('<br>');
-
-    // Part 1: Blank line at the top to separate signature from email body
-    let part1 = '\\line ';  // This will be the blank line at the top
-
-    // Part 2: Signature Block (all user information except the URL)
-    let signatureBlock = lines.slice(0, -1).map(line => 
-        line.replace(/^\s+/g, '')  // Remove any leading spaces
-            .replace(/&amp;/g, '&')  // Replace &amp; with &
-            .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Convert to bold and green
-            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
-            .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
-            .trim()  // Trim trailing/leading spaces
-    ).filter(line => line !== '').join('\\line ');
-
-    // Add a blank line after the signature block
-    let part2 = `${signatureBlock}\\line `;  // Adds a blank line after the signature block
-
-    // Part 3: URL Block (only the URL with a blank line before it)
-    let part3 = lines[lines.length - 1]
-        .replace(/^\s+/g, '')  // Remove any leading spaces
-        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
-        .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
-        .trim();  // Trim trailing/leading spaces
-
-    // Make sure there's exactly one blank line before the URL block
-    part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
-
-    // Part 4: Image block if checkbox is selected
-    const addImage = document.getElementById('add-image-checkbox').checked;
-    let part4 = '';
-    if (addImage) {
-        part4 = `\\line {\\pict\\pngblip\\picw450\\pich100 https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg}`;
-    }
-
-    // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
-    const rtfContent = `{\\rtf1\\ansi\\deff0
-    {\\colortbl ;\\red30\\green107\\blue82;}
-    {\\fonttbl {\\f0 Arial;}}
-    \\fs24
-    ${part1}${part2}${part3}${part4}
-    }`;
-
-    // Create a blob and download the RTF file
-    const blob = new Blob([rtfContent], { type: 'application/rtf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'signature.rtf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-document.getElementById('download-button').addEventListener('click', downloadRTF);
 
 // Initialize listeners and validation on page load
 window.onload = function() {
