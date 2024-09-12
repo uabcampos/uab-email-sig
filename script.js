@@ -135,7 +135,7 @@ function downloadRTF() {
 
     // Handle the rest of the lines, removing leading spaces, stripping HTML tags, and converting links
     let restOfLines = lines.slice(1).map(line => 
-        line.trim()  // Trim whitespace from the line
+        line.replace(/^\s+/g, '')  // Remove any leading spaces
             .replace(/&amp;/g, '&')  // Replace &amp; with &
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
             .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
