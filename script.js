@@ -30,6 +30,9 @@ function updateSignaturePreview() {
     const addImage = document.getElementById('add-image-checkbox').checked;
     const imageHTML = addImage ? '<br><img src="https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg" alt="Health Promoting University" width="225">' : '';
 
+    // URL without the https://
+    const url = "uab.edu/medicine/gimpop";
+
     let signaturePreview = '';
 
     if (isStandardVersion) {
@@ -41,7 +44,7 @@ function updateSignaturePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${room} | ${street} | ${cityState} ${zip}<br>
             ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            <a href="https://${url}" target="_blank">${url}</a>
             ${imageHTML}
         `;
     } else {
@@ -50,7 +53,7 @@ function updateSignaturePreview() {
             <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${phoneLine}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            <a href="https://${url}" target="_blank">${url}</a>
             ${imageHTML}
         `;
     }
@@ -185,7 +188,7 @@ function downloadRTF() {
     const addImage = document.getElementById('add-image-checkbox').checked;
     let part4 = '';
     if (addImage) {
-        part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg}`;
+        part4 = `\\line {\\pict\\pngblip\\picw450\\pich100 https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg}`;
     }
 
     // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
