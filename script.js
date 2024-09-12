@@ -23,21 +23,39 @@ function updateSignaturePreview() {
         phoneLine = `M: ${mobilePhone}`;
     }
 
-    const signaturePreview = `
-        <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
-        Department of Medicine | Heersink School of Medicine<br>
-        Division of General Internal Medicine & Population Science<br>
-        UAB | The University of Alabama at Birmingham<br>
-        ${room} | ${street} | ${cityState} ${zip}<br>
-        ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
-        <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
-    `;
+    // Determine if the standard or abbreviated version is active
+    const isStandardVersion = document.getElementById('btn-standard').classList.contains('active');
+
+    let signaturePreview = '';
+
+    if (isStandardVersion) {
+        // Standard version of the signature
+        signaturePreview = `
+            <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
+            Department of Medicine | Heersink School of Medicine<br>
+            Division of General Internal Medicine & Population Science<br>
+            UAB | The University of Alabama at Birmingham<br>
+            ${room} | ${street} | ${cityState} ${zip}<br>
+            ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
+            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+        `;
+    } else {
+        // Abbreviated version of the signature
+        signaturePreview = `
+            <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
+            UAB | The University of Alabama at Birmingham<br>
+            ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
+            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+        `;
+    }
 
     document.getElementById('signature-preview').innerHTML = signaturePreview;
 }
 
 // Call the updateSignaturePreview function on page load
 window.onload = function() {
+    // Set the standard version active by default
+    document.getElementById('btn-standard').classList.add('active');
     updateSignaturePreview(); // Show the standard version by default
 };
 
@@ -55,13 +73,79 @@ document.getElementById('phone-office').addEventListener('input', updateSignatur
 document.getElementById('phone-mobile').addEventListener('input', updateSignaturePreview);
 document.getElementById('phone-office-enable').addEventListener('change', updateSignaturePreview);
 document.getElementById('phone-mobile-enable').addEventListener('change', updateSignaturePreview);
+
+// Event listener for version buttons
 document.getElementById('btn-standard').addEventListener('click', function() {
-    updateSignaturePreview(); // Standard version click handler
     document.getElementById('btn-standard').classList.add('active');
     document.getElementById('btn-abbreviated').classList.remove('active');
+    updateSignaturePreview(); // Update preview when standard version is selected
 });
 document.getElementById('btn-abbreviated').addEventListener('click', function() {
-    updateSignaturePreview(); // Abbreviated version click handler
     document.getElementById('btn-abbreviated').classList.add('active');
     document.getElementById('btn-standard').classList.remove('active');
+    updateSignaturePreview(); // Update preview when abbreviated version is selected
 });
+
+// Function to copy the signature to clipboard
+function copyToClipboard() {
+    const signaturePreview = document.getElementById('signature-preview').innerHTML;
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = `
+        <div style="font-size: 12px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif;">
+            ${signaturePreview}
+        </div>
+    `;
+    document.body.appendChild(tempElement);
+
+    const range = document.createRange();
+    range.selectNodeContents(tempElement);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    try {
+        document.execCommand('copy');
+        document.getElementById('copy-success').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('copy-success').style.display = 'none';
+        }, 3000);
+    } catch (err) {
+        console.error('Failed to copy signature: ', err);
+    }
+
+    selection.removeAllRanges();
+    document.body.removeChild(tempElement);
+}
+
+document.getElementById('copy-button').addEventListener('click', copyToClipboard);
+
+// Function to download the signature as an RTF file
+function downloadRTF() {
+    let signaturePreview = document.getElementById('signature-preview').innerHTML;
+    let lines = signaturePreview.split('<br>');
+    let firstLine = lines[0].replace(/^\s+/g, '').replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
+    let restOfLines = lines.slice(1).map(line => 
+        line.replace(/^\s+/g, '')
+            .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+            .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .replace(/\s+$/g, '')
+    ).join('\\line ');
+
+    const rtfContent = `{\\rtf1\\ansi\\deff0
+    {\\colortbl ;\\red30\\green107\\blue82;}
+    {\\fonttbl {\\f0 Arial;}}
+    \\fs24
+    ${firstLine}\\line ${restOfLines}
+    }`;
+
+    const blob = new Blob([rtfContent], { type: 'application/rtf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'signature.rtf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+document.getElementById('download-button').addEventListener('click', downloadRTF);
