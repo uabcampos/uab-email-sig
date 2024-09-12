@@ -105,9 +105,10 @@ function downloadRTF() {
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
             .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
             .replace(/<\/?[^>]+(>|$)/g, '')  // Remove any remaining HTML tags
-    ).join('\\line ');
+            .trim()  // Trim to remove any leftover spaces or empty lines
+    ).filter(line => line !== '').join('\\line ');  // Remove empty lines
 
-    // Generate the RTF content without a blank first line
+    // Generate the RTF content without a blank first line and without extra spaces
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
