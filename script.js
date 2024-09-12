@@ -92,31 +92,38 @@ function downloadRTF() {
     // Split the signature content by <br> tags to handle each line
     let lines = signaturePreview.split('<br>');
 
-    // Fix the first line (name and title) by removing any leading spaces and converting HTML to RTF
-    let firstLine = lines[0]
-        .replace(/^\s+/g, '')  // Remove leading spaces
-        .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Make bold and green
-        .replace(/&amp;/g, '&');  // Replace &amp; with &
+    // Part 1: Blank line at the top to separate signature from email body
+    let part1 = '\\line ';  // This will be the blank line at the top
 
-    // Handle the rest of the lines, removing leading spaces, stripping HTML tags, and converting links
-    let restOfLines = lines.slice(1).map(line => 
+    // Part 2: Signature Block (all user information except the URL)
+    let signatureBlock = lines.slice(0, -1).map(line => 
         line.replace(/^\s+/g, '')  // Remove any leading spaces
             .replace(/&amp;/g, '&')  // Replace &amp; with &
+            .replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}')  // Convert to bold and green
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
-            .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
-            .replace(/<\/?[^>]+(>|$)/g, '')  // Remove any remaining HTML tags
-            .trim()  // Trim to remove any leftover spaces or empty lines
-    ).filter(line => line !== '').join('\\line ');  // Remove empty lines
+            .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
+            .trim()  // Trim trailing/leading spaces
+    ).join('\\line ');
 
-    // Add a single blank line between the signature block and the URL
-    restOfLines += '\\line ';  // Insert one blank line before the URL
+    // Add a blank line after the signature block
+    let part2 = `${signatureBlock}\\line `;  // Adds a blank line after the signature block
 
-    // Generate the RTF content without leading spaces
+    // Part 3: URL Block (only the URL with a blank line before it)
+    let part3 = lines[lines.length - 1]
+        .replace(/^\s+/g, '')  // Remove any leading spaces
+        .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
+        .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
+        .trim();  // Trim trailing/leading spaces
+
+    // Add a blank line before the URL
+    part3 = `\\line ${part3}`;  // This ensures there is a blank line before the URL block
+
+    // Combine all parts (Part 1 + Part 2 + Part 3)
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${firstLine}\\line ${restOfLines}
+    ${part1}${part2}${part3}
     }`;
 
     // Create a blob and download the RTF file
