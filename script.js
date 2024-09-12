@@ -26,6 +26,10 @@ function updateSignaturePreview() {
     // Determine if the standard or abbreviated version is active
     const isStandardVersion = document.getElementById('btn-standard').classList.contains('active');
 
+    // Check if the image option is selected
+    const addImage = document.getElementById('add-image-checkbox').checked;
+    const imageHTML = addImage ? '<br><img src="https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg" alt="Health Promoting University" width="225">' : '';
+
     let signaturePreview = '';
 
     if (isStandardVersion) {
@@ -37,7 +41,8 @@ function updateSignaturePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${room} | ${street} | ${cityState} ${zip}<br>
             ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/gimpop/" target="_blank">uab.edu/medicine/gimpop/</a>
+            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            ${imageHTML}
         `;
     } else {
         // Abbreviated version without email
@@ -45,7 +50,8 @@ function updateSignaturePreview() {
             <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${phoneLine}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/gimpop/" target="_blank">uab.edu/medicine/gimpop/</a>
+            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            ${imageHTML}
         `;
     }
 
@@ -137,6 +143,9 @@ function addValidationAndPreviewListeners() {
     document.getElementById('btn-abbreviated').addEventListener('click', function () {
         toggleVersion(false);
     });
+
+    // Listen for changes to the image checkbox to update the preview
+    document.getElementById('add-image-checkbox').addEventListener('change', updateSignaturePreview);
 }
 
 // Function to download the signature as an RTF file
@@ -172,12 +181,19 @@ function downloadRTF() {
     // Make sure there's exactly one blank line before the URL block
     part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
 
-    // Combine all parts (Part 1 + Part 2 + Part 3) without extra blank lines
+    // Part 4: Image block if checkbox is selected
+    const addImage = document.getElementById('add-image-checkbox').checked;
+    let part4 = '';
+    if (addImage) {
+        part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg}`;
+    }
+
+    // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${part1}${part2}${part3}
+    ${part1}${part2}${part3}${part4}
     }`;
 
     // Create a blob and download the RTF file
