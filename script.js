@@ -118,8 +118,12 @@ async function generateRTFContent() {
 
     if (addImage) {
         const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
-        const base64Image = await getImageBase64(imageUrl);
-        part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
+        try {
+            const base64Image = await getImageBase64(imageUrl);
+            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
+        } catch (error) {
+            console.error('Image conversion failed:', error);
+        }
     }
 
     // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
@@ -135,16 +139,20 @@ async function generateRTFContent() {
 
 // Function to download the signature as an RTF file with embedded image
 async function downloadRTF() {
-    const rtfContent = await generateRTFContent();
+    try {
+        const rtfContent = await generateRTFContent();
 
-    // Create a blob and download the RTF file
-    const blob = new Blob([rtfContent], { type: 'application/rtf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'signature.rtf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        // Create a blob and download the RTF file
+        const blob = new Blob([rtfContent], { type: 'application/rtf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'signature.rtf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Error generating RTF:', error);
+    }
 }
 
 // Copy to clipboard function
