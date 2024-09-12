@@ -37,7 +37,7 @@ function updateSignaturePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${room} | ${street} | ${cityState} ${zip}<br>
             ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            <a href="https://uab.edu/medicine/gimpop/" target="_blank">https://uab.edu/medicine/gimpop/</a>
         `;
     } else {
         // Abbreviated version without email
@@ -45,7 +45,7 @@ function updateSignaturePreview() {
             <strong style="color: #1E6B52;">${name}${credentials} | ${title}</strong><br>
             UAB | The University of Alabama at Birmingham<br>
             ${phoneLine}${pronouns}<br><br>
-            <a href="https://uab.edu/medicine/dom/" target="_blank">https://uab.edu/medicine/dom/</a>
+            <a href="https://uab.edu/medicine/gimpop/" target="_blank">https://uab.edu/medicine/gimpop/</a>
         `;
     }
 
