@@ -103,6 +103,14 @@ function validateAndUpdate(field) {
     updateSignaturePreview();  // Update the signature preview immediately after validation
 }
 
+// Function to validate all required fields on page load
+function validateAllRequiredFields() {
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        validateField(field);  // Validate each required field
+    });
+}
+
 // Function to add both validation and preview listeners
 function addValidationAndPreviewListeners() {
     document.getElementById('name').addEventListener('input', () => validateAndUpdate(document.getElementById('name')));
@@ -184,8 +192,10 @@ function downloadRTF() {
 
 document.getElementById('download-button').addEventListener('click', downloadRTF);
 
-// Initialize listeners on page load
+// Initialize listeners and validation on page load
 window.onload = function() {
     addValidationAndPreviewListeners();  // Add live preview listeners and validation listeners
     toggleVersion(true);  // Default to standard version on load
+    validateAllRequiredFields();  // Validate all required fields on page load
+    updateSignaturePreview();  // Update the signature preview on page load
 };
