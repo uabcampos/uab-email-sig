@@ -142,12 +142,19 @@ function downloadRTF() {
             .replace(/<\/?[^>]+(>|$)/g, '')  // Remove any remaining HTML tags
     ).join('\\line ');
 
-    // Add a blank line before the signature content to fix indenting
+    // Check if the signature is abbreviated (without email)
+    const isAbbreviated = document.getElementById('btn-abbreviated').classList.contains('active');
+
+    // For abbreviated version, remove email from the RTF content
+    if (isAbbreviated) {
+        restOfLines = restOfLines.replace(/\| johndoe@uabmc.edu/, ''); // Replace the email with an empty string in abbreviated version
+    }
+
+    // Generate the RTF content without a blank first line
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    \\line
     ${firstLine}\\line ${restOfLines}
     }`;
 
