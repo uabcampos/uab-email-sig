@@ -85,19 +85,25 @@ function copyToClipboard() {
 
 document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 
-// Event listeners for live preview update on field input
-function addLivePreviewListeners() {
-    document.getElementById('name').addEventListener('input', updateSignaturePreview);
-    document.getElementById('credentials').addEventListener('input', updateSignaturePreview);
-    document.getElementById('title').addEventListener('input', updateSignaturePreview);
-    document.getElementById('room').addEventListener('input', updateSignaturePreview);
-    document.getElementById('street').addEventListener('input', updateSignaturePreview);
-    document.getElementById('city-state').addEventListener('input', updateSignaturePreview);
-    document.getElementById('zip').addEventListener('input', updateSignaturePreview);
-    document.getElementById('email').addEventListener('input', updateSignaturePreview);
-    document.getElementById('phone-office').addEventListener('input', updateSignaturePreview);
-    document.getElementById('phone-mobile').addEventListener('input', updateSignaturePreview);
-    document.getElementById('pronouns').addEventListener('input', updateSignaturePreview);
+// Function to validate and update the preview
+function validateAndUpdate(field) {
+    validateField(field);  // Call validation for the field
+    updateSignaturePreview();  // Update the signature preview immediately after validation
+}
+
+// Function to add both validation and preview listeners
+function addValidationAndPreviewListeners() {
+    document.getElementById('name').addEventListener('input', () => validateAndUpdate(document.getElementById('name')));
+    document.getElementById('credentials').addEventListener('input', () => validateAndUpdate(document.getElementById('credentials')));
+    document.getElementById('title').addEventListener('input', () => validateAndUpdate(document.getElementById('title')));
+    document.getElementById('room').addEventListener('input', () => validateAndUpdate(document.getElementById('room')));
+    document.getElementById('street').addEventListener('input', () => validateAndUpdate(document.getElementById('street')));
+    document.getElementById('city-state').addEventListener('input', () => validateAndUpdate(document.getElementById('city-state')));
+    document.getElementById('zip').addEventListener('input', () => validateAndUpdate(document.getElementById('zip')));
+    document.getElementById('email').addEventListener('input', () => validateAndUpdate(document.getElementById('email')));
+    document.getElementById('phone-office').addEventListener('input', () => validateAndUpdate(document.getElementById('phone-office')));
+    document.getElementById('phone-mobile').addEventListener('input', () => validateAndUpdate(document.getElementById('phone-mobile')));
+    document.getElementById('pronouns').addEventListener('input', () => validateAndUpdate(document.getElementById('pronouns')));
 
     // Also listen for changes in the enable checkboxes for phone numbers
     document.getElementById('phone-office-enable').addEventListener('change', updateSignaturePreview);
@@ -157,9 +163,9 @@ function downloadRTF() {
 
 document.getElementById('download-button').addEventListener('click', downloadRTF);
 
-// Initialize live preview listeners on page load
+// Initialize listeners on page load
 window.onload = function() {
-    addLivePreviewListeners();  // Add live preview listeners for real-time updates
+    addValidationAndPreviewListeners();  // Add live preview listeners and validation listeners
     document.getElementById('btn-standard').classList.add('active');  // Default to standard version on load
     updateSignaturePreview();  // Update preview on page load
-};
+}
