@@ -122,20 +122,23 @@ document.getElementById('copy-button').addEventListener('click', copyToClipboard
 // Function to download the signature as an RTF file
 function downloadRTF() {
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
+
+    // Add a blank line before the first line to fix the indenting issue
     let lines = signaturePreview.split('<br>');
-    let firstLine = lines[0].replace(/^\s+/g, '').replace(/<strong style="color: #002c17;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}');
+    let firstLine = lines[0].replace(/<strong style="color: #1E6B52;">(.*?)<\/strong>/g, '{\\b\\cf1 $1}').trim();
     let restOfLines = lines.slice(1).map(line => 
-        line.replace(/^\s+/g, '')
+        line.trim()
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
             .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')
-            .replace(/<\/?[^>]+(>|$)/g, '')
-            .replace(/\s+$/g, '')
+            .replace(/<\/?[^>]+(>|$)/g, '') // Remove any remaining HTML tags
     ).join('\\line ');
 
+    // Add a blank line before the signature content to fix indenting
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
+    \\line
     ${firstLine}\\line ${restOfLines}
     }`;
 
