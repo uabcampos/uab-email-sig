@@ -68,7 +68,8 @@ function getImageBase64(url) {
         xhr.onload = function () {
             const reader = new FileReader();
             reader.onloadend = function () {
-                resolve(reader.result.replace(/^data:image\/(png|jpg);base64,/, ''));
+                const result = reader.result.split(',')[1]; // Get base64 part
+                resolve(result);
             };
             reader.readAsDataURL(xhr.response);
         };
@@ -120,7 +121,10 @@ async function generateRTFContent() {
         const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
         try {
             const base64Image = await getImageBase64(imageUrl);
-            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${base64Image}}`;
+            
+            // Make sure the Base64 string is split into chunks to avoid RTF format issues
+            const rtfImageData = base64Image.match(/.{1,60}/g).join('\\\n');
+            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${rtfImageData}}`;
         } catch (error) {
             console.error('Image conversion failed:', error);
         }
