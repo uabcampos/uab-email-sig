@@ -103,22 +103,22 @@ function downloadRTF() {
             .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')  // Convert mailto links
             .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
             .trim()  // Trim trailing/leading spaces
-    ).join('\\line ');
+    ).filter(line => line !== '').join('\\line ');
 
-    // Add a blank line after the signature block
-    let part2 = `${signatureBlock}\\line `;  // Adds a blank line after the signature block
+    // Add only one blank line after the signature block
+    let part2 = `${signatureBlock}\\line `;  // Adds a single blank line after the signature block
 
-    // Part 3: URL Block (only the URL with a blank line before it)
+    // Part 3: URL Block (only the URL with one blank line before it)
     let part3 = lines[lines.length - 1]
         .replace(/^\s+/g, '')  // Remove any leading spaces
         .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
         .replace(/<\/?[^>]+(>|$)/g, '')  // Remove remaining HTML tags
         .trim();  // Trim trailing/leading spaces
 
-    // Add a blank line before the URL
-    part3 = `\\line ${part3}`;  // This ensures there is a blank line before the URL block
+    // Make sure there's exactly one blank line before the URL block
+    part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
 
-    // Combine all parts (Part 1 + Part 2 + Part 3)
+    // Combine all parts (Part 1 + Part 2 + Part 3) without extra blank lines
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
