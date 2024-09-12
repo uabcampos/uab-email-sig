@@ -85,6 +85,25 @@ function copyToClipboard() {
 
 document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 
+// Event listeners for live preview update on field input
+function addLivePreviewListeners() {
+    document.getElementById('name').addEventListener('input', updateSignaturePreview);
+    document.getElementById('credentials').addEventListener('input', updateSignaturePreview);
+    document.getElementById('title').addEventListener('input', updateSignaturePreview);
+    document.getElementById('room').addEventListener('input', updateSignaturePreview);
+    document.getElementById('street').addEventListener('input', updateSignaturePreview);
+    document.getElementById('city-state').addEventListener('input', updateSignaturePreview);
+    document.getElementById('zip').addEventListener('input', updateSignaturePreview);
+    document.getElementById('email').addEventListener('input', updateSignaturePreview);
+    document.getElementById('phone-office').addEventListener('input', updateSignaturePreview);
+    document.getElementById('phone-mobile').addEventListener('input', updateSignaturePreview);
+    document.getElementById('pronouns').addEventListener('input', updateSignaturePreview);
+
+    // Also listen for changes in the enable checkboxes for phone numbers
+    document.getElementById('phone-office-enable').addEventListener('change', updateSignaturePreview);
+    document.getElementById('phone-mobile-enable').addEventListener('change', updateSignaturePreview);
+}
+
 // Function to download the signature as an RTF file
 function downloadRTF() {
     let signaturePreview = document.getElementById('signature-preview').innerHTML;
@@ -105,10 +124,10 @@ function downloadRTF() {
             .trim()  // Trim trailing/leading spaces
     ).filter(line => line !== '').join('\\line ');
 
-    // Add only one blank line after the signature block
-    let part2 = `${signatureBlock}\\line `;  // Adds a single blank line after the signature block
+    // Add a blank line after the signature block
+    let part2 = `${signatureBlock}\\line `;  // Adds a blank line after the signature block
 
-    // Part 3: URL Block (only the URL with one blank line before it)
+    // Part 3: URL Block (only the URL with a blank line before it)
     let part3 = lines[lines.length - 1]
         .replace(/^\s+/g, '')  // Remove any leading spaces
         .replace(/<a href="(.*?)"(.*?)>(.*?)<\/a>/g, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $3}}')  // Convert regular links
@@ -138,40 +157,9 @@ function downloadRTF() {
 
 document.getElementById('download-button').addEventListener('click', downloadRTF);
 
-// Validate the form and update the preview
-function validateAndUpdatePreview() {
-    // Validate all required fields before generating the preview
-    validateAllRequiredFields(); // Call the validateAllRequiredFields function from validation.js
-    updateSignaturePreview(); // If validation passes, update the preview
-}
-
-// Event listeners for form inputs to validate them as the user types
-document.getElementById('name').addEventListener('input', () => validateField(document.getElementById('name')));
-document.getElementById('credentials').addEventListener('input', () => validateField(document.getElementById('credentials')));
-document.getElementById('title').addEventListener('input', () => validateField(document.getElementById('title')));
-document.getElementById('room').addEventListener('input', () => validateField(document.getElementById('room')));
-document.getElementById('street').addEventListener('input', () => validateField(document.getElementById('street')));
-document.getElementById('city-state').addEventListener('input', () => validateField(document.getElementById('city-state')));
-document.getElementById('zip').addEventListener('input', () => validateField(document.getElementById('zip')));
-document.getElementById('email').addEventListener('input', () => validateField(document.getElementById('email')));
-document.getElementById('phone-office').addEventListener('input', () => validateField(document.getElementById('phone-office')));
-document.getElementById('phone-mobile').addEventListener('input', () => validateField(document.getElementById('phone-mobile')));
-
-// Toggle between Standard and Abbreviated versions
-document.getElementById('btn-standard').addEventListener('click', function() {
-    document.getElementById('btn-standard').classList.add('active');
-    document.getElementById('btn-abbreviated').classList.remove('active');
-    validateAndUpdatePreview(); // Validate and update preview on standard version selection
-});
-
-document.getElementById('btn-abbreviated').addEventListener('click', function() {
-    document.getElementById('btn-abbreviated').classList.add('active');
-    document.getElementById('btn-standard').classList.remove('active');
-    validateAndUpdatePreview(); // Validate and update preview on abbreviated version selection
-});
-
-// Call validateAndUpdatePreview on page load
+// Initialize live preview listeners on page load
 window.onload = function() {
-    document.getElementById('btn-standard').classList.add('active');
-    validateAndUpdatePreview(); // Validate fields and show the standard version by default on load
+    addLivePreviewListeners();  // Add live preview listeners for real-time updates
+    document.getElementById('btn-standard').classList.add('active');  // Default to standard version on load
+    updateSignaturePreview();  // Update preview on page load
 };
