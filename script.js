@@ -243,7 +243,9 @@ function addValidationAndPreviewListeners() {
 
     document.getElementById('btn-abbreviated').addEventListener('click', function () {
         toggleVersion(false);
-       // Listen for changes to the image checkbox to update the preview
+    });
+
+    // Listen for changes to the image checkbox to update the preview
     document.getElementById('add-image-checkbox').addEventListener('change', updateSignaturePreview);
 }
 
