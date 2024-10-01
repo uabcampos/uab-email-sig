@@ -31,7 +31,7 @@ function updateSignaturePreview() {
     const imageHTML = addImage ? '<br><img src="https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg" alt="Health Promoting University" width="225">' : '';
 
     // URL without the https://
-    const url = "uab.edu/medicine/internalmedicine";
+    const url = "uab.edu/medicine/gimaps";
 
     let signaturePreview = '';
 
