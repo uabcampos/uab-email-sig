@@ -15,20 +15,20 @@ function updateSignaturePreview() {
     const mobilePhone = document.getElementById('phone-mobile').value || '205.555.1234';
     let phoneLine = '';
 
+    // Format phone numbers
+    const formattedOfficePhone = formatPhoneNumber(officePhone);
+    const formattedMobilePhone = formatPhoneNumber(mobilePhone);
+
     if (officePhoneEnabled && mobilePhoneEnabled) {
-        phoneLine = `O: ${officePhone}, M: ${mobilePhone}`;
+        phoneLine = `O: ${formattedOfficePhone}, M: ${formattedMobilePhone}`;
     } else if (officePhoneEnabled) {
-        phoneLine = `O: ${officePhone}`;
+        phoneLine = `O: ${formattedOfficePhone}`;
     } else if (mobilePhoneEnabled) {
-        phoneLine = `M: ${mobilePhone}`;
+        phoneLine = `M: ${formattedMobilePhone}`;
     }
 
     // Determine if the standard or abbreviated version is active
     const isStandardVersion = document.getElementById('btn-standard').classList.contains('active');
-
-    // Check if the image option is selected
-    const addImage = document.getElementById('add-image-checkbox').checked;
-    const imageHTML = addImage ? '<br><img src="https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg" alt="Health Promoting University" width="225">' : '';
 
     // URL without the https://
     const url = "uab.edu/medicine/gimaps";
@@ -43,9 +43,8 @@ function updateSignaturePreview() {
             Division of General Internal Medicine & Population Science<br>
             UAB | The University of Alabama at Birmingham<br>
             ${room} | ${street} | ${cityState} ${zip}<br>
-            ${phoneLine ? `${phoneLine} | ` : ''}${email}${pronouns}<br><br>
+            ${phoneLine ? `${phoneLine} | ` : ''}<a href="mailto:${email}">${email}</a>${pronouns}<br><br>
             <a href="https://${url}" target="_blank">${url}</a>
-            ${imageHTML}
         `;
     } else {
         // Abbreviated version without email
@@ -54,11 +53,21 @@ function updateSignaturePreview() {
             UAB | The University of Alabama at Birmingham<br>
             ${phoneLine}${pronouns}<br><br>
             <a href="https://${url}" target="_blank">${url}</a>
-            ${imageHTML}
         `;
     }
 
     document.getElementById('signature-preview').innerHTML = signaturePreview;
+}
+
+// Helper function to format phone numbers
+function formatPhoneNumber(phoneNumber) {
+    const digits = phoneNumber.replace(/\D/g, ''); // Remove non-digit characters
+    if (digits.length === 7) {
+        return `205.${digits.slice(0, 3)}.${digits.slice(3)}`; // Assume 205 area code for 7 digits
+    } else if (digits.length === 10) {
+        return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`; // Format as ###.###.####
+    }
+    return phoneNumber; // Return as is if not 7 or 10 digits
 }
 
 // Convert image URL to hexadecimal
@@ -114,34 +123,18 @@ async function generateRTFContent() {
     // Make sure there's exactly one blank line before the URL block
     part3 = `\\line ${part3}`;  // Ensures only one blank line before the URL block
 
-    // Part 4: Image block if checkbox is selected
-    const addImage = document.getElementById('add-image-checkbox').checked;
-    let part4 = '';
-
-    if (addImage) {
-        const imageUrl = "https://www.uab.edu/toolkit/images/branded-items/email-signature/health-promoting/first-health-promoting-univ1.jpg";
-        try {
-            const hexImage = await getImageHex(imageUrl);
-            
-            // Insert hex image data directly into the RTF content
-            part4 = `\\line {\\pict\\pngblip\\picw225\\pich50 ${hexImage}}`;
-        } catch (error) {
-            console.error('Image conversion failed:', error);
-        }
-    }
-
-    // Combine all parts (Part 1 + Part 2 + Part 3 + Part 4) without extra blank lines
+    // Combine all parts (Part 1 + Part 2 + Part 3)
     const rtfContent = `{\\rtf1\\ansi\\deff0
     {\\colortbl ;\\red30\\green107\\blue82;}
     {\\fonttbl {\\f0 Arial;}}
     \\fs24
-    ${part1}${part2}${part3}${part4}
+    ${part1}${part2}${part3}
     }`;
 
     return rtfContent;
 }
 
-// Function to download the signature as an RTF file with embedded image
+// Function to download the signature as an RTF file
 async function downloadRTF() {
     try {
         const rtfContent = await generateRTFContent();
@@ -165,7 +158,7 @@ function copyToClipboard() {
     const tempElement = document.createElement('div');
     tempElement.innerHTML = `
         <div style="font-size: 12px; line-height: 1.0; font-family: 'Proxima Nova', Arial, sans-serif;">
-            ${signaturePreview}
+            ${signaturePreview.replace(/<a href="mailto:(.*?)">(.*?)<\/a>/g, '<a href="mailto:$1">$2</a>')}
         </div>
     `;
     document.body.appendChild(tempElement);
@@ -244,9 +237,6 @@ function addValidationAndPreviewListeners() {
     document.getElementById('btn-abbreviated').addEventListener('click', function () {
         toggleVersion(false);
     });
-
-    // Listen for changes to the image checkbox to update the preview
-    document.getElementById('add-image-checkbox').addEventListener('change', updateSignaturePreview);
 }
 
 // Initialize listeners and validation on page load
@@ -259,3 +249,4 @@ window.onload = function() {
 
 // Add the event listener for the download button
 document.getElementById('download-button').addEventListener('click', downloadRTF);
+
