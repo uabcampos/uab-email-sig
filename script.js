@@ -286,9 +286,8 @@ function hideQRCode() {
 }
 
 // ------------ Website Lookup (DuckDuckGo) ------------
-
 async function lookupWebsite() {
-  // Use division if provided, else department
+  // Use division if provided, otherwise department
   let text = el('division').value.trim() || el('department').value.trim();
   if (!text) {
     alert('Please enter a Division or Department name first.');
@@ -296,6 +295,7 @@ async function lookupWebsite() {
   }
   // Replace "&" with "and"
   text = text.replace(/&/g, 'and');
+
   // Build DuckDuckGo query
   const query = `Home "${text}" site:uab.edu`;
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
@@ -308,21 +308,41 @@ async function lookupWebsite() {
       return r.text();
     });
 
+    // Parse returned HTML and find only real results
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    let link = doc.querySelector('a.result__a')?.href;
-
-    if (link && link.includes('/l/?uddg=')) {
-      const u = new URL(link);
-      const d = u.searchParams.get('uddg');
-      if (d) link = decodeURIComponent(d);
-    }
+    // Select all result links
+    const anchors = Array.from(doc.querySelectorAll('a.result__a'));
+    // Find first whose href points to a uab.edu domain
+    let link = anchors
+      .map(a => a.href)
+      .map(h => {
+        // unwrap any DuckDuckGo redirect
+        if (h.includes('/l/?uddg=')) {
+          try {
+            const u = new URL(h);
+            const d = u.searchParams.get('uddg');
+            return d ? decodeURIComponent(d) : h;
+          } catch {
+            return h;
+          }
+        }
+        return h;
+      })
+      .find(h => {
+        try {
+          const host = new URL(h).hostname;
+          return host.endsWith('uab.edu');
+        } catch {
+          return false;
+        }
+      });
 
     if (link) {
       el('website').value = link;
       persist('website', link);
-      updateSignaturePreview(); // <-- Refresh preview immediately
+      updateSignaturePreview();  // refresh preview immediately
     } else {
-      alert('No result found; please paste URL manually.');
+      alert('No uab.edu result found; please paste URL manually.');
     }
   } catch (err) {
     console.error(err);
