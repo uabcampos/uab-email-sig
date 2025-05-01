@@ -34,6 +34,45 @@ function clearAllPersistence() {
     .forEach(k => localStorage.removeItem(k));
 }
 
+// ------------ URL Deep-Linking for QR ------------
+
+function buildDeepLink() {
+  const params = new URLSearchParams();
+  [
+    'name','credentials','title',
+    'department','school','division',
+    'room','street','city-state','zip',
+    'email','pronouns'
+  ].forEach(id => {
+    const fld = el(id);
+    if (fld && fld.value) params.set(id, fld.value);
+  });
+  params.set('phoneOffice', el('phone-office-enable').checked);
+  params.set('phoneMobile', el('phone-mobile-enable').checked);
+  params.set('version',
+    el('btn-standard').classList.contains('active') ? 'standard' : 'abbr'
+  );
+  return `${location.origin}${location.pathname}?${params.toString()}`;
+}
+
+function restoreFromQuery() {
+  const params = new URLSearchParams(location.search);
+  [
+    'name','credentials','title',
+    'department','school','division',
+    'room','street','city-state','zip',
+    'email','pronouns'
+  ].forEach(id => {
+    if (params.has(id)) el(id).value = params.get(id);
+  });
+  el('phone-office-enable').checked = params.get('phoneOffice') === 'true';
+  el('phone-mobile-enable').checked = params.get('phoneMobile') === 'true';
+  if (params.get('version') === 'abbr') {
+    el('btn-standard').classList.remove('active');
+    el('btn-abbreviated').classList.add('active');
+  }
+}
+
 // ------------ Formatting & Generation ------------
 
 function formatPhoneNumber(num) {
@@ -43,12 +82,10 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Decode HTML entities in signature-preview
 function decodedHTML() {
   return el('signature-preview').innerHTML.replace(/&amp;/g, '&');
 }
 
-// Generate RTF content
 async function generateRTFContent() {
   const raw = decodedHTML();
   const lines = raw.split('<br>').map(l => l.trim()).filter(Boolean);
@@ -78,7 +115,6 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Generate HTML signature for .html download or QR
 function generateHTMLSignature() {
   return `<!DOCTYPE html>
 <html><body style="font-family:Arial, sans-serif; font-size:12px;">
@@ -215,8 +251,7 @@ async function downloadPNG() {
 function showQRCode() {
   const qrModal = el('qr-modal');
   const img     = qrModal.querySelector('img');
-  const data    = encodeURIComponent(generateHTMLSignature());
-  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${data}&choe=UTF-8`;
+  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(buildDeepLink())}&choe=UTF-8`;
   qrModal.classList.add('active');
 }
 
@@ -245,7 +280,6 @@ function resetToDefaults() {
 }
 
 function updateSignaturePreview() {
-  // Persist inputs
   [
     'name','credentials','title',
     'department','school','division',
@@ -253,7 +287,6 @@ function updateSignaturePreview() {
     'email','pronouns'
   ].forEach(id => persist(id, (el(id)?.value || '').trim()));
 
-  // Gather values with defaults
   const name      = el('name').value.trim() || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim() || 'Program Director II';
@@ -283,7 +316,7 @@ function updateSignaturePreview() {
     html += `UAB | The University of Alabama at Birmingham<br>`;
     html += `${room} | ${street} | ${cityState} ${zip}<br>`;
   } else {
-    html += `UAB | The University of Alabama on Birmingham<br>`;
+    html += `UAB | The University of Alabama at Birmingham<br>`;
   }
   if (phoneLine) html += `${phoneLine} | `;
   html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
@@ -296,12 +329,15 @@ function updateSignaturePreview() {
 // ------------ Init on DOMContentLoaded ------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Replace Feather icons
+  // Feather icons
   if (window.feather) {
     feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
   }
 
-  // Insert QR modal and set up events
+  // Restore from URL query (for deep‐link mobile handoff)
+  restoreFromQuery();
+
+  // QR modal injection & events
   document.body.insertAdjacentHTML('beforeend', `
     <div id="qr-modal" class="qr-modal">
       <div class="qr-content"><img alt="QR code for signature"/></div>
@@ -312,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
   qrModal.addEventListener('click', hideQRCode);
   qrContent.addEventListener('click', e => e.stopPropagation());
 
-  // Restore persisted values
+  // Restore persisted fields
   [
     'name','credentials','title',
     'department','school','division',
@@ -324,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSignaturePreview();
 
   // Input listeners
-  const debounced = debounce(updateSignaturePreview);
+  const deb = debounce(updateSignaturePreview);
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns'
@@ -332,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const f = el(id);
     if (f) f.addEventListener('input', () => {
       validateField(f);
-      debounced();
+      deb();
     });
   });
 
@@ -365,13 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
     lastSavedEl.textContent = 'Last saved: never';
   });
 
-  // More options
+  // More options toggle
   el('more-options-toggle').addEventListener('click', () => {
     const panel = el('more-options');
     const btn   = el('more-options-toggle');
     const collapsed = panel.classList.toggle('collapsed');
-    const icon = btn.querySelector('i[data-feather]');
-    icon.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
+    const ico = btn.querySelector('i[data-feather]');
+    ico.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
 
@@ -379,14 +415,14 @@ document.addEventListener('DOMContentLoaded', () => {
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
 
-  // More actions
-  const moreActionsToggle = el('toggle-actions');
-  const extraActionsPanel = el('extra-actions');
-  extraActionsPanel.classList.add('collapsed');
-  moreActionsToggle.addEventListener('click', () => {
-    const collapsed = extraActionsPanel.classList.toggle('collapsed');
-    const icon = moreActionsToggle.querySelector('i[data-feather]');
-    icon.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
+  // More actions toggle
+  const moreToggle = el('toggle-actions');
+  const extraPanel = el('extra-actions');
+  extraPanel.classList.add('collapsed');
+  moreToggle.addEventListener('click', () => {
+    const collapsed = extraPanel.classList.toggle('collapsed');
+    const ico = moreToggle.querySelector('i[data-feather]');
+    ico.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
 
