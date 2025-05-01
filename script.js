@@ -83,14 +83,14 @@ ${sig}
 // ------------ Feedback, Copy & Download ------------
 
 function giveFeedback(btn) {
-  btn.classList.add('feedback');
-  setTimeout(() => btn.classList.remove('feedback'), 2000);
+  btn.classList.add('loading');
+  setTimeout(() => btn.classList.remove('loading'), 1500);
 }
 
 async function copyToClipboard() {
   const btn = el('copy-button');
   const tmp = document.createElement('div');
-  tmp.style.color = '#1E6B52';
+  tmp.style.color = '#1A5632';
   tmp.innerHTML = el('signature-preview').innerHTML;
   document.body.appendChild(tmp);
 
@@ -123,7 +123,7 @@ function copyHTML() {
 
 async function downloadRTF() {
   const btn = el('download-button');
-  btn.classList.add('loading');
+  giveFeedback(btn);
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
@@ -138,12 +138,11 @@ async function downloadRTF() {
   } catch {
     alert('RTF download failed.');
   }
-  btn.classList.remove('loading');
 }
 
 function downloadHTMLTemplate() {
   const btn = el('download-html-button');
-  btn.classList.add('loading');
+  giveFeedback(btn);
   const blob = new Blob([generateHTMLSignature()], { type: 'text/html' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -151,12 +150,11 @@ function downloadHTMLTemplate() {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  btn.classList.remove('loading');
 }
 
 async function downloadOFTTemplate() {
   const btn = el('download-oft-button');
-  btn.classList.add('loading');
+  giveFeedback(btn);
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/vnd.ms-outlook' });
@@ -169,7 +167,6 @@ async function downloadOFTTemplate() {
   } catch {
     alert('OFT download failed.');
   }
-  btn.classList.remove('loading');
 }
 
 let html2canvasPromise = null;
@@ -188,9 +185,9 @@ function loadHtml2canvas() {
 
 async function downloadPNG() {
   const btn = el('download-png-button');
-  btn.classList.add('loading');
+  giveFeedback(btn);
   try {
-    await loadHtml2canvas();
+    const html2canvas = await loadHtml2canvas();
     const frame = el('signature-preview');
     const canvas = await html2canvas(frame, { backgroundColor: null });
     canvas.toBlob(blob => {
@@ -206,7 +203,6 @@ async function downloadPNG() {
   } catch {
     alert('PNG download failed.');
   }
-  btn.classList.remove('loading');
 }
 
 function showQRCode() {
@@ -253,7 +249,7 @@ function updateSignaturePreview() {
   const street    = el('street').value.trim() || '1717 11th Avenue South';
   const cityState = el('city-state').value.trim() || 'Birmingham, AL';
   const zip       = el('zip').value.trim() || '35294-4410';
-  const email     = el('email').value.trim() || 'johndoe@uabmc.edu';
+  const email     = el('email').value.trim() || 'you@uabmc.edu';
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
   const phones = [];
@@ -264,7 +260,7 @@ function updateSignaturePreview() {
   const isStd = el('btn-standard').classList.contains('active');
   const url   = 'uab.edu/medicine/gimaps';
 
-  let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
+  let html = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
     html += `${dept} | ${school}<br>`;
     html += `${division}<br>`;
@@ -283,13 +279,12 @@ function updateSignaturePreview() {
 
 // ------------ Version Toggle & Init ------------
 
-function toggleVersion(isStd) {
-  el('btn-standard').classList.toggle('active', isStd);
-  el('btn-abbreviated').classList.toggle('active', !isStd);
-  updateSignaturePreview();
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+  // 1) Replace icons with Feather
+  if (window.feather) {
+    feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
+  }
+
   // Restore fields
   [
     'name','credentials','title',
@@ -320,8 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
     .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
   // Version buttons
-  el('btn-standard').addEventListener('click', () => toggleVersion(true));
-  el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
+  el('btn-standard').addEventListener('click', () => {
+    el('btn-standard').classList.add('active');
+    el('btn-abbreviated').classList.remove('active');
+    updateSignaturePreview();
+  });
+  el('btn-abbreviated').addEventListener('click', () => {
+    el('btn-abbreviated').classList.add('active');
+    el('btn-standard').classList.remove('active');
+    updateSignaturePreview();
+  });
 
   // Draft controls
   saveDraftBtn.addEventListener('click', () => {
@@ -338,39 +341,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // More-options toggle
   el('more-options-toggle').addEventListener('click', () => {
-    const mo = el('more-options');
-    const collapsed = mo.classList.toggle('collapsed');
-    el('more-options-toggle').textContent = collapsed ? 'More options ▼' : 'Less options ▲';
+    const panel = el('more-options');
+    const collapsed = panel.classList.toggle('collapsed');
+    // flip arrow
+    const path = el('more-options-toggle').querySelector('svg path');
+    path.setAttribute('d', collapsed ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6');
   });
-
-  // Insert preview titles if not already present
-  // (HTML now includes them)
 
   // Primary actions
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
 
-  // More Actions panel
-  const primaryRow = el('copy-button').parentNode;
-  const toggle = document.getElementById('toggle-actions');
-  const extra = document.getElementById('extra-actions');
+  // More-actions toggle
+  const moreActionsToggle = el('toggle-actions');
+  const extraActionsPanel = el('extra-actions');
+  extraActionsPanel.classList.add('collapsed');
+  moreActionsToggle.addEventListener('click', () => {
+    const collapsed = extraActionsPanel.classList.toggle('collapsed');
+    const path = moreActionsToggle.querySelector('svg path');
+    path.setAttribute('d', collapsed ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6');
+  });
 
-  // Bind secondary actions
+  // Secondary actions
   el('copy-html-button').addEventListener('click', copyHTML);
   el('download-png-button').addEventListener('click', downloadPNG);
   el('download-html-button').addEventListener('click', downloadHTMLTemplate);
   el('download-oft-button').addEventListener('click', downloadOFTTemplate);
   el('show-qr-button').addEventListener('click', showQRCode);
   el('reset-button').addEventListener('click', resetToDefaults);
-
-  // Toggle behavior for extra-actions
-  toggle.addEventListener('click', () => {
-    const expanded = extra.classList.toggle('expanded');
-    toggle.querySelector('svg').innerHTML = expanded
-      ? '<polyline points="4,10 8,6 12,10" stroke="currentColor" fill="none" stroke-width="2"/>'
-      : '<polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>';
-    toggle.childNodes[1].nodeValue = expanded ? ' Fewer actions' : ' More actions';
-  });
 
   // QR modal
   document.body.insertAdjacentHTML('beforeend', `
@@ -379,9 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `);
 
-  // Onboarding tour (unchanged)
-
   // Final init
-  toggleVersion(true);
   updateSignaturePreview();
 });
