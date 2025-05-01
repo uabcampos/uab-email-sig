@@ -1,6 +1,6 @@
 // script.js
 
-// Helper to get element
+// Helper to get element by ID
 function el(id) {
   return document.getElementById(id);
 }
@@ -19,7 +19,7 @@ function clearAllPersistence() {
     .forEach(k => localStorage.removeItem(k));
 }
 
-// Phone formatting
+// Format phone number
 function formatPhoneNumber(num) {
   const d = (num||'').replace(/\D/g, '');
   if (d.length === 7) return `205.${d.slice(0,3)}.${d.slice(3)}`;
@@ -27,23 +27,23 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Build RTF
+// Generate RTF content
 async function generateRTFContent() {
   const html  = el('signature-preview').innerHTML;
-  const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
+  const lines = html.split('<br>').map(l=>l.trim()).filter(Boolean);
   const p1    = '\\line ';
   const body  = lines.slice(0,-1).map(line =>
     line
       .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
       .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,
                '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-      .replace(/<\/?[^>]+>/g, '')
+      .replace(/<\/?[^>]+>/g,'')
   ).join('\\line ');
-  const p2 = body + '\\line ';
+  const p2    = body + '\\line ';
   const urlLine = lines[lines.length-1]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,
              '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
-    .replace(/<\/?[^>]+>/g, '');
+    .replace(/<\/?[^>]+>/g,'');
   const p3 = '\\line ' + urlLine;
 
   return [
@@ -58,16 +58,17 @@ async function generateRTFContent() {
 
 // Transient message
 function showMsg(id) {
-  const m = el(id);
-  m.style.display = 'inline';
-  setTimeout(() => m.style.display='none', 2000);
+  const msg = el(id);
+  msg.style.display = 'inline';
+  setTimeout(() => msg.style.display = 'none', 2000);
 }
 
-// Copy rich signature
+// Copy to clipboard (rich HTML + plain text)
 async function copyToClipboard() {
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
-  tmp.style.color = '#1E6B52'; tmp.innerHTML = html;
+  tmp.style.color = '#1E6B52';
+  tmp.innerHTML   = html;
   document.body.appendChild(tmp);
 
   if (navigator.clipboard && navigator.clipboard.write) {
@@ -75,18 +76,28 @@ async function copyToClipboard() {
       await navigator.clipboard.write([
         new ClipboardItem({
           'text/html':  new Blob([tmp.innerHTML], { type: 'text/html' }),
-          'text/plain': new Blob([tmp.textContent], { type: 'text/plain' })
+          'text/plain': new Blob([tmp.textContent],  { type: 'text/plain' })
         })
       ]);
-      showMsg('copy-success'); document.body.removeChild(tmp); return;
+      showMsg('copy-success');
+      document.body.removeChild(tmp);
+      return;
     } catch {}
   }
 
-  const range = document.createRange(); range.selectNodeContents(tmp);
-  const sel   = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-  try { document.execCommand('copy'); showMsg('copy-success'); }
-  catch { alert('Copy failed—please copy manually.'); }
-  sel.removeAllRanges(); document.body.removeChild(tmp);
+  const range = document.createRange();
+  range.selectNodeContents(tmp);
+  const sel   = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  try {
+    document.execCommand('copy');
+    showMsg('copy-success');
+  } catch {
+    alert('Copy failed—please copy manually.');
+  }
+  sel.removeAllRanges();
+  document.body.removeChild(tmp);
 }
 
 // Copy raw HTML
@@ -102,10 +113,33 @@ async function downloadRTF() {
     const blob = new Blob([await generateRTFContent()], { type: 'application/rtf' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href     = url; a.download = 'signature.rtf';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    a.href     = url;
+    a.download = 'signature.rtf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  } catch { alert('Download failed.'); }
+  } catch {
+    alert('Download failed.');
+  }
+}
+
+// Download PNG via html2canvas
+function downloadPNG() {
+  html2canvas(el('signature-preview'), { backgroundColor: null })
+    .then(canvas => {
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a   = document.createElement('a');
+        a.href    = url;
+        a.download= 'signature.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    })
+    .catch(() => alert('PNG export failed.'));
 }
 
 // Reset form
@@ -120,9 +154,9 @@ function resetToDefaults() {
   updateSignaturePreview();
 }
 
-// Live preview
+// Live preview (desktop + mobile)
 function updateSignaturePreview() {
-  // persist
+  // persist fields
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => persist(id, el(id).value.trim()));
 
@@ -137,11 +171,13 @@ function updateSignaturePreview() {
   const pronouns  = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
   const phones = [];
-  if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-  if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
+  if (el('phone-office-enable').checked)
+    phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
+  if (el('phone-mobile-enable').checked)
+    phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
 
-  const isStd = el('btn-standard').classList.contains('active');
+  const isStd  = el('btn-standard').classList.contains('active');
   const urlStr = 'uab.edu/medicine/gimaps';
 
   let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
@@ -159,6 +195,7 @@ function updateSignaturePreview() {
           `<a href="https://${urlStr}" target="_blank">${urlStr}</a>`;
 
   el('signature-preview').innerHTML = html;
+  el('mobile-preview').innerHTML    = html;
 }
 
 // Toggle version
@@ -170,11 +207,11 @@ function toggleVersion(isStandard) {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+  if ((e.ctrlKey||e.metaKey) && e.key === 's') {
     e.preventDefault();
     copyToClipboard();
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+  if ((e.ctrlKey||e.metaKey) && e.key === 'd') {
     e.preventDefault();
     downloadRTF();
   }
@@ -184,35 +221,37 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// On load, bind everything
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore
+  // Restore persisted
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(restore);
 
-  // Inputs
+  // Bind inputs for live preview & validation
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const f = el(id);
       if (!f) return;
       f.addEventListener('input', updateSignaturePreview);
+      f.addEventListener('blur', () => validateField(f));
     });
 
-  // Checkboxes
+  // Phone toggles
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
-  // Version
+  // Version buttons
   el('btn-standard')?.addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated')?.addEventListener('click', () => toggleVersion(false));
 
-  // Buttons
+  // Action buttons
   el('copy-button')?.addEventListener('click', copyToClipboard);
   el('copy-html-button')?.addEventListener('click', copyHTML);
   el('download-button')?.addEventListener('click', downloadRTF);
+  el('download-png-button')?.addEventListener('click', downloadPNG);
   el('reset-button')?.addEventListener('click', resetToDefaults);
 
-  // Initial
+  // Kick things off
   toggleVersion(true);
   updateSignaturePreview();
 });
