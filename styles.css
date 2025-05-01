@@ -461,3 +461,31 @@ body {
 .tour-controls button {
   margin: 0.5rem;
 }
+
+/* Place this at the bottom of your styles.css */
+
+/* 1) Ensure .phone-toggle is a block group like the other fields */
+.phone-toggle {
+  display: block;          /* stack, not flex */
+  margin-top: 1.25rem;     /* match other label spacing */
+}
+
+/* 2) Make the label+checkbox sit inline, then drop the input below */
+.phone-toggle > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--uab-green-dark);
+}
+
+/* 3) Force the phone input to full‐width on its own line */
+.phone-toggle > input[type="text"] {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--uab-grey-mid);
+  border-radius: 4px;
+  font-size: 1rem;
+}
