@@ -8,6 +8,7 @@ function el(id) {
   return node;
 }
 
+// Format phone numbers (7 or 10 digits)
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
@@ -18,17 +19,20 @@ function formatPhoneNumber(number) {
   return number;
 }
 
+// Generate RTF from current preview HTML
 async function generateRTFContent() {
-  const html   = el('signature-preview').innerHTML;
-  const parts  = html.split('<br>').map(p => p.trim()).filter(Boolean);
-  const part1  = '\\line ';
-  const body   = parts.slice(0,-1).map(line =>
+  const html  = el('signature-preview').innerHTML;
+  const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
+
+  const part1 = '\\line ';
+  const body  = parts.slice(0,-1).map(line =>
     line
       .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
       .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
-  const part2  = body + '\\line ';
+  const part2 = body + '\\line ';
+
   const urlLine = parts[parts.length-1]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
@@ -44,8 +48,11 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
+// Copy to clipboard, with diagnostic alert
 async function copyToClipboard() {
   console.log('🔍 copyToClipboard invoked');
+  alert('▶ copyToClipboard handler running');
+
   const html = el('signature-preview').innerHTML;
   const container = document.createElement('div');
   container.style.color = '#1E6B52';
@@ -90,8 +97,11 @@ async function copyToClipboard() {
   document.body.removeChild(container);
 }
 
+// Download RTF, with diagnostic alert
 async function downloadRTF() {
   console.log('🔍 downloadRTF invoked');
+  alert('▶ downloadRTF handler running');
+
   try {
     const rtf  = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
@@ -109,47 +119,25 @@ async function downloadRTF() {
   }
 }
 
+// Update signature preview with placeholder content
 async function updateSignaturePreview() {
   console.log('✏️ updateSignaturePreview');
   const valid = validateAllRequiredFields();
   el('copy-button').disabled     = !valid;
   el('download-button').disabled = !valid;
 
-  const name      = el('name').value.trim()        || 'John Doe';
-  const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
-  const title     = el('title').value.trim()       || 'Program Director II';
-  const room      = el('room').value.trim()        || 'MT634';
-  const street    = el('street').value.trim()      || '1717 11th Avenue South';
-  const cityState = el('city-state').value.trim()  || 'Birmingham, AL';
-  const zip       = el('zip').value.trim()         || '35294-4410';
-  const email     = el('email').value.trim()       || 'johndoe@uabmc.edu';
-  const pronouns  = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
-
-  const phones = [];
-  if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-  if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
-  const phoneLine = phones.join(', ');
-
-  const isStandard = el('btn-standard').classList.contains('active');
-  const baseUrl    = 'uab.edu/medicine/gimaps';
-
-  let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
-  if (isStandard) {
-    html +=
-      `Department of Medicine | Heersink School of Medicine<br>` +
-      `Division of General Internal Medicine & Population Science<br>` +
-      `UAB | The University of Alabama at Birmingham<br>` +
-      `${room} | ${street} | ${cityState} ${zip}<br>`;
-  } else {
-    html += `UAB | The University of Alabama at Birmingham<br>`;
-  }
-  if (phoneLine) html += `${phoneLine} | `;
-  html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>` +
-          `<a href="https://${baseUrl}" target="_blank">${baseUrl}</a>`;
-
-  el('signature-preview').innerHTML = html;
+  // Simplified placeholder preview
+  el('signature-preview').innerHTML = 
+      '<strong style="color:#1E6B52;">John Doe, Ph.D. | Program Director II</strong><br>' +
+      'Department of Medicine | Heersink School of Medicine<br>' +
+      'Division of General Internal Medicine & Population Science<br>' +
+      'UAB | The University of Alabama at Birmingham<br>' +
+      'MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410<br>' +
+      'O: 205.975.7908, M: 205.555.1234 | <a href="mailto:johndoe@uabmc.edu">johndoe@uabmc.edu</a><br><br>' +
+      '<a href="https://uab.edu/medicine/gimaps" target="_blank">uab.edu/medicine/gimaps</a>';
 }
 
+// Toggle between versions
 function toggleVersion(isStandard) {
   console.log(`🔀 toggleVersion(${isStandard})`);
   el('btn-standard').classList.toggle('active', isStandard);
@@ -157,43 +145,39 @@ function toggleVersion(isStandard) {
   updateSignaturePreview();
 }
 
+// Bind event listeners on load
 document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ DOMContentLoaded');
 
-  // Live preview & validation
-  [
-    'name','credentials','title','room','street','city-state',
-    'zip','email','pronouns','phone-office','phone-mobile'
-  ].forEach(id => {
-    const inp = el(id);
-    if (inp) {
-      console.log(`📌 binding input #${id}`);
-      inp.addEventListener('input',  updateSignaturePreview);
-      inp.addEventListener('blur',   () => { console.log(`🛑 blur #${id}`); validateField(inp); });
+  // Monitor all clicks on body
+  document.body.addEventListener('click', e => {
+    console.log(`📋 body click at ${e.target.id || e.target.tagName}`);
+  });
+
+  // Bind version buttons
+  ['btn-standard','btn-abbreviated'].forEach(id => {
+    const btn = el(id);
+    if (btn) {
+      console.log(`📌 binding #${id}`);
+      btn.addEventListener('click', () => toggleVersion(id === 'btn-standard'));
+      btn.onclick = () => toggleVersion(id === 'btn-standard');
     }
   });
 
-  // Checkboxes
-  ['phone-office-enable','phone-mobile-enable'].forEach(id => {
-    const cb = el(id);
-    if (cb) {
-      console.log(`📌 binding change #${id}`);
-      cb.addEventListener('change', updateSignaturePreview);
-    }
-  });
+  // Bind copy & download
+  const copyBtn = el('copy-button');
+  const dlBtn   = el('download-button');
+  if (copyBtn) {
+    console.log('📌 binding #copy-button');
+    copyBtn.addEventListener('click', copyToClipboard);
+    copyBtn.onclick = copyToClipboard;
+  }
+  if (dlBtn) {
+    console.log('📌 binding #download-button');
+    dlBtn.addEventListener('click', downloadRTF);
+    dlBtn.onclick = downloadRTF;
+  }
 
-  // Version buttons
-  const bs = el('btn-standard'),
-        ba = el('btn-abbreviated');
-  if (bs) { console.log('📌 binding #btn-standard'); bs.addEventListener('click', () => toggleVersion(true)); }
-  if (ba) { console.log('📌 binding #btn-abbreviated'); ba.addEventListener('click', () => toggleVersion(false)); }
-
-  // Copy & download
-  const cb = el('copy-button'),
-        db = el('download-button');
-  if (cb) { console.log('📌 binding #copy-button'); cb.addEventListener('click', copyToClipboard); }
-  if (db) { console.log('📌 binding #download-button'); db.addEventListener('click', downloadRTF); }
-
-  // Initial render
+  // Initial preview
   updateSignaturePreview();
 });
