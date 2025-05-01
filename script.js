@@ -60,10 +60,10 @@ async function generateRTFContent() {
 function showMsg(id) {
   const msg = el(id);
   msg.style.display = 'inline';
-  setTimeout(() => msg.style.display = 'none', 2000);
+  setTimeout(() => msg.style.display='none', 2000);
 }
 
-// Copy to clipboard (rich HTML + plain text)
+// Copy to clipboard (rich)
 async function copyToClipboard() {
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
@@ -156,7 +156,6 @@ function resetToDefaults() {
 
 // Live preview (desktop + mobile)
 function updateSignaturePreview() {
-  // persist fields
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => persist(id, el(id).value.trim()));
 
@@ -223,11 +222,9 @@ document.addEventListener('keydown', e => {
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore persisted
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(restore);
 
-  // Bind inputs for live preview & validation
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const f = el(id);
@@ -236,22 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
       f.addEventListener('blur', () => validateField(f));
     });
 
-  // Phone toggles
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
-  // Version buttons
   el('btn-standard')?.addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated')?.addEventListener('click', () => toggleVersion(false));
 
-  // Action buttons
   el('copy-button')?.addEventListener('click', copyToClipboard);
   el('copy-html-button')?.addEventListener('click', copyHTML);
   el('download-button')?.addEventListener('click', downloadRTF);
   el('download-png-button')?.addEventListener('click', downloadPNG);
   el('reset-button')?.addEventListener('click', resetToDefaults);
 
-  // Kick things off
   toggleVersion(true);
   updateSignaturePreview();
 });
