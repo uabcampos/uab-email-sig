@@ -1,191 +1,212 @@
 <!DOCTYPE html>
-<html lang="en" data-version="1.4.5">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>UAB Email Signature Generator</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <!-- Page Title & Version Toggle -->
   <div class="page-title">
     <h1>UAB Email Signature Generator</h1>
     <div class="version-selection">
-      <button id="btn-standard" class="version-button active" aria-label="Use Standard Version">
-        <svg width="16" height="16" viewBox="0 0 16 16">
-          <rect x="1" y="2" width="14" height="10" rx="1" stroke="currentColor" fill="none"/>
-          <rect x="5" y="13" width="6" height="1" fill="currentColor"/>
-        </svg>
-        Standard
+      <button id="btn-standard" class="version-button active">
+        Standard Version
       </button>
-      <button id="btn-abbreviated" class="version-button" aria-label="Use Abbreviated Version">
-        <svg width="16" height="16" viewBox="0 0 8 16">
-          <rect x="1" y="1" width="6" height="14" rx="1" stroke="currentColor" fill="none"/>
-          <circle cx="4" cy="13" r="1" fill="currentColor"/>
-        </svg>
-        Abbreviated
+      <button id="btn-abbreviated" class="version-button">
+        Abbreviated Version
       </button>
     </div>
   </div>
 
   <div class="container">
-
     <!-- Form Card -->
     <div class="card form-card">
-
       <!-- Draft Controls -->
       <div class="draft-controls">
-        <button id="save-draft" class="btn btn-save-draft">Save Draft</button>
-        <button id="clear-draft" class="btn btn-clear-draft">Clear Draft</button>
-        <span id="last-saved" class="last-saved">Last saved: never</span>
+        <button id="save-draft" class="btn">Save draft</button>
+        <button id="clear-draft" class="btn">Clear draft</button>
+        <span id="last-saved">Last saved: never</span>
       </div>
-
-      <!-- Required Basics -->
-      <label for="name">Name <span class="required">*</span></label>
-      <input type="text" id="name" placeholder="John Doe" required aria-describedby="name-error">
-      <div id="name-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-      <label for="title">Role/Title <span class="required">*</span></label>
-      <input type="text" id="title" placeholder="Program Director II" required aria-describedby="title-error">
-      <div id="title-error" class="error-message" role="alert" aria-live="assertive"></div>
 
       <!-- Organization Group -->
       <fieldset class="org-group">
         <legend>Organization</legend>
+        <label for="department">Department</label>
+        <input
+          type="text"
+          id="department"
+          required
+          placeholder="Department of Medicine"
+        />
+        <div id="department-error" class="error-message"></div>
 
-        <label for="department">Department <span class="required">*</span></label>
-        <input type="text" id="department" placeholder="Department of Medicine" required aria-describedby="department-error">
-        <div id="department-error" class="error-message" role="alert" aria-live="assertive"></div>
+        <label for="school">School/College</label>
+        <input
+          type="text"
+          id="school"
+          required
+          placeholder="Heersink School of Medicine"
+        />
+        <div id="school-error" class="error-message"></div>
 
-        <label for="school">School/College <span class="required">*</span></label>
-        <input type="text" id="school" placeholder="Heersink School of Medicine" required aria-describedby="school-error">
-        <div id="school-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-        <label for="division">Division <span class="required">*</span></label>
-        <input type="text" id="division" placeholder="Division of General Internal Medicine & Population Science" required aria-describedby="division-error">
-        <div id="division-error" class="error-message" role="alert" aria-live="assertive"></div>
+        <label for="division">Division</label>
+        <input
+          type="text"
+          id="division"
+          required
+          placeholder="Division of General Internal Medicine & Population Science"
+        />
+        <div id="division-error" class="error-message"></div>
       </fieldset>
 
-      <!-- Address & Email -->
-      <label for="room">Room <span class="required">*</span></label>
-      <input type="text" id="room" placeholder="MT634" required aria-describedby="room-error">
-      <div id="room-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-      <label for="street">Street Address <span class="required">*</span></label>
-      <input type="text" id="street" placeholder="1717 11th Avenue South" required aria-describedby="street-error">
-      <div id="street-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-      <label for="city-state">City, State <span class="required">*</span></label>
-      <input type="text" id="city-state" placeholder="Birmingham, AL" required aria-describedby="city-state-error">
-      <div id="city-state-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-      <label for="zip">ZIP Code <span class="required">*</span></label>
-      <input type="text" id="zip" placeholder="35294-4410" required aria-describedby="zip-error">
-      <div id="zip-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-      <label for="email">Email Address <span class="required">*</span></label>
-      <input type="email" id="email" placeholder="johndoe@uabmc.edu" required aria-describedby="email-error">
-      <div id="email-error" class="error-message" role="alert" aria-live="assertive"></div>
+      <!-- Name -->
+      <label for="name">Name</label>
+      <input type="text" id="name" required placeholder="John Doe" />
+      <div id="name-error" class="error-message"></div>
 
       <!-- More Options Toggle -->
-      <button id="more-options-toggle" class="btn btn-more-options">More options ▼</button>
-
-      <!-- Collapsible Optional Fields -->
+      <button id="more-options-toggle" class="btn-more-options">
+        More options ▼
+      </button>
       <div id="more-options" class="more-options collapsed">
         <label for="credentials">Credentials</label>
-        <input type="text" id="credentials" placeholder="Ph.D., MPH">
-        <div id="credentials-error" class="error-message" role="alert" aria-live="assertive"></div>
+        <input type="text" id="credentials" placeholder="Ph.D., MPH" />
+
+        <label for="pronouns">Pronouns</label>
+        <input type="text" id="pronouns" placeholder="He/Him" />
 
         <label>
-          <input type="checkbox" id="phone-office-enable">
-          Office Phone
+          <input type="checkbox" id="phone-office-enable" />
+          Show Office Phone
         </label>
-        <input type="text" id="phone-office" placeholder="205.975.7908" aria-describedby="phone-office-error">
-        <div id="phone-office-error" class="error-message" role="alert" aria-live="assertive"></div>
+        <input
+          type="text"
+          id="phone-office"
+          placeholder="205.975.7908"
+        />
 
         <label>
-          <input type="checkbox" id="phone-mobile-enable">
-          Mobile Phone
+          <input type="checkbox" id="phone-mobile-enable" />
+          Show Mobile Phone
         </label>
-        <input type="text" id="phone-mobile" placeholder="205.555.1234" aria-describedby="phone-mobile-error">
-        <div id="phone-mobile-error" class="error-message" role="alert" aria-live="assertive"></div>
-
-        <label for="pronouns">Preferred Pronouns</label>
-        <input type="text" id="pronouns" placeholder="He/Him">
-        <div id="pronouns-error" class="error-message" role="alert" aria-live="assertive"></div>
+        <input
+          type="text"
+          id="phone-mobile"
+          placeholder="205.555.1234"
+        />
       </div>
 
+      <!-- Title -->
+      <label for="title">Title / Role</label>
+      <input
+        type="text"
+        id="title"
+        required
+        placeholder="Program Director II"
+      />
+      <div id="title-error" class="error-message"></div>
+
+      <!-- Room -->
+      <label for="room">Room</label>
+      <input type="text" id="room" required placeholder="MT634" />
+      <div id="room-error" class="error-message"></div>
+
+      <!-- Street -->
+      <label for="street">Street Address</label>
+      <input
+        type="text"
+        id="street"
+        required
+        placeholder="1717 11th Avenue South"
+      />
+      <div id="street-error" class="error-message"></div>
+
+      <!-- City, State -->
+      <label for="city-state">City, State</label>
+      <input
+        type="text"
+        id="city-state"
+        required
+        placeholder="Birmingham, AL"
+      />
+      <div id="city-state-error" class="error-message"></div>
+
+      <!-- ZIP -->
+      <label for="zip">ZIP Code</label>
+      <input type="text" id="zip" required placeholder="35294-4410" />
+      <div id="zip-error" class="error-message"></div>
+
+      <!-- Email -->
+      <label for="email">Email Address</label>
+      <input
+        type="email"
+        id="email"
+        required
+        placeholder="you@uabmc.edu"
+      />
+      <div id="email-error" class="error-message"></div>
+
+      <!-- Primary Action Buttons -->
+      <div class="button-container">
+        <button id="copy-button" class="btn btn-copy">
+          <span class="feedback-icon">✔</span>
+          <span class="btn-text">Copy</span>
+        </button>
+        <button id="download-button" class="btn btn-download">
+          <span class="spinner"></span>
+          <span class="btn-text">Download RTF</span>
+        </button>
+      </div>
+      <!-- More Actions toggle & panel will be injected here by script -->
     </div>
 
     <!-- Preview Card -->
     <div class="card preview-card">
       <h2>Signature Previews</h2>
       <div class="preview-split">
-        <div class="preview-frame desktop-frame" tabindex="0" aria-label="Desktop preview">
-          <div id="signature-preview"></div>
+        <div class="preview-item">
+          <h3 class="preview-title">Desktop Preview</h3>
+          <div
+            class="preview-frame desktop-frame"
+            id="signature-preview"
+          ></div>
         </div>
-        <div class="preview-frame mobile-frame" tabindex="0" aria-label="Mobile preview">
-          <div id="mobile-preview"></div>
+        <div class="preview-item">
+          <h3 class="preview-title">Mobile Preview</h3>
+          <div
+            class="preview-frame mobile-frame"
+            id="mobile-preview"
+          ></div>
         </div>
-      </div>
-
-      <div class="button-container">
-        <button id="copy-button" class="btn btn-copy" aria-label="Copy signature">
-          <span class="feedback-icon"></span>
-          <svg width="16" height="16" viewBox="0 0 16 16">
-            <path d="M4 1h8v10H4z" stroke="currentColor" fill="none"/>
-            <path d="M2 5h8v10H2z" stroke="currentColor" fill="none"/>
-          </svg>
-          <span class="btn-text">Copy</span>
-        </button>
-        <button id="copy-html-button" class="btn btn-copy-html" aria-label="Copy HTML">
-          <span class="feedback-icon"></span>
-          <svg width="16" height="16" viewBox="0 0 16 16">
-            <text x="2" y="12" font-family="monospace" font-size="12" fill="currentColor">&lt;/&gt;</text>
-          </svg>
-          <span class="btn-text">Copy HTML</span>
-        </button>
-        <button id="download-button" class="btn btn-download" aria-label="Download RTF">
-          <span class="spinner"></span>
-          <svg width="16" height="16" viewBox="0 0 16 16">
-            <path d="M2 10v4h12v-4" stroke="currentColor" fill="none"/>
-            <path d="M8 1v9m-3-3l3 3 3-3" stroke="currentColor" fill="none"/>
-          </svg>
-          <span class="btn-text">Download RTF</span>
-        </button>
-        <button id="download-png-button" class="btn btn-download-png" aria-label="Download PNG">
-          <span class="spinner"></span>
-          <svg width="16" height="16" viewBox="0 0 16 16">
-            <rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" fill="none"/>
-            <circle cx="6" cy="6" r="2" stroke="currentColor" fill="none"/>
-            <path d="M2 12l4-4 2 2 4-4v6H2z" fill="currentColor"/>
-          </svg>
-          <span class="btn-text">Download PNG</span>
-        </button>
-        <button id="reset-button" class="btn btn-reset" aria-label="Reset">
-          <svg width="16" height="16" viewBox="0 0 16 16">
-            <path d="M8 1A7 7 0 1 0 15 8" stroke="currentColor" fill="none"/>
-            <polyline points="15,1 15,7 9,7" stroke="currentColor" fill="none"/>
-          </svg>
-          <span class="btn-text">Reset</span>
-        </button>
       </div>
 
       <div class="instructions">
         <h3>Instructions for Adding Your Signature</h3>
-        <p><strong>Windows – Outlook:</strong> After copying, go to <em>File › Options › Mail › Signatures</em>, create a new signature, and paste. Use “Paste Special › Merge Formatting” if needed.</p>
-        <p><strong>Mac – Outlook & Mail App:</strong> Copy and paste into the signature settings.</p>
-        <p><strong>iOS – Mail App:</strong> Copy, then go to <em>Settings › Mail › Signature</em> and paste.</p>
+        <p>
+          <strong>Windows – Outlook:</strong> After copying, go to
+          <em>File › Options › Mail › Signatures</em> and paste.
+        </p>
+        <p>
+          <strong>Mac – Outlook & Mail App:</strong> Copy, then open
+          signature settings and paste.
+        </p>
+        <p>
+          <strong>iOS – Mail App:</strong> Copy, then go to
+          <em>Settings › Mail › Signature</em> and paste.
+        </p>
       </div>
     </div>
-
   </div>
 
-  <!-- Footer Card -->
   <div class="footer-card">
-    <span id="signature-version" class="version-label"></span>
-    <p>This email signature generator is unofficial and not endorsed by UAB. It follows the latest guidance for the Division of General Internal Medicine & Population Science. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
+    This generator is unofficial, based on UAB branding guidelines.
+    For more, visit 
+    <a
+      href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature"
+      target="_blank"
+      >UAB Branding Toolkit</a
+    >.
   </div>
 
   <script src="validation.js"></script>
