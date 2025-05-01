@@ -38,6 +38,8 @@ function clearAllPersistence() {
 
 function buildDeepLink() {
   const params = new URLSearchParams();
+
+  // Core text fields
   [
     'name','credentials','title',
     'department','school','division',
@@ -47,16 +49,32 @@ function buildDeepLink() {
     const fld = el(id);
     if (fld && fld.value) params.set(id, fld.value);
   });
-  params.set('phoneOffice', el('phone-office-enable').checked);
-  params.set('phoneMobile', el('phone-mobile-enable').checked);
+
+  // Phone checkboxes & numbers
+  const officeEnabled = el('phone-office-enable').checked;
+  params.set('phoneOfficeEnabled', officeEnabled);
+  if (officeEnabled) {
+    params.set('phoneOfficeNumber', el('phone-office').value.trim());
+  }
+
+  const mobileEnabled = el('phone-mobile-enable').checked;
+  params.set('phoneMobileEnabled', mobileEnabled);
+  if (mobileEnabled) {
+    params.set('phoneMobileNumber', el('phone-mobile').value.trim());
+  }
+
+  // Version
   params.set('version',
     el('btn-standard').classList.contains('active') ? 'standard' : 'abbr'
   );
+
   return `${location.origin}${location.pathname}?${params.toString()}`;
 }
 
 function restoreFromQuery() {
   const params = new URLSearchParams(location.search);
+
+  // Core text fields
   [
     'name','credentials','title',
     'department','school','division',
@@ -65,8 +83,21 @@ function restoreFromQuery() {
   ].forEach(id => {
     if (params.has(id)) el(id).value = params.get(id);
   });
-  el('phone-office-enable').checked = params.get('phoneOffice') === 'true';
-  el('phone-mobile-enable').checked = params.get('phoneMobile') === 'true';
+
+  // Phone: restore enabled + number
+  const officeEnabled = params.get('phoneOfficeEnabled') === 'true';
+  el('phone-office-enable').checked = officeEnabled;
+  if (officeEnabled && params.has('phoneOfficeNumber')) {
+    el('phone-office').value = params.get('phoneOfficeNumber');
+  }
+
+  const mobileEnabled = params.get('phoneMobileEnabled') === 'true';
+  el('phone-mobile-enable').checked = mobileEnabled;
+  if (mobileEnabled && params.has('phoneMobileNumber')) {
+    el('phone-mobile').value = params.get('phoneMobileNumber');
+  }
+
+  // Version toggle
   if (params.get('version') === 'abbr') {
     el('btn-standard').classList.remove('active');
     el('btn-abbreviated').classList.add('active');
@@ -251,9 +282,8 @@ async function downloadPNG() {
 function showQRCode() {
   const qrModal = el('qr-modal');
   const img     = qrModal.querySelector('img');
-  const link    = buildDeepLink();
-  // use QuickChart to generate the QR
-  img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(link)}`;
+  // use QuickChart.io for robust QR generation
+  img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
   qrModal.classList.add('active');
 }
 
@@ -339,10 +369,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Restore from URL query (for deep‐link mobile handoff)
   restoreFromQuery();
 
-  // QR modal injection & events
+  // Inject QR modal and set up events
   document.body.insertAdjacentHTML('beforeend', `
-    <div id="qr-modal" class="qr-modal">
-      <div class="qr-content"><img alt="QR code for signature"/></div>
+    <div id="qr-modal" class="qr-modal" role="dialog" aria-modal="true">
+      <div class="qr-content">
+        <img alt="QR code for signature"/>
+        <p class="qr-text">
+          Scan this QR to open signature generator on your mobile device with your information already filled.
+        </p>
+      </div>
     </div>
   `);
   const qrModal   = el('qr-modal');
