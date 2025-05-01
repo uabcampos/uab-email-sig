@@ -1,11 +1,18 @@
 // script.js
 
-// Helper to get element by ID
-function el(id) {
-  return document.getElementById(id);
+// Debounce helper
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }
 
-// Persist & restore
+// DOM helper
+function el(id) { return document.getElementById(id); }
+
+// Persist & restore fields
 function persist(id, val) {
   localStorage.setItem(`siggen:${id}`, val);
 }
@@ -56,14 +63,14 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Transient message
+// Transient status message
 function showMsg(id) {
   const msg = el(id);
   msg.style.display = 'inline';
-  setTimeout(() => msg.style.display='none', 2000);
+  setTimeout(() => msg.style.display = 'none', 2000);
 }
 
-// Copy to clipboard (rich)
+// Copy rich HTML+text to clipboard
 async function copyToClipboard() {
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
@@ -124,37 +131,53 @@ async function downloadRTF() {
   }
 }
 
-// Download PNG via html2canvas
-function downloadPNG() {
-  html2canvas(el('signature-preview'), { backgroundColor: null })
-    .then(canvas => {
-      canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a   = document.createElement('a');
-        a.href    = url;
-        a.download= 'signature.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
-    })
-    .catch(() => alert('PNG export failed.'));
+// Lazy‐load html2canvas & export PNG
+let html2canvasPromise = null;
+function loadHtml2canvas() {
+  if (!html2canvasPromise) {
+    html2canvasPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = () => resolve(window.html2canvas || window.html2canvas);
+      s.onerror = reject;
+      document.body.appendChild(s);
+    });
+  }
+  return html2canvasPromise;
+}
+async function downloadPNG() {
+  try {
+    await loadHtml2canvas();
+    const frame = el('signature-preview');
+    const canvas = await html2canvas(frame, { backgroundColor: null });
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href    = url;
+      a.download= 'signature.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  } catch {
+    alert('PNG export failed.');
+  }
 }
 
-// Reset form
+// Reset form to defaults
 function resetToDefaults() {
   clearAllPersistence();
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
-    .forEach(id => el(id).value = '');
+    .forEach(id => (el(id).value = ''));
   ['phone-office-enable','phone-mobile-enable']
-    .forEach(id => el(id).checked = false);
+    .forEach(id => (el(id).checked = false));
   el('btn-standard').classList.add('active');
   el('btn-abbreviated').classList.remove('active');
   updateSignaturePreview();
 }
 
-// Live preview (desktop + mobile)
+// Build live preview (desktop + mobile)
 function updateSignaturePreview() {
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => persist(id, el(id).value.trim()));
@@ -197,6 +220,42 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
+// Contrast helpers for accessibility check
+function luminance(r,g,b) {
+  const a = [r,g,b].map(v=>{
+    v /= 255;
+    return v <= 0.03928 ? v/12.92 : ((v+0.055)/1.055)**2.4;
+  });
+  return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+}
+function contrast(hex1,hex2) {
+  const c1 = hex1.match(/\w\w/g).map(h=>parseInt(h,16));
+  const c2 = hex2.match(/\w\w/g).map(h=>parseInt(h,16));
+  const L1 = luminance(...c1), L2 = luminance(...c2);
+  return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);
+}
+
+// Accessibility check
+function runAccessibilityCheck() {
+  const reportEl = el('accessibility-report');
+  reportEl.textContent = '';
+  const nodes = el('signature-preview').querySelectorAll('*');
+  const issues = [];
+  nodes.forEach(node => {
+    const cs = getComputedStyle(node);
+    const fg = cs.color.match(/\d+/g).slice(0,3).map(n=>+n);
+    const bg = cs.backgroundColor.match(/\d+/g)?.slice(0,3).map(n=>+n) || [255,255,255];
+    const fgHex = '#'+fg.map(c=>c.toString(16).padStart(2,'0')).join('');
+    const bgHex = '#'+bg.map(c=>c.toString(16).padStart(2,'0')).join('');
+    if (contrast(fgHex,bgHex) < 4.5) {
+      issues.push(`Low contrast on “${node.textContent.trim()}”`);
+    }
+  });
+  reportEl.textContent = issues.length
+    ? 'Accessibility issues: ' + issues.join('; ')
+    : 'All text passes 4.5:1 contrast ratio.';
+}
+
 // Toggle version
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
@@ -207,16 +266,13 @@ function toggleVersion(isStandard) {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey||e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    copyToClipboard();
+    e.preventDefault(); copyToClipboard();
   }
   if ((e.ctrlKey||e.metaKey) && e.key === 'd') {
-    e.preventDefault();
-    downloadRTF();
+    e.preventDefault(); downloadRTF();
   }
   if (e.key === 'Escape') {
-    e.preventDefault();
-    resetToDefaults();
+    e.preventDefault(); resetToDefaults();
   }
 });
 
@@ -225,11 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(restore);
 
+  const debouncedUpdate = debounce(updateSignaturePreview, 300);
+
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const f = el(id);
       if (!f) return;
-      f.addEventListener('input', updateSignaturePreview);
+      f.addEventListener('input', debouncedUpdate);
       f.addEventListener('blur', () => validateField(f));
     });
 
@@ -243,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
   el('copy-html-button')?.addEventListener('click', copyHTML);
   el('download-button')?.addEventListener('click', downloadRTF);
   el('download-png-button')?.addEventListener('click', downloadPNG);
+  el('accessibility-check-button')?.addEventListener('click', runAccessibilityCheck);
   el('reset-button')?.addEventListener('click', resetToDefaults);
 
   toggleVersion(true);
