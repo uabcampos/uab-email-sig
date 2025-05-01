@@ -302,9 +302,9 @@ body {
 /* 12. Preview Section */
 .preview-split {
   display: flex;
+  flex-direction: column; /* stack vertically */
   gap: 1rem;
   margin-top: 1rem;
-  flex-wrap: wrap;
 }
 @media (max-width: 768px) {
   .preview-split {
