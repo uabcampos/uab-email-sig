@@ -1,175 +1,130 @@
 /* styles.css */
 
-/* Base reset and typography */
+/* --- Reset & Base --- */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  line-height: 1.4;
-  background: #f9f9f9;
   color: #333;
+  background: #f9f9f9;
+  line-height: 1.4;
   padding: 1rem;
 }
 
-/* Container and columns */
+/* --- Top Bar --- */
+h1 {
+  margin-bottom: 1rem;
+}
+.version-selection {
+  margin-bottom: 1.5rem;
+  text-align: right;
+}
+.version-selection .version-button {
+  margin-left: 0.5rem;
+}
+
+/* --- Overall Grid --- */
 .container {
-  display: flex;
-  gap: 1rem;
-  max-width: 1200px;
+  display: grid;
+  grid-template-columns: 300px minmax(300px, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-.two-column-mobile {
+/* Mobile: stack under 700px */
+@media (max-width: 700px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Form Column (left) --- */
+.column-left {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
 }
-
-/* Version selection buttons */
-.version-selection {
-  margin-bottom: 1rem;
-}
-
-.version-button {
-  background: #fff;
-  border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-right: 0.5rem;
-}
-
-.version-button.active {
-  background: #1e6b52;
-  color: #fff;
-  border-color: #15503e;
-}
-
-/* Column layouts */
-.column {
-  display: flex;
-  flex: 1;
-  gap: 2rem;
-}
-
-.column-left,
-.column-right {
-  flex: 1;
-}
-
-/* Form labels and inputs */
 .column-left label {
-  display: block;
   margin-top: 0.75rem;
   font-weight: bold;
 }
-
 .column-left input[type="text"],
-.column-left input[type="email"],
-.column-left input[type="checkbox"] {
-  margin-top: 0.25rem;
+.column-left input[type="email"] {
   width: 100%;
   padding: 0.5rem;
   font-size: 1rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-
+.column-left input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
 .error-message {
   color: #c00;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
   min-height: 1.2em;
+  margin-top: 0.25rem;
 }
 
-/* Signature preview */
+/* --- Preview Column (right) --- */
+.column-right {
+  display: flex;
+  flex-direction: column;
+}
+.column-right h2 {
+  margin-bottom: 0.5rem;
+}
 #preview-wrapper {
   background: #fff;
   border: 1px solid #ccc;
   padding: 1rem;
   min-height: 200px;
   overflow: auto;
+  color: #1E6B52; /* brand green */
 }
-
-/* Buttons */
 .button-container {
   margin-top: 1rem;
 }
-
 .button-container button {
-  background: #1e6b52;
+  background: #1E6B52;
   color: #fff;
   border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
+  padding: 0.75rem 1.25rem;
   font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
   margin-right: 0.5rem;
 }
-
 #copy-success {
   display: inline-block;
   margin-left: 0.5rem;
-  color: #1e6b52;
+  color: #1E6B52;
   font-weight: bold;
 }
 
-/* Instructions section */
+/* --- Instructions & Footer --- */
 .instructions {
   margin-top: 2rem;
   font-size: 0.9rem;
 }
-
 .instructions h3 {
   margin-bottom: 0.5rem;
 }
-
-/* Footer & version label */
 .footer {
-  margin-top: 2rem;
+  max-width: 1000px;
+  margin: 2rem auto 0;
   padding: 1rem;
   background: #fff;
   border: 1px solid #ddd;
   font-size: 0.85rem;
   color: #555;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
-
 .version-label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 0.85rem;
   color: #666;
-}
-
-/* Responsive: stack columns below 1000px */
-@media (max-width: 1000px) {
-  .container,
-  .two-column-mobile {
-    flex-direction: column;
-  }
-}
-
-/* Responsive: tighter mobile stacking below 480px */
-@media (max-width: 480px) {
-  .container,
-  .two-column-mobile {
-    flex-direction: column;
-  }
-
-  .column-left,
-  .column-right {
-    width: 100%;
-    padding: 0.5rem;
-  }
-
-  .version-button,
-  .button-container button,
-  .column-left input[type="text"],
-  .column-left input[type="email"] {
-    font-size: 0.9rem;
-    padding: 0.4rem;
-  }
 }
