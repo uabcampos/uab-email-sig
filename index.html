@@ -101,14 +101,20 @@
 
     <!-- Preview Card -->
     <div class="card preview-card">
-      <h2>Signature Preview</h2>
-      <div id="preview-wrapper">
-        <div id="signature-preview"></div>
+      <h2>Signature Previews</h2>
+      <div id="preview-wrapper" class="preview-split">
+        <div class="preview-frame desktop-frame">
+          <div id="signature-preview"></div>
+        </div>
+        <div class="preview-frame mobile-frame">
+          <div id="mobile-preview"></div>
+        </div>
       </div>
       <div class="button-container">
         <button id="copy-button" class="btn btn-copy">Copy to Clipboard</button>
         <button id="copy-html-button" class="btn btn-copy-html">Copy HTML</button>
         <button id="download-button" class="btn btn-download">Download RTF</button>
+        <button id="download-png-button" class="btn btn-download-png">Download PNG</button>
         <button id="reset-button" class="btn btn-reset">Reset to Defaults</button>
         <span id="copy-success" class="copy-msg" style="display:none;">Copied!</span>
         <span id="copy-html-success" class="copy-msg" style="display:none;">HTML Copied!</span>
@@ -128,6 +134,8 @@
     <p>This email signature generator is unofficial and not endorsed by UAB. It follows the latest guidance for the Division of General Internal Medicine & Population Science. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
   </div>
 
+  <!-- html2canvas for PNG export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="validation.js"></script>
   <script src="script.js"></script>
 </body>
