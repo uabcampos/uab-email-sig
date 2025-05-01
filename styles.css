@@ -257,6 +257,13 @@ input.invalid {
 .btn-download-png:hover {
   background: #1976D2;
 }
+.btn-a11y {
+  background: #444;
+  color: #fff;
+}
+.btn-a11y:hover {
+  background: #222;
+}
 .btn-reset {
   background: #eee;
   color: #333;
@@ -265,15 +272,28 @@ input.invalid {
   background: var(--uab-gray-light);
 }
 
-/* 9. Success Messages */
+/* 9. Focus Styles */
+:focus {
+  outline: 3px solid var(--uab-gold) !important;
+  outline-offset: 2px;
+}
+
+/* 10. Success & Accessibility Messages */
 .copy-msg {
   font-size: 0.9rem;
   margin-left: 0.5rem;
   color: var(--uab-light-green);
   font-weight: bold;
 }
+.a11y-report {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #C00;
+  min-height: 1.2em;
+}
 
-/* 10. Instructions & Footer */
+/* 11. Instructions & Footer */
 .instructions {
   margin-top: 2rem;
   font-size: 0.9rem;
