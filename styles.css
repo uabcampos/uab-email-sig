@@ -490,6 +490,19 @@ body {
   font-size: 1rem;
 }
 
+.website-lookup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.website-lookup input {
+  flex: 1 1 auto;
+}
+.btn-lookup {
+  flex: 0 0 auto;
+}
+
 /* Prevent phone-toggle labels from wrapping */
 .phone-toggle > label {
   white-space: nowrap;
