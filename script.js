@@ -1,117 +1,12 @@
 // script.js
 
-// Helper to get element by ID
+// Simple helper
 function el(id) {
   return document.getElementById(id);
 }
 
-// Format phone numbers (7 or 10 digits) into ###.###.####
-function formatPhoneNumber(number) {
-  const digits = (number || '').replace(/\D/g, '');
-  if (digits.length === 7) {
-    return `205.${digits.slice(0,3)}.${digits.slice(3)}`;
-  } else if (digits.length === 10) {
-    return `${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6)}`;
-  }
-  return number;
-}
-
-// Generate RTF content from the preview HTML
-async function generateRTFContent() {
-  const html   = el('signature-preview').innerHTML;
-  const parts  = html.split('<br>').map(p => p.trim()).filter(Boolean);
-  // Part 1: blank line
-  const part1  = '\\line ';
-  // Part 2: all but last line
-  const body   = parts.slice(0, -1).map(line =>
-    line
-      .replace(/<strong.*?>(.*?)<\/strong>/,        '{\\b\\cf1 $1}')
-      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,  '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-      .replace(/<\/?[^>]+>/g, '')
-  ).join('\\line ');
-  const part2  = body + '\\line ';
-  // Part 3: last line (URL)
-  const urlLine = parts[parts.length - 1]
-    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,      '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
-    .replace(/<\/?[^>]+>/g, '');
-  const part3  = '\\line ' + urlLine;
-
-  return [
-    '{\\rtf1\\ansi\\deff0',
-    '{\\colortbl ;\\red26\\green86\\blue50;}',
-    '{\\fonttbl{\\f0 Arial;}}',
-    '\\fs24',
-    part1, part2, part3,
-    '}'
-  ].join('\n');
-}
-
-// Copy the signature preview to the clipboard (HTML + plain text)
-async function copyToClipboard() {
-  const htmlSnippet = el('signature-preview').innerHTML;
-  const container   = document.createElement('div');
-  container.style.color = '#1E6B52';
-  container.innerHTML   = htmlSnippet;
-  document.body.appendChild(container);
-
-  // Use Clipboard API if available
-  if (navigator.clipboard && navigator.clipboard.write) {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': new Blob([container.innerHTML], { type: 'text/html' }),
-          'text/plain': new Blob([container.textContent], { type: 'text/plain' })
-        })
-      ]);
-      el('copy-success').style.display = 'inline';
-      setTimeout(() => el('copy-success').style.display = 'none', 2000);
-      document.body.removeChild(container);
-      return;
-    } catch {
-      // fallback to execCommand
-    }
-  }
-
-  // Fallback: execCommand
-  const range = document.createRange();
-  range.selectNodeContents(container);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-  try {
-    document.execCommand('copy');
-    el('copy-success').style.display = 'inline';
-    setTimeout(() => el('copy-success').style.display = 'none', 2000);
-  } catch {
-    alert('Copy failed — please copy manually.');
-  }
-  sel.removeAllRanges();
-  document.body.removeChild(container);
-}
-
-// Generate and download the RTF file
-async function downloadRTF() {
-  try {
-    const rtfBlob = new Blob([await generateRTFContent()], { type: 'application/rtf' });
-    const url     = URL.createObjectURL(rtfBlob);
-    const a       = document.createElement('a');
-    a.href        = url;
-    a.download    = 'signature.rtf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  } catch {
-    alert('Failed to download RTF.');
-  }
-}
-
-// Rebuild the signature preview live (with placeholders if empty)
+// Always show a preview (using placeholders if empty)
 function updateSignaturePreview() {
-  const valid = validateAllRequiredFields();
-  el('copy-button').disabled     = !valid;
-  el('download-button').disabled = !valid;
-
   const name      = el('name').value.trim()        || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim()       || 'Program Director II';
@@ -123,8 +18,8 @@ function updateSignaturePreview() {
   const pronouns  = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
   const phones = [];
-  if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-  if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
+  if (el('phone-office-enable').checked) phones.push(`O: ${el('phone-office').value.trim() || '205.975.7908'}`);
+  if (el('phone-mobile-enable').checked) phones.push(`M: ${el('phone-mobile').value.trim() || '205.555.1234'}`);
   const phoneLine = phones.join(', ');
 
   const isStandard = el('btn-standard').classList.contains('active');
@@ -147,16 +42,26 @@ function updateSignaturePreview() {
   el('signature-preview').innerHTML = html;
 }
 
-// Switch between standard and abbreviated
-function toggleVersion(isStandard) {
-  el('btn-standard').classList.toggle('active', isStandard);
-  el('btn-abbreviated').classList.toggle('active', !isStandard);
+// Stub alert for copy
+function copyToClipboard() {
+  alert('✅ Copy handler fired');
+}
+
+// Stub alert for download
+function downloadRTF() {
+  alert('✅ Download handler fired');
+}
+
+// Toggle versions
+function toggleVersion(isStd) {
+  el('btn-standard').classList.toggle('active', isStd);
+  el('btn-abbreviated').classList.toggle('active', !isStd);
   updateSignaturePreview();
 }
 
-// Setup listeners on load
+// On load, bind everything
 document.addEventListener('DOMContentLoaded', () => {
-  // Live update & validation
+  // Bind inputs for live preview
   [
     'name','credentials','title','room','street','city-state',
     'zip','email','pronouns','phone-office','phone-mobile'
@@ -164,22 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const inp = el(id);
     if (!inp) return;
     inp.addEventListener('input', updateSignaturePreview);
-    inp.addEventListener('blur',  () => validateField(inp));
   });
 
-  // Phone toggles
-  ['phone-office-enable','phone-mobile-enable'].forEach(id => {
-    el(id)?.addEventListener('change', updateSignaturePreview);
-  });
+  // Bind checkboxes
+  ['phone-office-enable','phone-mobile-enable']
+    .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
   // Version buttons
   el('btn-standard')?.addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated')?.addEventListener('click', () => toggleVersion(false));
 
-  // Copy & download
+  // Copy & Download
   el('copy-button')?.addEventListener('click', copyToClipboard);
   el('download-button')?.addEventListener('click', downloadRTF);
 
-  // Initial render
+  // Initial preview
+  toggleVersion(true);
   updateSignaturePreview();
 });
