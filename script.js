@@ -1,11 +1,13 @@
 // script.js
 
-// Helper to get element by ID
+console.log('▶ script.js loaded');
+
 function el(id) {
-  return document.getElementById(id);
+  const node = document.getElementById(id);
+  if (!node) console.warn(`⚠️ Element #${id} not found`);
+  return node;
 }
 
-// Format phone numbers (7 or 10 digits)
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
@@ -16,17 +18,17 @@ function formatPhoneNumber(number) {
   return number;
 }
 
-// Generate RTF content from preview
 async function generateRTFContent() {
-  const html = el('signature-preview').innerHTML;
-  const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
-  const part1 = '\\line ';
-  const body = parts.slice(0,-1).map(line =>
-    line.replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
-        .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-        .replace(/<\/?[^>]+>/g, '')
+  const html   = el('signature-preview').innerHTML;
+  const parts  = html.split('<br>').map(p => p.trim()).filter(Boolean);
+  const part1  = '\\line ';
+  const body   = parts.slice(0,-1).map(line =>
+    line
+      .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
+      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+      .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
-  const part2 = body + '\\line ';
+  const part2  = body + '\\line ';
   const urlLine = parts[parts.length-1]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
@@ -42,16 +44,15 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Copy preview HTML to clipboard
 async function copyToClipboard() {
-  console.log('Copy button clicked');
-  const previewHTML = el('signature-preview').innerHTML;
+  console.log('🔍 copyToClipboard invoked');
+  const html = el('signature-preview').innerHTML;
   const container = document.createElement('div');
   container.style.color = '#1E6B52';
-  container.innerHTML = previewHTML;
+  container.innerHTML = html;
   document.body.appendChild(container);
 
-  // Try Clipboard API first
+  // Try Clipboard API
   if (navigator.clipboard && navigator.clipboard.write) {
     try {
       await navigator.clipboard.write([
@@ -69,12 +70,13 @@ async function copyToClipboard() {
     }
   }
 
-  // Fallback to execCommand
+  // Fallback execCommand
   const range = document.createRange();
   range.selectNodeContents(container);
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
+
   try {
     document.execCommand('copy');
     el('copy-success').style.display = 'inline';
@@ -83,15 +85,15 @@ async function copyToClipboard() {
     alert('Copy failed—please copy manually.');
     console.error('execCommand copy failed', err);
   }
+
   sel.removeAllRanges();
   document.body.removeChild(container);
 }
 
-// Download RTF
 async function downloadRTF() {
-  console.log('Download button clicked');
+  console.log('🔍 downloadRTF invoked');
   try {
-    const rtf = await generateRTFContent();
+    const rtf  = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
@@ -107,8 +109,8 @@ async function downloadRTF() {
   }
 }
 
-// Update signature preview (always uses placeholders if empty)
 async function updateSignaturePreview() {
+  console.log('✏️ updateSignaturePreview');
   const valid = validateAllRequiredFields();
   el('copy-button').disabled     = !valid;
   el('download-button').disabled = !valid;
@@ -127,9 +129,6 @@ async function updateSignaturePreview() {
   if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
   if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
-
-  let bannerHtml = '';
-  // banner removed per request
 
   const isStandard = el('btn-standard').classList.contains('active');
   const baseUrl    = 'uab.edu/medicine/gimaps';
@@ -151,32 +150,50 @@ async function updateSignaturePreview() {
   el('signature-preview').innerHTML = html;
 }
 
-// Toggle version buttons
 function toggleVersion(isStandard) {
+  console.log(`🔀 toggleVersion(${isStandard})`);
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
   updateSignaturePreview();
 }
 
-// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Bind live preview & validation
-  ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
-    .forEach(id => {
-      const inp = el(id);
-      if (!inp) return;
-      inp.addEventListener('input', updateSignaturePreview);
-      inp.addEventListener('blur', () => validateField(inp));
-    });
-  ['phone-office-enable','phone-mobile-enable']
-    .forEach(id => el(id).addEventListener('change', updateSignaturePreview));
+  console.log('✅ DOMContentLoaded');
 
-  // Bind buttons
-  el('copy-button').addEventListener('click', copyToClipboard);
-  el('download-button').addEventListener('click', downloadRTF);
-  el('btn-standard').addEventListener('click', () => toggleVersion(true));
-  el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
+  // Live preview & validation
+  [
+    'name','credentials','title','room','street','city-state',
+    'zip','email','pronouns','phone-office','phone-mobile'
+  ].forEach(id => {
+    const inp = el(id);
+    if (inp) {
+      console.log(`📌 binding input #${id}`);
+      inp.addEventListener('input',  updateSignaturePreview);
+      inp.addEventListener('blur',   () => { console.log(`🛑 blur #${id}`); validateField(inp); });
+    }
+  });
 
-  // Initial preview
+  // Checkboxes
+  ['phone-office-enable','phone-mobile-enable'].forEach(id => {
+    const cb = el(id);
+    if (cb) {
+      console.log(`📌 binding change #${id}`);
+      cb.addEventListener('change', updateSignaturePreview);
+    }
+  });
+
+  // Version buttons
+  const bs = el('btn-standard'),
+        ba = el('btn-abbreviated');
+  if (bs) { console.log('📌 binding #btn-standard'); bs.addEventListener('click', () => toggleVersion(true)); }
+  if (ba) { console.log('📌 binding #btn-abbreviated'); ba.addEventListener('click', () => toggleVersion(false)); }
+
+  // Copy & download
+  const cb = el('copy-button'),
+        db = el('download-button');
+  if (cb) { console.log('📌 binding #copy-button'); cb.addEventListener('click', copyToClipboard); }
+  if (db) { console.log('📌 binding #download-button'); db.addEventListener('click', downloadRTF); }
+
+  // Initial render
   updateSignaturePreview();
 });
