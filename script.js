@@ -251,7 +251,9 @@ async function downloadPNG() {
 function showQRCode() {
   const qrModal = el('qr-modal');
   const img     = qrModal.querySelector('img');
-  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(buildDeepLink())}&choe=UTF-8`;
+  const link    = buildDeepLink();
+  // use QuickChart to generate the QR
+  img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(link)}`;
   qrModal.classList.add('active');
 }
 
