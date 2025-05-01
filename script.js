@@ -73,6 +73,8 @@ function buildDeepLink() {
 
 function restoreFromQuery() {
   const params = new URLSearchParams(location.search);
+
+  // Restore fields present
   [
     'name','credentials','title',
     'department','school','division',
@@ -82,6 +84,11 @@ function restoreFromQuery() {
     if (params.has(id)) el(id).value = params.get(id);
   });
 
+  // Clear optional if absent
+  if (!params.has('credentials')) el('credentials').value = '';
+  if (!params.has('pronouns'))   el('pronouns').value   = '';
+
+  // Phones
   const oe = params.get('phoneOfficeEnabled') === 'true';
   el('phone-office-enable').checked = oe;
   if (oe && params.has('phoneOfficeNumber')) {
@@ -94,6 +101,7 @@ function restoreFromQuery() {
     el('phone-mobile').value = params.get('phoneMobileNumber');
   }
 
+  // Version
   if (params.get('version') === 'abbr') {
     el('btn-standard').classList.remove('active');
     el('btn-abbreviated').classList.add('active');
@@ -104,7 +112,7 @@ function restoreFromQuery() {
 
 function formatPhoneNumber(num) {
   const d = (num || '').replace(/\D/g, '');
-  if (d.length === 7) return `205.${d.slice(0,3)}.${d.slice(3)}`;
+  if (d.length === 7)  return `205.${d.slice(0,3)}.${d.slice(3)}`;
   if (d.length === 10) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6)}`;
   return num;
 }
@@ -114,30 +122,30 @@ function decodedHTML() {
 }
 
 async function generateRTFContent() {
-  const raw = decodedHTML();
+  const raw   = decodedHTML();
   const lines = raw.split('<br>').map(l => l.trim()).filter(Boolean);
 
-  const part1 = '\\line ';
-  const body = lines.slice(0, -1).map(line =>
+  const p1 = '\\line ';
+  const body = lines.slice(0,-1).map(line =>
     line
-      .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
+      .replace(/<strong.*?>(.*?)<\/strong>/,'{\\b\\cf1 $1}')
       .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,
                '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-      .replace(/<\/?[^>]+>/g, '')
+      .replace(/<\/?[^>]+>/g,'')
   ).join('\\line ');
-  const part2 = body + '\\line ';
+  const p2 = body + '\\line ';
   const urlLine = lines.slice(-1)[0]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,
              '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
-    .replace(/<\/?[^>]+>/g, '');
-  const part3 = '\\line ' + urlLine;
+    .replace(/<\/?[^>]+>/g,'');
+  const p3 = '\\line ' + urlLine;
 
   return [
     '{\\rtf1\\ansi\\deff0',
     '{\\colortbl ;\\red26\\green86\\blue50;}',
     '{\\fonttbl{\\f0 Arial;}}',
     '\\fs24',
-    part1, part2, part3,
+    p1, p2, p3,
     '}'
   ].join('\n');
 }
@@ -170,13 +178,10 @@ async function copyToClipboard() {
       })
     ]);
   } catch {
-    const range = document.createRange();
-    range.selectNodeContents(tmp);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    document.execCommand('copy');
-    sel.removeAllRanges();
+    const r = document.createRange(), s = window.getSelection();
+    r.selectNodeContents(tmp);
+    s.removeAllRanges(); s.addRange(r);
+    document.execCommand('copy'); s.removeAllRanges();
   }
 
   tmp.remove();
@@ -199,9 +204,7 @@ async function downloadRTF() {
     a.href = URL.createObjectURL(blob);
     a.download = 'signature.rtf';
     document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
+    a.click(); a.remove(); URL.revokeObjectURL(a.href);
   } catch {
     alert('RTF download failed.');
   }
@@ -217,9 +220,7 @@ async function downloadOFTTemplate() {
     a.href = URL.createObjectURL(blob);
     a.download = 'signature.oft';
     document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
+    a.click(); a.remove(); URL.revokeObjectURL(a.href);
   } catch {
     alert('OFT download failed.');
   }
@@ -233,9 +234,7 @@ function downloadHTMLTemplate() {
   a.href = URL.createObjectURL(blob);
   a.download = 'signature.html';
   document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(a.href);
+  a.click(); a.remove(); URL.revokeObjectURL(a.href);
 }
 
 let html2canvasPromise = null;
@@ -263,9 +262,7 @@ async function downloadPNG() {
       a.href = URL.createObjectURL(blob);
       a.download = 'signature.png';
       document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(a.href);
+      a.click(); a.remove(); URL.revokeObjectURL(a.href);
     });
   } catch {
     alert('PNG download failed.');
@@ -275,10 +272,9 @@ async function downloadPNG() {
 // ------------ QR Code Modal ------------
 
 function showQRCode() {
-  const qrModal = el('qr-modal');
-  const img     = qrModal.querySelector('img');
-  img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
-  qrModal.classList.add('active');
+  const qr = el('qr-modal');
+  qr.querySelector('img').src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
+  qr.classList.add('active');
 }
 
 function hideQRCode() {
@@ -289,55 +285,40 @@ function hideQRCode() {
 
 async function lookupWebsite() {
   let text = el('division').value.trim() || el('department').value.trim();
-  if (!text) {
-    alert('Please enter a Division or Department name first.');
-    return;
-  }
-  text = text.replace(/&/g, 'and');
+  if (!text) { alert('Enter Division or Department first.'); return; }
+  text = text.replace(/&/g,'and');
   const query = `Home "${text}" site:uab.edu`;
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
 
   try {
-    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-    const html = await fetch(proxyUrl).then(r => {
-      if (!r.ok) throw new Error('Network error');
-      return r.text();
-    });
+    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const html = await fetch(proxy).then(r=>{ if(!r.ok) throw ''; return r.text(); });
 
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const doc = new DOMParser().parseFromString(html,'text/html');
     const anchors = Array.from(doc.querySelectorAll('a.result__a'));
     let link = anchors
-      .map(a => a.href)
-      .map(h => {
-        if (h.includes('/l/?uddg=')) {
-          try {
-            const u = new URL(h);
-            const d = u.searchParams.get('uddg');
-            return d ? decodeURIComponent(d) : h;
-          } catch {
-            return h;
-          }
+      .map(a=>a.href)
+      .map(h=>{
+        if(h.includes('/l/?uddg=')){
+          try{ const u=new URL(h), d=u.searchParams.get('uddg'); return d?decodeURIComponent(d):h; }
+          catch{ return h; }
         }
         return h;
       })
-      .find(h => {
-        try {
-          return new URL(h).hostname.endsWith('uab.edu');
-        } catch {
-          return false;
-        }
+      .find(h=>{
+        try{ return new URL(h).hostname.endsWith('uab.edu'); }
+        catch{ return false; }
       });
 
-    if (link) {
+    if(link){
       el('website').value = link;
-      persist('website', link);
+      persist('website',link);
       updateSignaturePreview();
     } else {
-      alert('No uab.edu result found; please paste URL manually.');
+      alert('No uab.edu result found; paste manually.');
     }
-  } catch (err) {
-    console.error(err);
-    alert('Lookup failed; please paste URL manually.');
+  } catch {
+    alert('Lookup failed; paste manually.');
   }
 }
 
@@ -348,61 +329,56 @@ function resetToDefaults() {
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
-  ].forEach(id => { if (el(id)) el(id).value = ''; });
-  ['phone-office-enable','phone-mobile-enable'].forEach(id => el(id).checked = false);
+  ].forEach(id=>el(id)&&(el(id).value=''));
+  ['phone-office-enable','phone-mobile-enable'].forEach(id=>el(id).checked=false);
   el('btn-standard').classList.add('active');
   el('btn-abbreviated').classList.remove('active');
   updateSignaturePreview();
 }
 
 function updateSignaturePreview() {
-  // Persist all editable fields
-  ['name','credentials','title','department','school','division',
-   'room','street','city-state','zip','email','pronouns','website']
-    .forEach(id => persist(id, (el(id)?.value || '').trim()));
+  [
+    'name','credentials','title','department','school','division',
+    'room','street','city-state','zip','email','pronouns','website'
+  ].forEach(id=>persist(id,(el(id)?.value||'').trim()));
 
-  // Grab values (fallbacks only for those you want defaults on)
-  const name      = el('name').value.trim() || 'John Doe';
+  const name      = el('name').value.trim()||'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
-  const title     = el('title').value.trim() || 'Program Director II';
-  const dept      = el('department').value.trim() || 'Department of Medicine';
-  const school    = el('school').value.trim() || 'Heersink School of Medicine';
-  const division  = el('division').value.trim(); // optional
-  const room      = el('room').value.trim() || 'MT634';
-  const street    = el('street').value.trim() || '1717 11th Avenue South';
-  const cityState = el('city-state').value.trim() || 'Birmingham, AL';
-  const zip       = el('zip').value.trim() || '35294-4410';
-  const email     = el('email').value.trim() || 'you@uabmc.edu';
+  const title     = el('title').value.trim()||'Program Director II';
+  const dept      = el('department').value.trim()||'Department of Medicine';
+  const school    = el('school').value.trim()||'Heersink School of Medicine';
+  const division  = el('division').value.trim();
+  const room      = el('room').value.trim()||'MT634';
+  const street    = el('street').value.trim()||'1717 11th Avenue South';
+  const cityState = el('city-state').value.trim()||'Birmingham, AL';
+  const zip       = el('zip').value.trim()||'35294-4410';
+  const email     = el('email').value.trim()||'you@uabmc.edu';
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
-  // Phone formatting
   const phones = [];
-  if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-  if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
+  if(el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
+  if(el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
 
-  // Determine URL href/text
-  let href = el('website').value.trim() || 'https://uab.edu/medicine/gimaps';
-  if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
-  const text = href.replace(/^https?:\/\//, '').replace(/^www\./, '');
+  let href = el('website').value.trim()||'https://uab.edu/medicine/gimaps';
+  if(!/^https?:\/\//i.test(href)) href='https://'+href;
+  const text = href.replace(/^https?:\/\//,'').replace(/^www\./,'');
 
   const isStd = el('btn-standard').classList.contains('active');
 
-  // Build the inner HTML
   let inner = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
-  if (isStd) {
-    inner += `${dept} | ${school}`;
-    if (division) inner += `<br>${division}`;
-    inner += `<br>UAB | The University of Alabama at Birmingham<br>`;
-    inner += `${room} | ${street} | ${cityState} ${zip}<br>`;
+  if(isStd){
+    inner+=`${dept} | ${school}`;
+    if(division) inner+=`<br>${division}`;
+    inner+=`<br>UAB | The University of Alabama at Birmingham<br>`;
+    inner+=`${room} | ${street} | ${cityState} ${zip}<br>`;
   } else {
-    inner += `UAB | The University of Alabama at Birmingham<br>`;
+    inner+=`UAB | The University of Alabama at Birmingham<br>`;
   }
-  if (phoneLine) inner += `${phoneLine} | `;
-  inner += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
-  inner += `<a href="${href}" target="_blank">${text}</a>`;
+  if(phoneLine) inner+=`${phoneLine} | `;
+  inner+=`<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
+  inner+=`<a href="${href}" target="_blank">${text}</a>`;
 
-  // Wrap in Arial styling
   const wrapperStart = `<div style="font-family:Arial, sans-serif; font-size:12px; line-height:1.2;">`;
   const wrapperEnd   = `</div>`;
 
@@ -413,7 +389,7 @@ function updateSignaturePreview() {
 // ------------ Initialization ------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.feather) feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
+  if(window.feather) feather.replace({ 'stroke-width':2,width:20,height:20 });
 
   [
     'name','credentials','title','department','school','division',
@@ -422,16 +398,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   restoreFromQuery();
 
-  document.body.insertAdjacentHTML('beforeend', `
+  // Inject QR modal container
+  document.body.insertAdjacentHTML('beforeend',`
     <div id="qr-modal" class="qr-modal" role="dialog" aria-modal="true">
       <div class="qr-content">
-        <img alt="QR code for signature" />
+        <img alt="QR code for signature"/>
         <p>Scan to open on mobile with your info pre-filled.</p>
       </div>
-    </div>
-  `);
+    </div>`);
+
   el('qr-modal').addEventListener('click', hideQRCode);
-  el('qr-modal').querySelector('.qr-content').addEventListener('click', e => e.stopPropagation());
+  el('qr-modal').querySelector('.qr-content').addEventListener('click', e=>e.stopPropagation());
 
   updateSignaturePreview();
 
@@ -439,44 +416,44 @@ document.addEventListener('DOMContentLoaded', () => {
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
-  ].forEach(id => {
+  ].forEach(id=>{
     const f = el(id);
-    if (f) f.addEventListener('input', () => { validateField(f); deb(); });
+    if(f) f.addEventListener('input', ()=>{ validateField(f); deb(); });
   });
 
-  ['phone-office-enable','phone-mobile-enable'].forEach(id =>
+  ['phone-office-enable','phone-mobile-enable'].forEach(id=> 
     el(id).addEventListener('change', updateSignaturePreview)
   );
 
-  el('btn-standard').addEventListener('click', () => {
+  el('btn-standard').addEventListener('click', ()=>{
     el('btn-standard').classList.add('active');
     el('btn-abbreviated').classList.remove('active');
     updateSignaturePreview();
   });
-  el('btn-abbreviated').addEventListener('click', () => {
+  el('btn-abbreviated').addEventListener('click', ()=>{
     el('btn-abbreviated').classList.add('active');
     el('btn-standard').classList.remove('active');
     updateSignaturePreview();
   });
 
-  saveDraftBtn.addEventListener('click', () => {
+  saveDraftBtn.addEventListener('click', ()=>{
     [
       'name','credentials','title','department','school','division',
       'room','street','city-state','zip','email','pronouns','website'
-    ].forEach(id => persist(id, el(id).value.trim()));
+    ].forEach(id=>persist(id, el(id).value.trim()));
   });
 
-  clearDraftBtn.addEventListener('click', () => {
+  clearDraftBtn.addEventListener('click', ()=>{
     clearAllPersistence();
     resetToDefaults();
-    lastSavedEl.textContent = 'Last saved: never';
+    lastSavedEl.textContent='Last saved: never';
   });
 
-  el('more-options-toggle').addEventListener('click', () => {
+  el('more-options-toggle').addEventListener('click', ()=>{
     const panel = el('more-options'), btn = el('more-options-toggle');
-    const collapsed = panel.classList.toggle('collapsed');
-    btn.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
-    feather.reload();
+    const col = panel.classList.toggle('collapsed');
+    btn.querySelector('i[data-feather]').dataset.feather = col?'chevron-down':'chevron-up';
+    feather.replace();
   });
 
   el('lookup-website').addEventListener('click', lookupWebsite);
@@ -490,12 +467,11 @@ document.addEventListener('DOMContentLoaded', () => {
   el('show-qr-button').addEventListener('click', showQRCode);
   el('reset-button').addEventListener('click', resetToDefaults);
 
-  const moreToggle = el('toggle-actions');
-  const extraPanel = el('extra-actions');
+  const moreToggle = el('toggle-actions'), extraPanel = el('extra-actions');
   extraPanel.classList.add('collapsed');
-  moreToggle.addEventListener('click', () => {
-    const collapsed = extraPanel.classList.toggle('collapsed');
-    moreToggle.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
+  moreToggle.addEventListener('click', ()=>{
+    const col = extraPanel.classList.toggle('collapsed');
+    moreToggle.querySelector('i[data-feather]').dataset.feather = col?'chevron-down':'chevron-up';
     feather.replace();
   });
 });
