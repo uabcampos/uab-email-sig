@@ -12,18 +12,12 @@
   <div class="page-title">
     <h1>UAB Email Signature Generator</h1>
     <div class="version-selection">
-      <button id="btn-standard" class="version-button active">
-        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16">
-          <rect x="1" y="2" width="14" height="10" rx="1" ry="1" stroke="currentColor" fill="none"/>
-          <rect x="5" y="13" width="6" height="1" fill="currentColor"/>
-        </svg>
+      <button id="btn-standard" class="version-button active" aria-label="Use Standard Version">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="10" rx="1" ry="1" stroke="currentColor" fill="none"/><rect x="5" y="13" width="6" height="1" fill="currentColor"/></svg>
         Standard
       </button>
-      <button id="btn-abbreviated" class="version-button">
-        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 8 16">
-          <rect x="1" y="1" width="6" height="14" rx="1" ry="1" stroke="currentColor" fill="none"/>
-          <circle cx="4" cy="13" r="1" fill="currentColor"/>
-        </svg>
+      <button id="btn-abbreviated" class="version-button" aria-label="Use Abbreviated Version">
+        <svg width="16" height="16" viewBox="0 0 8 16"><rect x="1" y="1" width="6" height="14" rx="1" ry="1" stroke="currentColor" fill="none"/><circle cx="4" cy="13" r="1" fill="currentColor"/></svg>
         Abbreviated
       </button>
     </div>
@@ -37,7 +31,7 @@
         Name <span class="required">*</span>
         <span class="tooltip" data-tooltip="Your full name as you want it to appear.">?</span>
       </label>
-      <input type="text" id="name" placeholder="John Doe" required>
+      <input type="text" id="name" placeholder="John Doe" required aria-describedby="name-error">
       <div id="name-error" class="error-message"></div>
 
       <label for="credentials">
@@ -50,35 +44,35 @@
         Role/Title <span class="required">*</span>
         <span class="tooltip" data-tooltip="Your role or title.">?</span>
       </label>
-      <input type="text" id="title" placeholder="Program Director II" required>
+      <input type="text" id="title" placeholder="Program Director II" required aria-describedby="title-error">
       <div id="title-error" class="error-message"></div>
 
       <label for="room">
         Room <span class="required">*</span>
         <span class="tooltip" data-tooltip="Building and room number (e.g., MT634).">?</span>
       </label>
-      <input type="text" id="room" placeholder="MT634" required>
+      <input type="text" id="room" placeholder="MT634" required aria-describedby="room-error">
       <div id="room-error" class="error-message"></div>
 
       <label for="street">
         Street Address <span class="required">*</span>
         <span class="tooltip" data-tooltip="Street address for your office.">?</span>
       </label>
-      <input type="text" id="street" placeholder="1717 11th Avenue South" required>
+      <input type="text" id="street" placeholder="1717 11th Avenue South" required aria-describedby="street-error">
       <div id="street-error" class="error-message"></div>
 
       <label for="city-state">
         City, State <span class="required">*</span>
         <span class="tooltip" data-tooltip="City and two-letter state abbreviation.">?</span>
       </label>
-      <input type="text" id="city-state" placeholder="Birmingham, AL" required>
+      <input type="text" id="city-state" placeholder="Birmingham, AL" required aria-describedby="city-state-error">
       <div id="city-state-error" class="error-message"></div>
 
       <label for="zip">
         ZIP Code <span class="required">*</span>
         <span class="tooltip" data-tooltip="Five-digit ZIP or ZIP+4 code.">?</span>
       </label>
-      <input type="text" id="zip" placeholder="35294-4410" required>
+      <input type="text" id="zip" placeholder="35294-4410" required aria-describedby="zip-error">
       <div id="zip-error" class="error-message"></div>
 
       <label>
@@ -86,7 +80,7 @@
         Office Phone
         <span class="tooltip" data-tooltip="Include your 7- or 10-digit office phone number.">?</span>
       </label>
-      <input type="text" id="phone-office" placeholder="205.975.7908">
+      <input type="text" id="phone-office" placeholder="205.975.7908" aria-describedby="phone-office-error">
       <div id="phone-office-error" class="error-message"></div>
 
       <label>
@@ -94,14 +88,14 @@
         Mobile Phone
         <span class="tooltip" data-tooltip="Include your 7- or 10-digit mobile phone number.">?</span>
       </label>
-      <input type="text" id="phone-mobile" placeholder="205.555.1234">
+      <input type="text" id="phone-mobile" placeholder="205.555.1234" aria-describedby="phone-mobile-error">
       <div id="phone-mobile-error" class="error-message"></div>
 
       <label for="email">
         Email Address <span class="required">*</span>
         <span class="tooltip" data-tooltip="Your UAB or UABMC email address.">?</span>
       </label>
-      <input type="email" id="email" placeholder="johndoe@uabmc.edu" required>
+      <input type="email" id="email" placeholder="johndoe@uabmc.edu" required aria-describedby="email-error">
       <div id="email-error" class="error-message"></div>
 
       <label for="pronouns">
@@ -115,42 +109,47 @@
     <div class="card preview-card">
       <h2>Signature Previews</h2>
       <div id="preview-wrapper" class="preview-split">
-        <div class="preview-frame desktop-frame">
+        <div class="preview-frame desktop-frame" tabindex="0" aria-label="Desktop preview">
           <div id="signature-preview"></div>
         </div>
-        <div class="preview-frame mobile-frame">
+        <div class="preview-frame mobile-frame" tabindex="0" aria-label="Mobile preview">
           <div id="mobile-preview"></div>
         </div>
       </div>
       <div class="button-container">
-        <button id="copy-button" class="btn btn-copy">
+        <button id="copy-button" class="btn btn-copy" aria-label="Copy signature to clipboard">
           <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 1h8v10H4z" stroke="currentColor" fill="none"/><path d="M2 5h8v10H2z" stroke="currentColor" fill="none"/></svg>
           Copy
         </button>
-        <button id="copy-html-button" class="btn btn-copy-html">
+        <button id="copy-html-button" class="btn btn-copy-html" aria-label="Copy signature HTML to clipboard">
           <svg width="16" height="16" viewBox="0 0 16 16"><text x="2" y="12" font-family="monospace" font-size="12" fill="currentColor">&lt;/&gt;</text></svg>
           Copy HTML
         </button>
-        <button id="download-button" class="btn btn-download">
+        <button id="download-button" class="btn btn-download" aria-label="Download signature as RTF">
           <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 10v4h12v-4" stroke="currentColor" fill="none"/><path d="M8 1v9m-3-3l3 3 3-3" stroke="currentColor" fill="none"/></svg>
           Download RTF
         </button>
-        <button id="download-png-button" class="btn btn-download-png">
+        <button id="download-png-button" class="btn btn-download-png" aria-label="Download signature as PNG">
           <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" ry="1" stroke="currentColor" fill="none"/><circle cx="6" cy="6" r="2" stroke="currentColor" fill="none"/><path d="M2 12l4-4 2 2 4-4v6H2z" fill="currentColor"/></svg>
           Download PNG
         </button>
-        <button id="reset-button" class="btn btn-reset">
+        <button id="accessibility-check-button" class="btn btn-a11y" aria-label="Check accessibility contrast">
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="currentColor" fill="none"/><text x="4.5" y="11" font-size="6" fill="currentColor">A11Y</text></svg>
+          Check Accessibility
+        </button>
+        <button id="reset-button" class="btn btn-reset" aria-label="Reset form to defaults">
           <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1A7 7 0 1 0 15 8" stroke="currentColor" fill="none"/><polyline points="15,1 15,7 9,7" stroke="currentColor" fill="none"/></svg>
           Reset
         </button>
+        <span id="accessibility-report" class="a11y-report" aria-live="polite"></span>
         <span id="copy-success" class="copy-msg" style="display:none;">Copied!</span>
         <span id="copy-html-success" class="copy-msg" style="display:none;">HTML Copied!</span>
       </div>
       <div class="instructions">
         <h3>Instructions for Adding Your Signature</h3>
-        <p><strong>Windows — Outlook:</strong> Copy, then File → Options → Mail → Signatures. Paste with “Merge Formatting.”</p>
+        <p><strong>Windows — Outlook:</strong> Copy, then File &rarr; Options &rarr; Mail &rarr; Signatures. Paste with “Merge Formatting.”</p>
         <p><strong>Mac — Outlook & Mail App:</strong> Copy, open signature settings, and paste.</p>
-        <p><strong>iOS — Mail App:</strong> Copy, then Settings → Mail → Signature. Paste.</p>
+        <p><strong>iOS — Mail App:</strong> Copy, then Settings &rarr; Mail &rarr; Signature. Paste.</p>
       </div>
     </div>
   </div>
@@ -161,8 +160,7 @@
     <p>This email signature generator is unofficial and not endorsed by UAB. It follows the latest guidance for the Division of General Internal Medicine & Population Science. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
   </div>
 
-  <!-- html2canvas for PNG export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Note: html2canvas is lazy-loaded in script.js -->
   <script src="validation.js"></script>
   <script src="script.js"></script>
 </body>
