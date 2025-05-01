@@ -5,7 +5,7 @@
 
 :root {
   --uab-green:        #1A5632;
-  --uab-green-dark:   #16482F;     /* ~10% darker */
+  --uab-green-dark:   #16482F;
   --uab-grey-light:   #F5F5F5;
   --uab-grey-mid:     #E6E6E6;
   --uab-grey-dark:    #E0E0E0;
@@ -58,6 +58,7 @@ body {
   border: 1px solid var(--uab-grey-mid);
   border-radius: var(--btn-radius);
   cursor: pointer;
+  font-weight: 700;
   transition: background 0.2s, transform 0.1s;
 }
 .version-selection .version-button.active {
@@ -80,7 +81,9 @@ body {
   margin: 2rem auto;
 }
 @media (max-width: 768px) {
-  .container { grid-template-columns: 1fr; }
+  .container {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* 4. Card Component */
@@ -103,20 +106,24 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  flex: 0 0 auto;
   height: var(--btn-height);
   padding: var(--btn-padding);
-  background: var(--uab-green);
-  color: #fff;
-  border: none;
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: var(--btn-radius);
   cursor: pointer;
   font-weight: 700;
-  box-shadow: 0 2px 6px var(--shadow-light);
+  box-shadow: none;
   transition: background 0.2s, transform 0.1s;
 }
 .draft-controls .btn:hover,
 .draft-controls .btn:focus {
-  background: var(--uab-green-dark);
+  background: var(--uab-grey-dark);
+}
+.draft-controls .btn svg {
+  fill: var(--uab-green-dark);
 }
 .draft-controls span {
   margin-left: auto;
@@ -172,6 +179,7 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   margin-top: 1rem;
+  flex: 0 0 auto;
   height: var(--btn-height);
   padding: var(--btn-padding);
   background: var(--uab-grey-light);
@@ -185,6 +193,9 @@ body {
 .btn-more-options:hover,
 .btn-more-options:focus {
   background: var(--uab-grey-dark);
+}
+.btn-more-options svg {
+  fill: var(--uab-green-dark);
 }
 .more-options {
   overflow: hidden;
@@ -200,6 +211,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  flex: 0 0 auto;
   height: var(--btn-height);
   padding: var(--btn-padding);
   background: var(--uab-green);
@@ -215,7 +227,8 @@ body {
 .btn:focus {
   background: var(--uab-green-dark);
 }
-.btn svg {
+.btn svg,
+.btn i {
   fill: #fff;
   width: 1.2rem;
   height: 1.2rem;
@@ -224,7 +237,8 @@ body {
 /* 10. Primary Actions Row */
 .button-container {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 1rem;
   margin-top: 1.5rem;
 }
@@ -236,6 +250,7 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   margin-top: 1rem;
+  flex: 0 0 auto;
   height: var(--btn-height);
   padding: var(--btn-padding);
   background: var(--uab-grey-light);
@@ -250,6 +265,10 @@ body {
 .btn-toggle-actions:focus {
   background: var(--uab-grey-dark);
 }
+.btn-toggle-actions svg,
+.btn-toggle-actions i {
+  fill: var(--uab-green-dark);
+}
 .extra-actions {
   overflow: hidden;
   transition: max-height 0.3s ease;
@@ -257,7 +276,7 @@ body {
 .extra-actions.collapsed {
   max-height: 0;
 }
-/* grid of two columns */
+/* layout: two columns of auto-width buttons */
 .extra-actions {
   display: grid;
   grid-template-columns: repeat(2, max-content);
@@ -341,23 +360,26 @@ body {
   font-size: 0.9rem;
 }
 
-/* 15. Spinner (for download) */
+/* 15. Spinner */
 .spinner {
   display: none;
   width: 1rem;
   height: 1rem;
   border: 2px solid #ccc;
-  border-top-color: #16482F;
+  border-top-color: var(--uab-green-dark);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   margin-right: 0.5rem;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 .btn.loading .spinner {
   display: inline-block;
 }
 .btn.loading span,
-.btn.loading svg {
+.btn.loading svg,
+.btn.loading i {
   display: none;
 }
 
@@ -403,19 +425,4 @@ body {
 }
 .tour-controls button {
   margin: 0.5rem;
-}
-
-/* Override draft-control buttons to be grey like secondary version toggle */
-.draft-controls .btn {
-  background: var(--uab-grey-light);
-  color: var(--uab-green-dark);
-  border: 1px solid var(--uab-grey-mid);
-  box-shadow: none;
-}
-.draft-controls .btn svg {
-  fill: var(--uab-green-dark);
-}
-.draft-controls .btn:hover,
-.draft-controls .btn:focus {
-  background: var(--uab-grey-mid);
 }
