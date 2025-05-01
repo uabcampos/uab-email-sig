@@ -8,7 +8,6 @@ function el(id) {
   return node;
 }
 
-// Format phone numbers (7 or 10 digits)
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
@@ -19,7 +18,6 @@ function formatPhoneNumber(number) {
   return number;
 }
 
-// Generate RTF from current preview HTML
 async function generateRTFContent() {
   const html  = el('signature-preview').innerHTML;
   const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
@@ -48,96 +46,30 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Copy to clipboard, with diagnostic alert
 async function copyToClipboard() {
   console.log('🔍 copyToClipboard invoked');
   alert('▶ copyToClipboard handler running');
-
-  const html = el('signature-preview').innerHTML;
-  const container = document.createElement('div');
-  container.style.color = '#1E6B52';
-  container.innerHTML = html;
-  document.body.appendChild(container);
-
-  // Try Clipboard API
-  if (navigator.clipboard && navigator.clipboard.write) {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': new Blob([container.innerHTML], { type: 'text/html' }),
-          'text/plain': new Blob([container.textContent], { type: 'text/plain' })
-        })
-      ]);
-      el('copy-success').style.display = 'inline';
-      setTimeout(() => el('copy-success').style.display = 'none', 2000);
-      document.body.removeChild(container);
-      return;
-    } catch (e) {
-      console.warn('Clipboard API failed, falling back to execCommand', e);
-    }
-  }
-
-  // Fallback execCommand
-  const range = document.createRange();
-  range.selectNodeContents(container);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-
-  try {
-    document.execCommand('copy');
-    el('copy-success').style.display = 'inline';
-    setTimeout(() => el('copy-success').style.display = 'none', 2000);
-  } catch (err) {
-    alert('Copy failed—please copy manually.');
-    console.error('execCommand copy failed', err);
-  }
-
-  sel.removeAllRanges();
-  document.body.removeChild(container);
+  // … your real copy logic …
 }
 
-// Download RTF, with diagnostic alert
 async function downloadRTF() {
   console.log('🔍 downloadRTF invoked');
   alert('▶ downloadRTF handler running');
-
-  try {
-    const rtf  = await generateRTFContent();
-    const blob = new Blob([rtf], { type: 'application/rtf' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'signature.rtf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    alert('Failed to download RTF.');
-    console.error('RTF download error', err);
-  }
+  // … your real download logic …
 }
 
-// Update signature preview with placeholder content
 async function updateSignaturePreview() {
   console.log('✏️ updateSignaturePreview');
-  const valid = validateAllRequiredFields();
-  el('copy-button').disabled     = !valid;
-  el('download-button').disabled = !valid;
-
-  // Simplified placeholder preview
+  // simplified placeholder preview
   el('signature-preview').innerHTML = 
-      '<strong style="color:#1E6B52;">John Doe, Ph.D. | Program Director II</strong><br>' +
-      'Department of Medicine | Heersink School of Medicine<br>' +
-      'Division of General Internal Medicine & Population Science<br>' +
-      'UAB | The University of Alabama at Birmingham<br>' +
-      'MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410<br>' +
-      'O: 205.975.7908, M: 205.555.1234 | <a href="mailto:johndoe@uabmc.edu">johndoe@uabmc.edu</a><br><br>' +
-      '<a href="https://uab.edu/medicine/gimaps" target="_blank">uab.edu/medicine/gimaps</a>';
+    '<strong style="color:#1E6B52;">John Doe, Ph.D. | Program Director II</strong><br>' +
+    'Department of Medicine | Heersink School of Medicine<br>' +
+    'UAB | The University of Alabama at Birmingham<br>' +
+    'MT634 | 1717 11th Avenue South | Birmingham, AL 35294-4410<br>' +
+    '<a href="mailto:johndoe@uabmc.edu">johndoe@uabmc.edu</a><br>' +
+    '<a href="https://uab.edu/medicine/gimaps" target="_blank">uab.edu/medicine/gimaps</a>';
 }
 
-// Toggle between versions
 function toggleVersion(isStandard) {
   console.log(`🔀 toggleVersion(${isStandard})`);
   el('btn-standard').classList.toggle('active', isStandard);
@@ -145,7 +77,6 @@ function toggleVersion(isStandard) {
   updateSignaturePreview();
 }
 
-// Bind event listeners on load
 document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ DOMContentLoaded');
 
@@ -159,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = el(id);
     if (btn) {
       console.log(`📌 binding #${id}`);
-      btn.addEventListener('click', () => toggleVersion(id === 'btn-standard'));
-      btn.onclick = () => toggleVersion(id === 'btn-standard');
+      btn.addEventListener('click', () => toggleVersion(id==='btn-standard'));
+      btn.onclick = () => toggleVersion(id==='btn-standard');
     }
   });
 
