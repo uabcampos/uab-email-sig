@@ -5,7 +5,7 @@ function el(id) {
   return document.getElementById(id);
 }
 
-// Format phone numbers: 7 or 10 digits
+// Format phone numbers (7 or 10 digits)
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
@@ -16,33 +16,18 @@ function formatPhoneNumber(number) {
   return number;
 }
 
-// Fetch banner image as Data-URL
-function getImageDataURL(url) {
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror   = reject;
-      reader.readAsDataURL(blob);
-    }));
-}
-
-// Generate RTF content from preview HTML
+// Generate RTF content from preview
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
-
   const part1 = '\\line ';
-  const body = parts.slice(0, -1).map(line =>
-    line
-      .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
-      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
-      .replace(/<\/?[^>]+>/g, '')
+  const body = parts.slice(0,-1).map(line =>
+    line.replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
+        .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+        .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
   const part2 = body + '\\line ';
-
-  const urlLine = parts[parts.length - 1]
+  const urlLine = parts[parts.length-1]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
   const part3 = '\\line ' + urlLine;
@@ -57,15 +42,16 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Copy preview HTML to clipboard, with fallback
+// Copy preview HTML to clipboard
 async function copyToClipboard() {
-  const preview = el('signature-preview').innerHTML;
+  console.log('Copy button clicked');
+  const previewHTML = el('signature-preview').innerHTML;
   const container = document.createElement('div');
   container.style.color = '#1E6B52';
-  container.innerHTML = preview;
+  container.innerHTML = previewHTML;
   document.body.appendChild(container);
 
-  // Try Clipboard API
+  // Try Clipboard API first
   if (navigator.clipboard && navigator.clipboard.write) {
     try {
       await navigator.clipboard.write([
@@ -79,30 +65,31 @@ async function copyToClipboard() {
       document.body.removeChild(container);
       return;
     } catch (e) {
-      // fallback to execCommand
+      console.warn('Clipboard API failed, falling back to execCommand', e);
     }
   }
 
+  // Fallback to execCommand
   const range = document.createRange();
   range.selectNodeContents(container);
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
-
   try {
     document.execCommand('copy');
     el('copy-success').style.display = 'inline';
     setTimeout(() => el('copy-success').style.display = 'none', 2000);
-  } catch {
+  } catch (err) {
     alert('Copy failed—please copy manually.');
+    console.error('execCommand copy failed', err);
   }
-
   sel.removeAllRanges();
   document.body.removeChild(container);
 }
 
 // Download RTF
 async function downloadRTF() {
+  console.log('Download button clicked');
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
@@ -114,12 +101,13 @@ async function downloadRTF() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  } catch {
+  } catch (err) {
     alert('Failed to download RTF.');
+    console.error('RTF download error', err);
   }
 }
 
-// Update signature preview (always runs, using placeholders if empty)
+// Update signature preview (always uses placeholders if empty)
 async function updateSignaturePreview() {
   const valid = validateAllRequiredFields();
   el('copy-button').disabled     = !valid;
@@ -141,21 +129,12 @@ async function updateSignaturePreview() {
   const phoneLine = phones.join(', ');
 
   let bannerHtml = '';
-  if (el('add-image-checkbox').checked) {
-    try {
-      const dataUrl = await getImageDataURL('https://www.uab.edu/medicine/images/banner.png');
-      bannerHtml = `<img src="${dataUrl}" alt="UAB Banner" style="max-width:100%;margin-bottom:0.5rem;">`;
-    } catch {
-      bannerHtml = '';
-    }
-  }
+  // banner removed per request
 
   const isStandard = el('btn-standard').classList.contains('active');
   const baseUrl    = 'uab.edu/medicine/gimaps';
 
-  let html = bannerHtml +
-    `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
-
+  let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
   if (isStandard) {
     html +=
       `Department of Medicine | Heersink School of Medicine<br>` +
@@ -165,7 +144,6 @@ async function updateSignaturePreview() {
   } else {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
-
   if (phoneLine) html += `${phoneLine} | `;
   html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>` +
           `<a href="https://${baseUrl}" target="_blank">${baseUrl}</a>`;
@@ -173,16 +151,16 @@ async function updateSignaturePreview() {
   el('signature-preview').innerHTML = html;
 }
 
-// Switch versions
+// Toggle version buttons
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
   updateSignaturePreview();
 }
 
-// Setup event listeners
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Live update & validation
+  // Bind live preview & validation
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const inp = el(id);
@@ -190,15 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
       inp.addEventListener('input', updateSignaturePreview);
       inp.addEventListener('blur', () => validateField(inp));
     });
-  ['phone-office-enable','phone-mobile-enable','add-image-checkbox']
+  ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id).addEventListener('change', updateSignaturePreview));
 
-  // Buttons
+  // Bind buttons
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
   el('btn-standard').addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
 
-  // Initial render
+  // Initial preview
   updateSignaturePreview();
 });
