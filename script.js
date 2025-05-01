@@ -10,9 +10,7 @@ function debounce(fn, delay = 300) {
 }
 
 // DOM helper
-function el(id) {
-  return document.getElementById(id);
-}
+function el(id) { return document.getElementById(id); }
 
 // ------------ Persistence & Draft ------------
 
@@ -38,8 +36,8 @@ function clearAllPersistence() {
 
 function formatPhoneNumber(num) {
   const d = (num || '').replace(/\D/g, '');
-  if (d.length === 7) return `205.${d.slice(0, 3)}.${d.slice(3)}`;
-  if (d.length === 10) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  if (d.length === 7) return `205.${d.slice(0,3)}.${d.slice(3)}`;
+  if (d.length === 10) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6)}`;
   return num;
 }
 
@@ -48,21 +46,17 @@ async function generateRTFContent() {
   const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
 
   const p1 = '\\line ';
-  const body = lines.slice(0, -1).map(line =>
+  const body = lines.slice(0,-1).map(line =>
     line
       .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
-      .replace(
-        /<a href="mailto:(.*?)">(.*?)<\/a>/,
-        '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}'
-      )
+      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,
+               '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
   const p2 = body + '\\line ';
   const urlLine = lines.slice(-1)[0]
-    .replace(
-      /<a href="(.*?)".*?>(.*?)<\/a>/,
-      '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}'
-    )
+    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,
+             '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
   const p3 = '\\line ' + urlLine;
 
@@ -295,29 +289,25 @@ function toggleVersion(isStd) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Restore fields
-  [
-    'name','credentials','title',
-    'department','school','division',
-    'room','street','city-state','zip',
-    'email','pronouns'
-  ].forEach(restore);
+  ['name','credentials','title','department','school','division',
+   'room','street','city-state','zip','email','pronouns']
+    .forEach(restore);
 
   // Initial preview
   updateSignaturePreview();
 
   // Bind inputs
   const debounced = debounce(updateSignaturePreview);
-  [
-    'name','credentials','title','department','school','division',
-    'room','street','city-state','zip','email','pronouns'
-  ].forEach(id => {
-    const f = el(id);
-    if (!f) return;
-    f.addEventListener('input', () => {
-      validateField(f);
-      debounced();
+  ['name','credentials','title','department','school','division',
+   'room','street','city-state','zip','email','pronouns']
+    .forEach(id => {
+      const f = el(id);
+      if (!f) return;
+      f.addEventListener('input', () => {
+        validateField(f);
+        debounced();
+      });
     });
-  });
 
   // Checkboxes
   ['phone-office-enable','phone-mobile-enable']
@@ -327,20 +317,18 @@ document.addEventListener('DOMContentLoaded', () => {
   el('btn-standard').addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
 
-  // Draft
+  // Draft controls
   saveDraftBtn.addEventListener('click', () => {
-    [
-      'name','credentials','title','department','school','division',
-      'room','street','city-state','zip','email','pronouns'
-    ].forEach(id => persist(id, el(id).value.trim()));
+    ['name','credentials','title','department','school','division',
+     'room','street','city-state','zip','email','pronouns']
+      .forEach(id => persist(id, el(id).value.trim()));
   });
   clearDraftBtn.addEventListener('click', () => {
-    clearAllPersistence();
-    resetToDefaults();
+    clearAllPersistence(); resetToDefaults();
     lastSavedEl.textContent = 'Last saved: never';
   });
 
-  // More-options toggle
+  // More-actions panel
   el('more-options-toggle').addEventListener('click', () => {
     const mo = el('more-options');
     const c  = mo.classList.toggle('collapsed');
@@ -351,10 +339,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const pc = document.querySelector('.preview-card');
   const df = pc.querySelector('.desktop-frame');
   const mf = pc.querySelector('.mobile-frame');
+
   const dt = document.createElement('h3');
   dt.className = 'preview-title';
   dt.textContent = 'Desktop Preview';
   df.parentNode.insertBefore(dt, df);
+
   const mt = document.createElement('h3');
   mt.className = 'preview-title';
   mt.textContent = 'Mobile Preview';
@@ -364,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
 
-  // Toggle More Actions
+  // Toggle More actions
   const primaryRow = el('copy-button').parentNode;
   const toggle = document.createElement('button');
   toggle.id = 'toggle-actions';
@@ -402,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggle.childNodes[1].nodeValue = expanded ? ' Fewer actions' : ' More actions';
   });
 
-  // Bind secondary
+  // Bind secondary actions
   el('copy-html-button').addEventListener('click', copyHTML);
   el('download-png-button').addEventListener('click', downloadPNG);
   el('download-html-button').addEventListener('click', downloadHTMLTemplate);
@@ -410,10 +400,10 @@ document.addEventListener('DOMContentLoaded', () => {
   el('show-qr-button').addEventListener('click', showQRCode);
   el('reset-button').addEventListener('click', resetToDefaults);
 
-  // QR modal
+  // QR modal injection
   document.body.insertAdjacentHTML('beforeend', `
     <div id="qr-modal" class="qr-modal" onclick="hideQRCode()">
-      <div class="qr-content"><img alt="QR code for signature"/></div>
+      <div class="qr-content"><img alt="QR code for signature" /></div>
     </div>
   `);
 
