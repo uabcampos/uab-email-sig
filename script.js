@@ -288,17 +288,20 @@ function hideQRCode() {
 // ------------ Website Lookup (DuckDuckGo) ------------
 
 async function lookupWebsite() {
-  // use division if present, otherwise department
+  // Use division if provided, else department
   let text = el('division').value.trim() || el('department').value.trim();
   if (!text) {
     alert('Please enter a Division or Department name first.');
     return;
   }
+  // Replace "&" with "and"
   text = text.replace(/&/g, 'and');
+  // Build DuckDuckGo query
   const query = `Home "${text}" site:uab.edu`;
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
 
   try {
+    // Proxy through AllOrigins to avoid CORS
     const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const html = await fetch(proxyUrl).then(r => {
       if (!r.ok) throw new Error('Network error');
@@ -307,6 +310,7 @@ async function lookupWebsite() {
 
     const doc = new DOMParser().parseFromString(html, 'text/html');
     let link = doc.querySelector('a.result__a')?.href;
+
     if (link && link.includes('/l/?uddg=')) {
       const u = new URL(link);
       const d = u.searchParams.get('uddg');
@@ -315,6 +319,8 @@ async function lookupWebsite() {
 
     if (link) {
       el('website').value = link;
+      persist('website', link);
+      updateSignaturePreview(); // <-- Refresh preview immediately
     } else {
       alert('No result found; please paste URL manually.');
     }
@@ -344,13 +350,13 @@ function resetToDefaults() {
 }
 
 function updateSignaturePreview() {
-  // persist
+  // Persist all fields
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => persist(id, (el(id)?.value || '').trim()));
 
-  // gather values
+  // Gather values
   const name      = el('name').value.trim() || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim() || 'Program Director II';
@@ -364,6 +370,7 @@ function updateSignaturePreview() {
   const email     = el('email').value.trim() || 'you@uabmc.edu';
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
+  // Phone line
   const phones = [];
   if (el('phone-office-enable').checked) {
     phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
@@ -373,14 +380,14 @@ function updateSignaturePreview() {
   }
   const phoneLine = phones.join(', ');
 
-  // href/text for website link
+  // Determine URL href & text
   let href = el('website').value.trim() || 'https://uab.edu/medicine/gimaps';
   if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
   const text = href.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
   const isStd = el('btn-standard').classList.contains('active');
 
-  // build HTML
+  // Build HTML
   let html = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
     html += `${dept} | ${school}`;
