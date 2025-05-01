@@ -12,8 +12,20 @@
   <div class="page-title">
     <h1>UAB Email Signature Generator</h1>
     <div class="version-selection">
-      <button id="btn-standard" class="version-button active">Standard Version</button>
-      <button id="btn-abbreviated" class="version-button">Abbreviated Version</button>
+      <button id="btn-standard" class="version-button active">
+        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16">
+          <rect x="1" y="2" width="14" height="10" rx="1" ry="1" stroke="currentColor" fill="none"/>
+          <rect x="5" y="13" width="6" height="1" fill="currentColor"/>
+        </svg>
+        Standard
+      </button>
+      <button id="btn-abbreviated" class="version-button">
+        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 8 16">
+          <rect x="1" y="1" width="6" height="14" rx="1" ry="1" stroke="currentColor" fill="none"/>
+          <circle cx="4" cy="13" r="1" fill="currentColor"/>
+        </svg>
+        Abbreviated
+      </button>
     </div>
   </div>
 
@@ -111,11 +123,26 @@
         </div>
       </div>
       <div class="button-container">
-        <button id="copy-button" class="btn btn-copy">Copy to Clipboard</button>
-        <button id="copy-html-button" class="btn btn-copy-html">Copy HTML</button>
-        <button id="download-button" class="btn btn-download">Download RTF</button>
-        <button id="download-png-button" class="btn btn-download-png">Download PNG</button>
-        <button id="reset-button" class="btn btn-reset">Reset to Defaults</button>
+        <button id="copy-button" class="btn btn-copy">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 1h8v10H4z" stroke="currentColor" fill="none"/><path d="M2 5h8v10H2z" stroke="currentColor" fill="none"/></svg>
+          Copy
+        </button>
+        <button id="copy-html-button" class="btn btn-copy-html">
+          <svg width="16" height="16" viewBox="0 0 16 16"><text x="2" y="12" font-family="monospace" font-size="12" fill="currentColor">&lt;/&gt;</text></svg>
+          Copy HTML
+        </button>
+        <button id="download-button" class="btn btn-download">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 10v4h12v-4" stroke="currentColor" fill="none"/><path d="M8 1v9m-3-3l3 3 3-3" stroke="currentColor" fill="none"/></svg>
+          Download RTF
+        </button>
+        <button id="download-png-button" class="btn btn-download-png">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" ry="1" stroke="currentColor" fill="none"/><circle cx="6" cy="6" r="2" stroke="currentColor" fill="none"/><path d="M2 12l4-4 2 2 4-4v6H2z" fill="currentColor"/></svg>
+          Download PNG
+        </button>
+        <button id="reset-button" class="btn btn-reset">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1A7 7 0 1 0 15 8" stroke="currentColor" fill="none"/><polyline points="15,1 15,7 9,7" stroke="currentColor" fill="none"/></svg>
+          Reset
+        </button>
         <span id="copy-success" class="copy-msg" style="display:none;">Copied!</span>
         <span id="copy-html-success" class="copy-msg" style="display:none;">HTML Copied!</span>
       </div>
