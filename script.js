@@ -292,27 +292,20 @@ function hideQRCode() {
 
 // ------------ Website Lookup ------------
 
-async function lookupWebsite() {
+function lookupWebsite() {
   const dept     = el('department').value.trim();
   const school   = el('school').value.trim();
   const division = el('division').value.trim();
-  const query    = `${dept} ${school} ${division} site:uab.edu`;
 
-  try {
-    const resp = await fetch(
-      `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`
-    );
-    const data = await resp.json();
-    const url = data.AbstractURL || data.RelatedTopics[0]?.FirstURL || '';
-    if (url) {
-      el('website').value = url;
-    } else {
-      alert('No site found. Please enter a URL manually.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('Lookup failed. Check your connection.');
-  }
+  // Exact‐match phrases plus site restriction
+  const parts = [];
+  if (dept)     parts.push(`"${dept}"`);
+  if (school)   parts.push(`"${school}"`);
+  if (division) parts.push(`"${division}"`);
+  parts.push('site:uab.edu');
+
+  const query = encodeURIComponent(parts.join(' '));
+  window.open(`https://duckduckgo.com/?q=${query}`, '_blank');
 }
 
 // ------------ Reset & Preview ------------
