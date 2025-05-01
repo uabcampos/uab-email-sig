@@ -37,7 +37,7 @@ function clearAllPersistence() {
     .forEach(k => localStorage.removeItem(k));
 }
 
-// Format phone number as ###.###.####
+// Format phone number
 function formatPhoneNumber(num) {
   const d = (num || '').replace(/\D/g, '');
   if (d.length === 7) return `205.${d.slice(0,3)}.${d.slice(3)}`;
@@ -45,7 +45,7 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Generate RTF content from HTML preview
+// Generate RTF content
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
@@ -75,59 +75,53 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Show transient status messages
-function showMsg(id) {
-  const msg = el(id);
-  msg.style.display = 'inline';
-  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+// Give feedback on copy
+function giveFeedback(btn) {
+  btn.classList.add('feedback');
+  setTimeout(() => btn.classList.remove('feedback'), 2000);
 }
 
-// Copy signature (rich HTML + text) to clipboard
+// Copy signature
 async function copyToClipboard() {
+  const btn = el('copy-button');
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
   tmp.style.color = '#1E6B52';
   tmp.innerHTML = html;
   document.body.appendChild(tmp);
 
-  if (navigator.clipboard && navigator.clipboard.write) {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html':  new Blob([tmp.innerHTML], { type: 'text/html' }),
-          'text/plain': new Blob([tmp.textContent], { type: 'text/plain' })
-        })
-      ]);
-      showMsg('copy-success');
-      document.body.removeChild(tmp);
-      return;
-    } catch {}
-  }
-
-  const range = document.createRange();
-  range.selectNodeContents(tmp);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
   try {
-    document.execCommand('copy');
-    showMsg('copy-success');
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html':  new Blob([tmp.innerHTML], { type: 'text/html' }),
+        'text/plain': new Blob([tmp.textContent], { type: 'text/plain' })
+      })
+    ]);
   } catch {
-    alert('Copy failed—please copy manually.');
+    const range = document.createRange();
+    range.selectNodeContents(tmp);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
   }
-  sel.removeAllRanges();
   document.body.removeChild(tmp);
+  giveFeedback(btn);
 }
 
-// Copy raw HTML to clipboard
+// Copy HTML
 function copyHTML() {
+  const btn = el('copy-html-button');
   navigator.clipboard.writeText(el('signature-preview').innerHTML)
-    .then(() => showMsg('copy-html-success'))
     .catch(() => alert('Copy HTML failed.'));
+  giveFeedback(btn);
 }
 
-// Download RTF
+// Download RTF with spinner
 async function downloadRTF() {
+  const btn = el('download-button');
+  btn.classList.add('loading');
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
@@ -142,6 +136,7 @@ async function downloadRTF() {
   } catch {
     alert('RTF download failed.');
   }
+  btn.classList.remove('loading');
 }
 
 // Lazy-load html2canvas and download PNG
@@ -159,6 +154,8 @@ function loadHtml2canvas() {
   return html2canvasPromise;
 }
 async function downloadPNG() {
+  const btn = el('download-png-button');
+  btn.classList.add('loading');
   try {
     await loadHtml2canvas();
     const frame = el('signature-preview');
@@ -176,9 +173,10 @@ async function downloadPNG() {
   } catch {
     alert('PNG download failed.');
   }
+  btn.classList.remove('loading');
 }
 
-// Reset form to defaults
+// Reset form
 function resetToDefaults() {
   clearAllPersistence();
   [
@@ -226,7 +224,6 @@ function updateSignaturePreview() {
   let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
 
   if (isStd) {
-    // department and school on same line now:
     html += `${dept} | ${school}<br>`;
     html += `${division}<br>`;
     html += `UAB | The University of Alabama at Birmingham<br>`;
@@ -243,7 +240,7 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
-// Toggle between versions
+// Toggle version
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
@@ -276,9 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
+  // Debounced preview
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
-  // Bind inline validation & preview
+  // Inline validation and preview binding
   [
     'name','credentials','title',
     'department','school','division',
