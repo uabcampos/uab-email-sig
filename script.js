@@ -149,7 +149,7 @@ async function downloadOFTTemplate() {
   const btn = el('download-oft-button');
   giveFeedback(btn);
   try {
-    const rtf = await generateRTFContent(); // now has decoded &amp;
+    const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/vnd.ms-outlook' });
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(blob);
@@ -198,7 +198,7 @@ async function downloadPNG() {
     const canvas = await html2canvas(el('signature-preview'), { backgroundColor: null });
     canvas.toBlob(blob => {
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      a.href     = URL.createObjectURL(blob);
       a.download = 'signature.png';
       document.body.appendChild(a);
       a.click();
@@ -210,15 +210,21 @@ async function downloadPNG() {
   }
 }
 
+// ------------ QR Code Modal ------------
+
 function showQRCode() {
-  const m = el('qr-modal');
-  m.querySelector('img').src =
-    `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(generateHTMLSignature())}`;
-  m.classList.add('active');
+  const qrModal = el('qr-modal');
+  const img     = qrModal.querySelector('img');
+  const data    = encodeURIComponent(generateHTMLSignature());
+  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${data}&choe=UTF-8`;
+  qrModal.classList.add('active');
 }
+
 function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
+
+// ------------ Reset & Preview ------------
 
 function resetToDefaults() {
   clearAllPersistence();
@@ -228,8 +234,8 @@ function resetToDefaults() {
     'room','street','city-state','zip',
     'email','pronouns'
   ].forEach(id => {
-    const elField = el(id);
-    if (elField) elField.value = '';
+    const fld = el(id);
+    if (fld) fld.value = '';
   });
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id).checked = false);
@@ -237,8 +243,6 @@ function resetToDefaults() {
   el('btn-abbreviated').classList.remove('active');
   updateSignaturePreview();
 }
-
-// ------------ Preview & Listeners ------------
 
 function updateSignaturePreview() {
   // Persist inputs
@@ -273,14 +277,13 @@ function updateSignaturePreview() {
   const isStd = el('btn-standard').classList.contains('active');
   const url   = 'uab.edu/medicine/gimaps';
 
-  // Build HTML
   let html = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
     html += `${dept} | ${school}<br>${division}<br>`;
     html += `UAB | The University of Alabama at Birmingham<br>`;
     html += `${room} | ${street} | ${cityState} ${zip}<br>`;
   } else {
-    html += `UAB | The University of Alabama at Birmingham<br>`;
+    html += `UAB | The University of Alabama on Birmingham<br>`;
   }
   if (phoneLine) html += `${phoneLine} | `;
   html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
@@ -293,10 +296,21 @@ function updateSignaturePreview() {
 // ------------ Init on DOMContentLoaded ------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Replace icons
+  // Replace Feather icons
   if (window.feather) {
     feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
   }
+
+  // Insert QR modal and set up events
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="qr-modal" class="qr-modal">
+      <div class="qr-content"><img alt="QR code for signature"/></div>
+    </div>
+  `);
+  const qrModal   = el('qr-modal');
+  const qrContent = qrModal.querySelector('.qr-content');
+  qrModal.addEventListener('click', hideQRCode);
+  qrContent.addEventListener('click', e => e.stopPropagation());
 
   // Restore persisted values
   [
@@ -383,14 +397,4 @@ document.addEventListener('DOMContentLoaded', () => {
   el('download-oft-button').addEventListener('click', downloadOFTTemplate);
   el('show-qr-button').addEventListener('click', showQRCode);
   el('reset-button').addEventListener('click', resetToDefaults);
-
-  // QR modal markup
-  document.body.insertAdjacentHTML('beforeend', `
-    <div id="qr-modal" class="qr-modal" onclick="hideQRCode()">
-      <div class="qr-content"><img alt="QR code for signature"/></div>
-    </div>
-  `);
-
-  // Final render
-  updateSignaturePreview();
 });
