@@ -1,15 +1,11 @@
 // script.js
 
-// ———————————————————————————————
 // Helper to get element by ID
-// ———————————————————————————————
 function el(id) {
   return document.getElementById(id);
 }
 
-// ———————————————————————————————
-// Phone-formatting utility
-// ———————————————————————————————
+// Format phone numbers: 7 or 10 digits
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
@@ -20,9 +16,7 @@ function formatPhoneNumber(number) {
   return number;
 }
 
-// ———————————————————————————————
 // Fetch banner image as Data-URL
-// ———————————————————————————————
 function getImageDataURL(url) {
   return fetch(url)
     .then(res => res.blob())
@@ -34,25 +28,22 @@ function getImageDataURL(url) {
     }));
 }
 
-// ———————————————————————————————
-// Generate RTF from the current preview HTML
-// ———————————————————————————————
+// Generate RTF content from preview HTML
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
-  // Part 1: blank line
+
   const part1 = '\\line ';
-  // Part 2: all but last line
-  const bodyLines = parts.slice(0,-1).map(line =>
+  const body = parts.slice(0, -1).map(line =>
     line
-      .replace(/<strong.*?>(.*?)<\/strong>/,            '{\\b\\cf1 $1}')
-      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,      '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+      .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
+      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
-  const part2 = bodyLines + '\\line ';
-  // Part 3: last line (URL)
-  const urlLine = parts[parts.length-1]
-    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,          '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
+  const part2 = body + '\\line ';
+
+  const urlLine = parts[parts.length - 1]
+    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
   const part3 = '\\line ' + urlLine;
 
@@ -66,17 +57,15 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// ———————————————————————————————
-// Copy signature HTML to clipboard
-// ———————————————————————————————
+// Copy preview HTML to clipboard, with fallback
 async function copyToClipboard() {
-  const html = el('signature-preview').innerHTML;
+  const preview = el('signature-preview').innerHTML;
   const container = document.createElement('div');
-  container.style.color = '#1E6B52';  // brand color
-  container.innerHTML   = html;
+  container.style.color = '#1E6B52';
+  container.innerHTML = preview;
   document.body.appendChild(container);
 
-  // Try modern clipboard API first
+  // Try Clipboard API
   if (navigator.clipboard && navigator.clipboard.write) {
     try {
       await navigator.clipboard.write([
@@ -90,30 +79,29 @@ async function copyToClipboard() {
       document.body.removeChild(container);
       return;
     } catch (e) {
-      // fallback
+      // fallback to execCommand
     }
   }
 
-  // Fallback to execCommand
   const range = document.createRange();
   range.selectNodeContents(container);
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
+
   try {
     document.execCommand('copy');
     el('copy-success').style.display = 'inline';
     setTimeout(() => el('copy-success').style.display = 'none', 2000);
-  } catch (err) {
+  } catch {
     alert('Copy failed—please copy manually.');
   }
+
   sel.removeAllRanges();
   document.body.removeChild(container);
 }
 
-// ———————————————————————————————
-// Download RTF file
-// ———————————————————————————————
+// Download RTF
 async function downloadRTF() {
   try {
     const rtf = await generateRTFContent();
@@ -126,22 +114,17 @@ async function downloadRTF() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error('RTF download failed:', err);
+  } catch {
     alert('Failed to download RTF.');
   }
 }
 
-// ———————————————————————————————
-// Update signature preview
-// ———————————————————————————————
+// Update signature preview (always runs, using placeholders if empty)
 async function updateSignaturePreview() {
-  // Validate fields (this also toggles the error messages)
-  const allValid = validateAllRequiredFields();
-  el('copy-button').disabled    = !allValid;
-  el('download-button').disabled = !allValid;
+  const valid = validateAllRequiredFields();
+  el('copy-button').disabled     = !valid;
+  el('download-button').disabled = !valid;
 
-  // Gather values or placeholders
   const name      = el('name').value.trim()        || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim()       || 'Program Director II';
@@ -152,28 +135,24 @@ async function updateSignaturePreview() {
   const email     = el('email').value.trim()       || 'johndoe@uabmc.edu';
   const pronouns  = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
-  // Phone line
   const phones = [];
   if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-    if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
+  if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
 
-  // Banner
   let bannerHtml = '';
   if (el('add-image-checkbox').checked) {
     try {
       const dataUrl = await getImageDataURL('https://www.uab.edu/medicine/images/banner.png');
-      bannerHtml = `<img src="${dataUrl}" alt="UAB Banner" style="max-width:100%; margin-bottom:0.5rem;">`;
+      bannerHtml = `<img src="${dataUrl}" alt="UAB Banner" style="max-width:100%;margin-bottom:0.5rem;">`;
     } catch {
       bannerHtml = '';
     }
   }
 
-  // Version
   const isStandard = el('btn-standard').classList.contains('active');
   const baseUrl    = 'uab.edu/medicine/gimaps';
 
-  // Build HTML
   let html = bannerHtml +
     `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
 
@@ -194,20 +173,16 @@ async function updateSignaturePreview() {
   el('signature-preview').innerHTML = html;
 }
 
-// ———————————————————————————————
-// Toggle version buttons
-// ———————————————————————————————
+// Switch versions
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
   updateSignaturePreview();
 }
 
-// ———————————————————————————————
-// Initialize event listeners
-// ———————————————————————————————
+// Setup event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Live update on input/blur
+  // Live update & validation
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const inp = el(id);
@@ -215,8 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
       inp.addEventListener('input', updateSignaturePreview);
       inp.addEventListener('blur', () => validateField(inp));
     });
-
-  // Checkbox changes
   ['phone-office-enable','phone-mobile-enable','add-image-checkbox']
     .forEach(id => el(id).addEventListener('change', updateSignaturePreview));
 
