@@ -74,7 +74,7 @@ body {
 /* 3. Layout & Container */
 .container {
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 50% 50%;
   gap: 1.5rem;
   max-width: 1000px;
   margin: 2rem auto;
