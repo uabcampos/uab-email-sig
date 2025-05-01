@@ -239,43 +239,6 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
-// Contrast & accessibility helpers
-function luminance(r,g,b) {
-  const a = [r,g,b].map(v => {
-    v /= 255;
-    return v <= 0.03928 ? v/12.92 : ((v+0.055)/1.055)**2.4;
-  });
-  return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-}
-function contrast(hex1,hex2) {
-  const c1 = hex1.match(/\w\w/g).map(h => parseInt(h,16));
-  const c2 = hex2.match(/\w\w/g).map(h => parseInt(h,16));
-  const L1 = luminance(...c1), L2 = luminance(...c2);
-  return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);
-}
-
-// Run accessibility contrast check
-function runAccessibilityCheck() {
-  const reportEl = el('accessibility-report');
-  reportEl.textContent = '';
-  const nodes = el('signature-preview').querySelectorAll('*');
-  const issues = [];
-  nodes.forEach(node => {
-    const cs = getComputedStyle(node);
-    const fg = cs.color.match(/\d+/g).slice(0,3).map(n => +n);
-    const bgMatch = cs.backgroundColor.match(/\d+/g);
-    const bg = bgMatch ? bgMatch.slice(0,3).map(n => +n) : [255,255,255];
-    const fgHex = '#' + fg.map(c => c.toString(16).padStart(2,'0')).join('');
-    const bgHex = '#' + bg.map(c => c.toString(16).padStart(2,'0')).join('');
-    if (contrast(fgHex,bgHex) < 4.5) {
-      issues.push(`Low contrast on “${node.textContent.trim()}”`);
-    }
-  });
-  reportEl.textContent = issues.length
-    ? 'Accessibility issues: ' + issues.join('; ')
-    : 'All text passes 4.5:1 contrast ratio.';
-}
-
 // Toggle between Standard and Abbreviated versions
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
@@ -337,10 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
   el('copy-html-button')?.addEventListener('click', copyHTML);
   el('download-button')?.addEventListener('click', downloadRTF);
   el('download-png-button')?.addEventListener('click', downloadPNG);
-  el('accessibility-check-button')?.addEventListener('click', runAccessibilityCheck);
   el('reset-button')?.addEventListener('click', resetToDefaults);
 
-  // Initial render
+  // Kick off initial render
   toggleVersion(true);
   updateSignaturePreview();
 });
