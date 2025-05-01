@@ -463,3 +463,29 @@ body {
   flex: 1 1 auto;
   margin: 0;
 }
+
+/* Override phone‐toggle to look like a standard field row */
+.phone-toggle {
+  display: block;
+  margin-top: 1.25rem; /* match other field spacing */
+}
+
+/* Make the label+checkbox sit inline, then drop the input below */
+.phone-toggle > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--uab-green-dark);
+}
+
+/* Force the phone input to full-width on its own line */
+.phone-toggle > input[type="text"] {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--uab-grey-mid);
+  border-radius: 4px;
+  font-size: 1rem;
+}
