@@ -8,10 +8,10 @@
   --uab-green-dark:   #16482F;
   --uab-grey-light:   #F5F5F5;
   --uab-grey-mid:     #E6E6E6;
-  --uab-grey-dark:    #E0E0E0;
+  --uab-grey-dark:    #E6E6E0;
   --font-sans:        'PT Sans', Arial, sans-serif;
-  --btn-height:       2.25rem;
-  --btn-padding:      0 1rem;
+  --btn-height:       2.5rem;       /* tightened per request */
+  --btn-padding:      0 1rem;       /* tightened per request */
   --btn-radius:       0.5rem;
   --card-radius:      8px;
   --shadow-light:     rgba(0,0,0,0.03);
@@ -74,7 +74,7 @@ body {
 /* 3. Layout & Container */
 .container {
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 50% 50%;  /* now equal-width columns */
   gap: 1.5rem;
   max-width: 1000px;
   margin: 2rem auto;
@@ -312,7 +312,7 @@ body {
   }
 }
 .preview-item {
-  flex: 1 1 45%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
@@ -336,15 +336,29 @@ body {
   min-height: 6rem;
   position: relative;
 }
+
+/* Enhanced mobile preview styling */
+.mobile-frame {
+  width: 240px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 20px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  box-shadow: 
+    0 0 0 8px var(--uab-grey-light) inset,
+    0 4px 8px var(--shadow-light);
+}
 .mobile-frame::before {
   content: '';
   position: absolute;
   top: 0.5rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
+  width: 60px;
   height: 4px;
-  background: #666;
+  background: rgba(0,0,0,0.2);
   border-radius: 2px;
 }
 
@@ -414,6 +428,14 @@ body {
   border-radius: 8px;
   text-align: center;
 }
+.qr-text {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #333;
+  max-width: 220px;
+  text-align: center;
+  line-height: 1.3;
+}
 
 /* 17. Onboarding Tour */
 .tour-overlay {
@@ -438,64 +460,4 @@ body {
 }
 .tour-controls button {
   margin: 0.5rem;
-}
-
-/* Make phone‐toggle a flex row */
-.phone-toggle {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* Label (with checkbox) takes only the space it needs */
-.phone-toggle > label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  color: var(--uab-green-dark);
-  white-space: nowrap;
-}
-
-/* Phone number input fills the remaining space */
-.phone-toggle > input[type="text"] {
-  flex: 1 1 auto;
-  margin: 0;
-}
-
-/* Override phone‐toggle to look like a standard field row */
-.phone-toggle {
-  display: block;
-  margin-top: 1.25rem; /* match other field spacing */
-}
-
-/* Make the label+checkbox sit inline, then drop the input below */
-.phone-toggle > label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  color: var(--uab-green-dark);
-}
-
-/* Force the phone input to full-width on its own line */
-.phone-toggle > input[type="text"] {
-  display: block;
-  width: 100%;
-  margin-top: 0.25rem;
-  padding: 0.75rem;
-  border: 1px solid var(--uab-grey-mid);
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-/* QR modal explanatory text */
-.qr-text {
-  margin-top: 0.75rem;
-  font-size: 0.9rem;
-  color: #333;
-  max-width: 220px;
-  text-align: center;
-  line-height: 1.3;
 }
