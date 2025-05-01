@@ -1,234 +1,175 @@
+/* styles.css */
+
+/* Base reset and typography */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    font-family: 'proxima-nova', Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
-    color: #333;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.4;
+  background: #f9f9f9;
+  color: #333;
+  padding: 1rem;
 }
 
+/* Container and columns */
 .container {
-    max-width: 1200px; 
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-h1 {
-    font-size: 24px;
-    color: #002c17;
-    text-align: center;
-    margin-bottom: 20px;
+.two-column-mobile {
+  display: flex;
+  gap: 1rem;
 }
 
+/* Version selection buttons */
 .version-selection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.column {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px; /* Increased gap for better spacing */
-}
-
-.column-left, .column-right {
-    width: 48%;
-}
-
-label {
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: bold;
-}
-
-input[type="text"],
-input[type="email"] {
-    width: calc(100% - 20px); /* Adjusting width to account for padding */
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-input[type="checkbox"] {
-    margin-right: 5px;
+  margin-bottom: 1rem;
 }
 
 .version-button {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin: 0 10px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 0.5rem;
 }
 
 .version-button.active {
-    background-color: #002c17;
-    color: white;
-    border: none;
+  background: #1e6b52;
+  color: #fff;
+  border-color: #15503e;
+}
+
+/* Column layouts */
+.column {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+}
+
+.column-left,
+.column-right {
+  flex: 1;
+}
+
+/* Form labels and inputs */
+.column-left label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: bold;
+}
+
+.column-left input[type="text"],
+.column-left input[type="email"],
+.column-left input[type="checkbox"] {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
 }
 
 .error-message {
-    color: red;
-    font-size: 12px;
-    display: none;
+  color: #c00;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  min-height: 1.2em;
 }
 
-/* General styling for signature preview */
-#signature-preview {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 20px;
-    font-family: 'Proxima Nova', Arial, sans-serif; /* Ensure your font is applied */
-    white-space: pre-line; 
-    line-height: .9; 
+/* Signature preview */
+#preview-wrapper {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  min-height: 200px;
+  overflow: auto;
 }
 
-/* Mobile-specific styling */
-@media (max-width: 1000px) {
-    #signature-preview {
-        font-size: 14px; /* Adjust font size for smaller screens */
-    }
-}
-
-@media (max-width: 600px) {
-    #signature-preview {
-        font-size: 12px; /* Further reduce font size for very small screens */
-    }
-}
-
+/* Buttons */
 .button-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+  margin-top: 1rem;
 }
 
-#download-button {
-    display: block;
-    padding: 10px;
-    background-color: #002c17;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-#download-button:hover {
-    background-color: #004d2b;
-}
-
-#copy-button {
-    display: block;
-    padding: 10px;
-    background-color: #002c17;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-#copy-button:hover {
-    background-color: #004d2b;
+.button-container button {
+  background: #1e6b52;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 0.5rem;
 }
 
 #copy-success {
-    color: green;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: #1e6b52;
+  font-weight: bold;
 }
 
-/* General styling for buttons */
-.department-button, .version-button {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin: 0 10px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+/* Instructions section */
+.instructions {
+  margin-top: 2rem;
+  font-size: 0.9rem;
 }
 
-/* Active button styling */
-.department-button.active, .version-button.active {
-    background-color: #002c17;
-    color: white;
-    border: none;
+.instructions h3 {
+  margin-bottom: 0.5rem;
 }
 
-/* Department and Version Selection Buttons Container */
-.department-selection, .version-selection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.info-box {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;
-}
-
-.info-box h3 {
-    margin-top: 0;
-    font-size: 16px;
-    color: #002c17;
-}
-
-.info-box ul {
-    margin: 10px 0;
-    padding-left: 20px;
-}
-
-.info-box li {
-    margin-bottom: 10px;
-}
-
+/* Footer & version label */
 .footer {
-    margin-top: 30px;
-    font-size: 12px;
-    color: #555;
-    text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+  color: #555;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.footer a {
-    color: #002c17;
-    text-decoration: none;
+.version-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
 }
 
-.footer a:hover {
-    text-decoration: underline;
+/* Responsive: stack columns below 1000px */
+@media (max-width: 1000px) {
+  .container,
+  .two-column-mobile {
+    flex-direction: column;
+  }
 }
 
-/* Mobile styles */
-@media screen and (max-width: 1000px) {
-    .column {
-        flex-direction: column;
-    }
+/* Responsive: tighter mobile stacking below 480px */
+@media (max-width: 480px) {
+  .container,
+  .two-column-mobile {
+    flex-direction: column;
+  }
 
-    .column-left, .column-right {
-        width: 100%;
-    }
+  .column-left,
+  .column-right {
+    width: 100%;
+    padding: 0.5rem;
+  }
 
-    .column-right {
-        margin-top: 20px;
-    }
+  .version-button,
+  .button-container button,
+  .column-left input[type="text"],
+  .column-left input[type="email"] {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
 }
