@@ -9,6 +9,7 @@
   --uab-gold:         #FDB913;
   --uab-gray-bg:      #F5F5F5;
   --uab-gray-light:   #E6E6E6;
+  --uab-button-shadow: rgba(0,0,0,0.1);
   --font-sans:        'PT Sans', Arial, sans-serif;
 }
 
@@ -22,10 +23,11 @@ body {
   background: var(--uab-gray-bg);
   font-family: var(--font-sans);
   color: #333;
+  line-height: 1.4;
   padding: 1rem;
 }
 
-/* Page Title & Version Toggle */
+/* 2. Page Title & Version Toggle */
 .page-title {
   background: #fff;
   padding: 1rem 2rem;
@@ -65,7 +67,7 @@ body {
   color: var(--uab-dark-green);
 }
 
-/* Layout & Container */
+/* 3. Layout & Container */
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -80,15 +82,15 @@ body {
   }
 }
 
-/* Card */
+/* 4. Card Component */
 .card {
   background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--uab-button-shadow);
+  padding: 1.5rem;
 }
 
-/* Draft Controls */
+/* 5. Draft Controls */
 .draft-controls {
   display: flex;
   align-items: center;
@@ -113,7 +115,7 @@ body {
   margin-left: auto;
 }
 
-/* Form */
+/* 6. Form Card – tighter vertical rhythm */
 .form-card label {
   display: block;
   margin-top: 0.75rem;
@@ -121,7 +123,8 @@ body {
   font-weight: 700;
   color: var(--uab-dark-green);
 }
-.form-card input,
+.form-card input[type="text"],
+.form-card input[type="email"],
 .form-card select {
   width: 100%;
   padding: 0.5rem;
@@ -131,9 +134,14 @@ body {
   border-radius: 4px;
   transition: border-color 0.2s;
 }
-.form-card input:focus {
+.form-card input:focus,
+.form-card select:focus {
   border-color: var(--uab-light-green);
   outline: none;
+}
+.form-card input[type="checkbox"] {
+  margin-right: 0.4rem;
+  transform: scale(1.05);
 }
 .error-message {
   color: #C00;
@@ -142,7 +150,7 @@ body {
   min-height: 1em;
 }
 
-/* Organization group */
+/* 7. Organization fieldset */
 .org-group {
   border: 1px solid var(--uab-gray-light);
   border-radius: 4px;
@@ -156,7 +164,7 @@ body {
   font-size: 0.95rem;
 }
 
-/* More-options */
+/* 8. More options collapse */
 .more-options {
   overflow: hidden;
   transition: max-height 0.3s ease;
@@ -165,17 +173,19 @@ body {
   max-height: 0;
 }
 
-/* Inline validation */
+/* 9. Inline validation animations */
+@keyframes fadeInCheck {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 label.valid::after {
   content: '✓';
   color: var(--uab-light-green);
   margin-left: 0.3rem;
   animation: fadeInCheck 0.3s ease;
 }
-@keyframes fadeInCheck {
-  from { opacity: 0; transform: translateX(-5px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
+
+/* 10. Valid/invalid inputs */
 input.invalid {
   border-color: #C00 !important;
 }
@@ -183,35 +193,38 @@ input.valid {
   border-color: var(--uab-light-green) !important;
 }
 
-/* Preview Titles */
+/* 11. Preview Titles */
 .preview-card .preview-title {
-  margin-bottom: 0.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
   color: var(--uab-dark-green);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
-/* Preview Frames */
+/* 12. Preview Split */
 .preview-split {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 .preview-frame {
   background: #fff;
   border: 1px solid var(--uab-gray-light);
-  border-radius: 4px;
-  padding: 0.75rem;
+  border-radius: 8px;
+  padding: 1rem;
   flex: 1 1 45%;
   min-width: 200px;
-  overflow: auto;
+  box-shadow: 0 2px 6px var(--uab-button-shadow);
+  position: relative;
 }
 .mobile-frame::before {
   content: '';
   position: absolute;
-  top: 0.4rem;
-  left: calc(50% - 20px);
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   width: 40px;
   height: 4px;
   background: #666;
@@ -219,87 +232,117 @@ input.valid {
 }
 #mobile-preview {
   background: #fff;
-  padding: 0.4rem;
+  padding: 0.5rem;
   overflow-wrap: break-word;
 }
 
-/* Buttons – all same height */
+/* 13. Buttons – equal height, modern style */
 .button-container {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 .button-container .btn {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 3rem;
+  height: 3.5rem;
+  padding: 0 1.2rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px var(--uab-button-shadow);
+  transition: background 0.2s, transform 0.1s;
+}
+.button-container .btn:hover {
+  transform: translateY(-1px);
 }
 
-/* Primary */
-.btn-copy { background: var(--uab-light-green); color: #fff; }
-.btn-copy:hover { background: var(--uab-dark-green); }
-.btn-download { background: var(--uab-gold); color: var(--uab-dark-green); }
-.btn-download:hover { background: #f1b600; }
+/* 14. Primary button variants */
+.btn-copy {
+  background: var(--uab-light-green);
+  color: #fff;
+}
+.btn-copy:hover {
+  background: var(--uab-dark-green);
+}
+.btn-download {
+  background: var(--uab-gold);
+  color: var(--uab-dark-green);
+}
+.btn-download:hover {
+  background: #f1b600;
+}
 
-/* Toggle More Actions */
+/* 15. Toggle More Actions */
 .btn-toggle-actions {
   display: inline-flex;
   align-items: center;
-  margin-top: 0.75rem;
-  padding: 0.4rem 0.8rem;
-  background: transparent;
-  border: 1px solid var(--uab-gray-light);
-  border-radius: 4px;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 2px solid var(--uab-gray-light);
+  border-radius: 6px;
   color: var(--uab-dark-green);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 6px var(--uab-button-shadow);
   transition: background 0.2s;
 }
 .btn-toggle-actions:hover {
   background: var(--uab-gray-light);
 }
 .btn-toggle-actions svg {
-  margin-right: 0.4rem;
+  margin-right: 0.5rem;
+  fill: currentColor;
 }
 
-/* Extra Actions row */
+/* 16. Extra Actions row */
 .extra-actions {
+  display: flex;
+  gap: 1rem;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.3s ease;
 }
 .extra-actions.expanded {
-  max-height: 200px;
+  max-height: 500px;
   margin-top: 0.5rem;
 }
 .extra-actions .btn {
   flex: 1;
-  height: 3rem;
+  height: 3.5rem;
 }
 
-/* Secondary variants */
-.btn-copy-html { background: #eee; color: #333; }
-.btn-copy-html:hover { background: var(--uab-gray-light); }
-.btn-download-png { background: #2196F3; color: #fff; }
-.btn-download-png:hover { background: #1976D2; }
-.btn-download-html { background: #ddd; color: #333; }
+/* 17. Secondary button variants */
+.btn-copy-html    { background: #eee;             color: #333; }
+.btn-copy-html:hover    { background: var(--uab-gray-light); }
+.btn-download-png  { background: #2196F3;          color: #fff; }
+.btn-download-png:hover  { background: #1976D2; }
+.btn-download-html { background: #ddd;             color: #333; }
 .btn-download-html:hover { background: #ccc; }
-.btn-download-oft { background: #ddd; color: #333; }
-.btn-download-oft:hover { background: #ccc; }
-.btn-qr { background: var(--uab-light-green); color: #fff; }
-.btn-qr:hover { background: var(--uab-dark-green); }
-.btn-reset { background: #eee; color: #333; }
-.btn-reset:hover { background: var(--uab-gray-light); }
+.btn-download-oft  { background: #ddd;             color: #333; }
+.btn-download-oft:hover  { background: #ccc; }
+.btn-qr            { background: var(--uab-light-green); color: #fff; }
+.btn-qr:hover      { background: var(--uab-dark-green); }
+.btn-reset         { background: #eee;             color: #333; }
+.btn-reset:hover         { background: var(--uab-gray-light); }
 
-/* Spinner & feedback */
+/* 18. Spinner & feedback */
 .spinner {
-  display: none; width: 16px; height: 16px;
-  border: 2px solid #ccc; border-top-color: var(--uab-dark-green);
-  border-radius: 50%; animation: spin 0.6s linear infinite;
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: var(--uab-dark-green);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
   margin-right: 0.4rem;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 .btn.loading .spinner {
   display: inline-block;
 }
@@ -307,12 +350,20 @@ input.valid {
 .btn.loading svg {
   display: none;
 }
-.feedback-icon { display: none; color: var(--uab-light-green); margin-right:0.4rem; }
-.btn.feedback .feedback-icon { display: inline-block; }
+.feedback-icon {
+  display: none;
+  color: var(--uab-light-green);
+  margin-right: 0.4rem;
+}
+.btn.feedback .feedback-icon {
+  display: inline-block;
+}
 .btn.feedback .btn-text,
-.btn.feedback svg { display: none; }
+.btn.feedback svg {
+  display: none;
+}
 
-/* Mobile adjustments */
+/* 19. Mobile adjustments */
 @media (max-width: 768px) {
   .preview-split {
     display: block;
@@ -326,12 +377,82 @@ input.valid {
   }
   .button-container {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #fff; padding: 0.5rem;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-    z-index: 100; justify-content: space-around;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 0.5rem;
+    box-shadow: 0 -2px 6px var(--uab-button-shadow);
+    z-index: 100;
+    justify-content: space-around;
   }
-  body { padding-bottom: 4rem; }
+  body {
+    padding-bottom: 4rem;
+  }
 }
 
-/* QR Modal, Tour, Footer… remain as before */
+/* 20. QR Modal */
+.qr-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+.qr-modal.active {
+  display: flex;
+}
+.qr-content {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* 21. Onboarding Tour */
+.tour-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+.tour-overlay.active {
+  display: flex;
+}
+.tour-step {
+  max-width: 320px;
+}
+.tour-step p {
+  margin-bottom: 1rem;
+}
+.tour-controls button {
+  margin: 0.5rem;
+}
+
+/* 22. Instructions & Footer */
+.instructions {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+.instructions h3 {
+  margin-bottom: 0.5rem;
+  color: var(--uab-light-green);
+  font-weight: 700;
+}
+.footer-card {
+  max-width: 1000px;
+  margin: 1.5rem auto;
+  background: var(--uab-gray-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px var(--uab-button-shadow);
+  padding: 1rem 1.5rem;
+  font-size: 0.85rem;
+  color: #333;
+}
