@@ -5,10 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UAB Email Signature Generator</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://use.typekit.net/qdc7ecx.css">
 </head>
 <body>
-  <header>
+  <!-- Global UAB Medicine header bar -->
+  <div class="site-header">
+    <a href="https://www.uab.edu/medicine">
+      <strong>UAB</strong> MEDICINE | The University of Alabama at Birmingham
+    </a>
+    <a href="https://www.uab.edu" target="_blank">Explore UAB</a>
+  </div>
+
+  <!-- Page title with gold underline and version toggle -->
+  <div class="page-title">
     <h1>UAB Email Signature Generator</h1>
     <div class="version-selection">
       <button id="btn-standard"
@@ -22,10 +30,11 @@
         Abbreviated Version
       </button>
     </div>
-  </header>
+  </div>
 
+  <!-- Main two-column grid -->
   <div class="container">
-    <!-- Form Card -->
+    <!-- Left: Form card -->
     <div class="card form-card">
       <label for="name">Name <span class="required">*</span></label>
       <input type="text" id="name" placeholder="John Doe" required
@@ -104,7 +113,7 @@
       </label>
     </div>
 
-    <!-- Preview Card -->
+    <!-- Right: Preview card -->
     <div class="card preview-card">
       <h2>Signature Preview</h2>
       <div id="preview-wrapper">
@@ -113,7 +122,7 @@
       <div class="button-container">
         <button id="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
         <button id="download-button" onclick="downloadRTF()">Download</button>
-        <span id="copy-success" style="display: none;">Copied!</span>
+        <span id="copy-success">Copied!</span>
       </div>
       <div class="instructions">
         <h3>Instructions for Adding Your Signature</h3>
@@ -124,7 +133,7 @@
     </div>
   </div>
 
-  <!-- Footer Card -->
+  <!-- Footer card -->
   <div class="footer-card">
     <span id="signature-version" class="version-label"></span>
     <p>This email signature generator is unofficial and not endorsed by UAB. It is based on the latest guidance for the Division of General Internal Medicine & Population Science. For more information, visit the <a href="https://www.uab.edu/toolkit/branding/download-branded-items/email-signature" target="_blank">UAB branding toolkit</a>.</p>
@@ -132,9 +141,5 @@
 
   <script src="validation.js"></script>
   <script src="script.js"></script>
-  <script>
-    // Ensure preview is rendered on page load
-    document.addEventListener('DOMContentLoaded', updateSignaturePreview);
-  </script>
 </body>
 </html>
