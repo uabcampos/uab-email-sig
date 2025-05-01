@@ -286,37 +286,30 @@ function hideQRCode() {
 }
 
 // ------------ Website Lookup (DuckDuckGo) ------------
+
 async function lookupWebsite() {
-  // Use division if provided, otherwise department
+  // Use division if provided, else department
   let text = el('division').value.trim() || el('department').value.trim();
   if (!text) {
     alert('Please enter a Division or Department name first.');
     return;
   }
-  // Replace "&" with "and"
   text = text.replace(/&/g, 'and');
-
-  // Build DuckDuckGo query
   const query = `Home "${text}" site:uab.edu`;
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
 
   try {
-    // Proxy through AllOrigins to avoid CORS
     const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const html = await fetch(proxyUrl).then(r => {
       if (!r.ok) throw new Error('Network error');
       return r.text();
     });
 
-    // Parse returned HTML and find only real results
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    // Select all result links
     const anchors = Array.from(doc.querySelectorAll('a.result__a'));
-    // Find first whose href points to a uab.edu domain
     let link = anchors
       .map(a => a.href)
       .map(h => {
-        // unwrap any DuckDuckGo redirect
         if (h.includes('/l/?uddg=')) {
           try {
             const u = new URL(h);
@@ -330,8 +323,7 @@ async function lookupWebsite() {
       })
       .find(h => {
         try {
-          const host = new URL(h).hostname;
-          return host.endsWith('uab.edu');
+          return new URL(h).hostname.endsWith('uab.edu');
         } catch {
           return false;
         }
@@ -340,7 +332,7 @@ async function lookupWebsite() {
     if (link) {
       el('website').value = link;
       persist('website', link);
-      updateSignaturePreview();  // refresh preview immediately
+      updateSignaturePreview();
     } else {
       alert('No uab.edu result found; please paste URL manually.');
     }
@@ -370,7 +362,7 @@ function resetToDefaults() {
 }
 
 function updateSignaturePreview() {
-  // Persist all fields
+  // Persist fields
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
@@ -378,13 +370,16 @@ function updateSignaturePreview() {
 
   // Gather values
   const name      = el('name').value.trim() || 'John Doe';
-  const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
-  const title     = el('title').value.trim() || 'Program Director II';
+  const creds     = el('credentials').
+trim() ? `, ${el('credentials').value.trim()}` : '';
+  const title     = el('title').
+trim() || 'Program Director II';
   const dept      = el('department').value.trim() || 'Department of Medicine';
   const school    = el('school').value.trim() || 'Heersink School of Medicine';
   const division  = el('division').value.trim();
   const room      = el('room').value.trim() || 'MT634';
-  const street    = el('street').value.trim() || '1717 11th Avenue South';
+  const street    = el('street').
+trim() || '1717 11th Avenue South';
   const cityState = el('city-state').value.trim() || 'Birmingham, AL';
   const zip       = el('zip').value.trim() || '35294-4410';
   const email     = el('email').value.trim() || 'you@uabmc.edu';
@@ -407,24 +402,26 @@ function updateSignaturePreview() {
 
   const isStd = el('btn-standard').classList.contains('active');
 
-  // Build HTML
-  let html = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
+  // Build signature HTML
+  let inner = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
-    html += `${dept} | ${school}`;
-    if (division) html += `<br>${division}`;
-    html += `<br>UAB | The University of Alabama at Birmingham<br>`;
-    html += `${room} | ${street} | ${cityState} ${zip}<br>`;
+    inner += `${dept} | ${school}`;
+    if (division) inner += `<br>${division}`;
+    inner += `<br>UAB | The University of Alabama at Birmingham<br>`;
+    inner += `${room} | ${street} | ${cityState} ${zip}<br>`;
   } else {
-    html += `UAB | The University of Alabama at Birmingham<br>`;
+    inner += `UAB | The University of Alabama at Birmingham<br>`;
   }
-  if (phoneLine) {
-    html += `${phoneLine} | `;
-  }
-  html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
-  html += `<a href="${href}" target="_blank">${text}</a>`;
+  if (phoneLine) inner += `${phoneLine} | `;
+  inner += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
+  inner += `<a href="${href}" target="_blank">${text}</a>`;
 
-  el('signature-preview').innerHTML = html;
-  el('mobile-preview').innerHTML    = html;
+  // Wrap in Arial
+  const wrapperStart = `<div style="font-family:Arial, sans-serif; font-size:12px; line-height:1.2;">`;
+  const wrapperEnd   = `</div>`;
+
+  el('signature-preview').innerHTML = wrapperStart + inner + wrapperEnd;
+  el('mobile-preview').innerHTML    = wrapperStart + inner + wrapperEnd;
 }
 
 // ------------ Initialization ------------
