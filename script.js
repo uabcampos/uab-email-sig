@@ -1,166 +1,177 @@
 // script.js
 
+// ———————————————————————————————
 // Helper to get element by ID
+// ———————————————————————————————
 function el(id) {
   return document.getElementById(id);
 }
 
-// Format phone numbers: 7 or 10 digits
+// ———————————————————————————————
+// Phone-formatting utility
+// ———————————————————————————————
 function formatPhoneNumber(number) {
   const digits = (number || '').replace(/\D/g, '');
   if (digits.length === 7) {
-    return `205.${digits.slice(0, 3)}.${digits.slice(3)}`;
+    return `205.${digits.slice(0,3)}.${digits.slice(3)}`;
   } else if (digits.length === 10) {
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    return `${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6)}`;
   }
   return number;
 }
 
-// Fetch an image URL and return a data-URL
-function getImageHex(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.onload = () => {
+// ———————————————————————————————
+// Fetch banner image as Data-URL
+// ———————————————————————————————
+function getImageDataURL(url) {
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(xhr.response);
-    };
-    xhr.onerror = reject;
-    xhr.send();
-  });
+      reader.onerror   = reject;
+      reader.readAsDataURL(blob);
+    }));
 }
 
-// Generate RTF content for download
+// ———————————————————————————————
+// Generate RTF from the current preview HTML
+// ———————————————————————————————
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
-  const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
-
+  const parts = html.split('<br>').map(p => p.trim()).filter(Boolean);
   // Part 1: blank line
   const part1 = '\\line ';
-
-  // Part 2: lines except last (URL)
-  const sigLines = lines.slice(0, -1).map(line =>
+  // Part 2: all but last line
+  const bodyLines = parts.slice(0,-1).map(line =>
     line
-      .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
-      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
+      .replace(/<strong.*?>(.*?)<\/strong>/,            '{\\b\\cf1 $1}')
+      .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,      '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
-
-  const part2 = sigLines + '\\line ';
-
-  // Part 3: last line
-  const urlLine = lines[lines.length - 1]
-    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/, '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
+  const part2 = bodyLines + '\\line ';
+  // Part 3: last line (URL)
+  const urlLine = parts[parts.length-1]
+    .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,          '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
-
   const part3 = '\\line ' + urlLine;
 
-  return `{\n` +
-    `\\rtf1\\ansi\\deff0\n` +
-    `{\\colortbl ;\\red26\\green86\\blue50;}\n` +
-    `{\\fonttbl{\\f0 Arial;}}\n` +
-    `\\fs24\n` +
-    part1 + part2 + part3 +
-    `\n}`;
+  return [
+    '{\\rtf1\\ansi\\deff0',
+    '{\\colortbl ;\\red26\\green86\\blue50;}',
+    '{\\fonttbl{\\f0 Arial;}}',
+    '\\fs24',
+    part1, part2, part3,
+    '}'
+  ].join('\n');
 }
 
-// Download RTF wrapper
-async function downloadRTF() {
-  try {
-    const rtf = await generateRTFContent();
-    const blob = new Blob([rtf], { type: 'application/rtf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'signature.rtf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (err) {
-    console.error('RTF generation failed:', err);
-  }
-}
-
-// Copy preview HTML to clipboard, preserving color
-function copyToClipboard() {
-  const preview = el('signature-preview').innerHTML;
+// ———————————————————————————————
+// Copy signature HTML to clipboard
+// ———————————————————————————————
+async function copyToClipboard() {
+  const html = el('signature-preview').innerHTML;
   const container = document.createElement('div');
-  container.style.color = '#1E6B52';
-  container.innerHTML = preview;
+  container.style.color = '#1E6B52';  // brand color
+  container.innerHTML   = html;
   document.body.appendChild(container);
 
+  // Try modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.write) {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([container.innerHTML], { type: 'text/html' }),
+          'text/plain': new Blob([container.textContent], { type: 'text/plain' })
+        })
+      ]);
+      el('copy-success').style.display = 'inline';
+      setTimeout(() => el('copy-success').style.display = 'none', 2000);
+      document.body.removeChild(container);
+      return;
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  // Fallback to execCommand
   const range = document.createRange();
   range.selectNodeContents(container);
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
-
   try {
     document.execCommand('copy');
     el('copy-success').style.display = 'inline';
-    setTimeout(() => {
-      el('copy-success').style.display = 'none';
-    }, 2000);
+    setTimeout(() => el('copy-success').style.display = 'none', 2000);
   } catch (err) {
-    console.error('Copy failed:', err);
+    alert('Copy failed—please copy manually.');
   }
-
   sel.removeAllRanges();
   document.body.removeChild(container);
 }
 
-// Toggle between standard and abbreviated versions
-function toggleVersion(isStandard) {
-  el('btn-standard').classList.toggle('active', isStandard);
-  el('btn-abbreviated').classList.toggle('active', !isStandard);
-  updateSignaturePreview();
+// ———————————————————————————————
+// Download RTF file
+// ———————————————————————————————
+async function downloadRTF() {
+  try {
+    const rtf = await generateRTFContent();
+    const blob = new Blob([rtf], { type: 'application/rtf' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'signature.rtf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('RTF download failed:', err);
+    alert('Failed to download RTF.');
+  }
 }
 
-// Update the signature preview (always show placeholders; disable buttons if invalid)
+// ———————————————————————————————
+// Update signature preview
+// ———————————————————————————————
 async function updateSignaturePreview() {
-  // Check validity
-  const valid = validateAllRequiredFields();
-  el('copy-button').disabled = !valid;
-  el('download-button').disabled = !valid;
+  // Validate fields (this also toggles the error messages)
+  const allValid = validateAllRequiredFields();
+  el('copy-button').disabled    = !allValid;
+  el('download-button').disabled = !allValid;
 
   // Gather values or placeholders
-  const name        = el('name').value.trim()        || 'John Doe';
-  const creds       = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
-  const title       = el('title').value.trim()       || 'Program Director II';
-  const room        = el('room').value.trim()        || 'MT634';
-  const street      = el('street').value.trim()      || '1717 11th Avenue South';
-  const cityState   = el('city-state').value.trim()  || 'Birmingham, AL';
-  const zip         = el('zip').value.trim()         || '35294-4410';
-  const email       = el('email').value.trim()       || 'johndoe@uabmc.edu';
-  const pronouns    = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
+  const name      = el('name').value.trim()        || 'John Doe';
+  const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
+  const title     = el('title').value.trim()       || 'Program Director II';
+  const room      = el('room').value.trim()        || 'MT634';
+  const street    = el('street').value.trim()      || '1717 11th Avenue South';
+  const cityState = el('city-state').value.trim()  || 'Birmingham, AL';
+  const zip       = el('zip').value.trim()         || '35294-4410';
+  const email     = el('email').value.trim()       || 'johndoe@uabmc.edu';
+  const pronouns  = el('pronouns').value.trim()    ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
-  // Phones
+  // Phone line
   const phones = [];
-  if (el('phone-office-enable').checked) {
-    phones.push(`O: ${formatPhoneNumber(el('phone-office').value.trim() || '')}`);
-  }
-  if (el('phone-mobile-enable').checked) {
-    phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value.trim() || '')}`);
-  }
+  if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
+    if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
 
-  // Banner image
+  // Banner
   let bannerHtml = '';
   if (el('add-image-checkbox').checked) {
     try {
-      const url = 'https://www.uab.edu/medicine/images/banner.png';
-      const dataUrl = await getImageHex(url);
+      const dataUrl = await getImageDataURL('https://www.uab.edu/medicine/images/banner.png');
       bannerHtml = `<img src="${dataUrl}" alt="UAB Banner" style="max-width:100%; margin-bottom:0.5rem;">`;
-    } catch (e) {
-      console.error('Banner load failed:', e);
+    } catch {
+      bannerHtml = '';
     }
   }
 
-  // Determine version
+  // Version
   const isStandard = el('btn-standard').classList.contains('active');
-  const baseUrl = 'uab.edu/medicine/gimaps';
+  const baseUrl    = 'uab.edu/medicine/gimaps';
 
   // Build HTML
   let html = bannerHtml +
@@ -176,23 +187,27 @@ async function updateSignaturePreview() {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
 
-  if (phoneLine) {
-    html += `${phoneLine} | `;
-  }
-
+  if (phoneLine) html += `${phoneLine} | `;
   html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>` +
-    `<a href="https://${baseUrl}" target="_blank">${baseUrl}</a>`;
+          `<a href="https://${baseUrl}" target="_blank">${baseUrl}</a>`;
 
   el('signature-preview').innerHTML = html;
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  // Wire up version buttons
-  el('btn-standard').addEventListener('click', () => toggleVersion(true));
-  el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
+// ———————————————————————————————
+// Toggle version buttons
+// ———————————————————————————————
+function toggleVersion(isStandard) {
+  el('btn-standard').classList.toggle('active', isStandard);
+  el('btn-abbreviated').classList.toggle('active', !isStandard);
+  updateSignaturePreview();
+}
 
-  // Live-update listeners
+// ———————————————————————————————
+// Initialize event listeners
+// ———————————————————————————————
+document.addEventListener('DOMContentLoaded', () => {
+  // Live update on input/blur
   ['name','credentials','title','room','street','city-state','zip','email','pronouns','phone-office','phone-mobile']
     .forEach(id => {
       const inp = el(id);
@@ -200,12 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
       inp.addEventListener('input', updateSignaturePreview);
       inp.addEventListener('blur', () => validateField(inp));
     });
+
+  // Checkbox changes
   ['phone-office-enable','phone-mobile-enable','add-image-checkbox']
     .forEach(id => el(id).addEventListener('change', updateSignaturePreview));
 
-  // Copy & Download
+  // Buttons
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
+  el('btn-standard').addEventListener('click', () => toggleVersion(true));
+  el('btn-abbreviated').addEventListener('click', () => toggleVersion(false));
 
   // Initial render
   updateSignaturePreview();
