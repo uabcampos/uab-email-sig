@@ -15,7 +15,6 @@
   --btn-radius:       0.5rem;
   --card-radius:      8px;
   --shadow-light:     rgba(0,0,0,0.03);
-  --shadow-md:        rgba(0,0,0,0.05);
 }
 
 * {
@@ -115,14 +114,14 @@ body {
   border-radius: var(--btn-radius);
   cursor: pointer;
   font-weight: 700;
-  box-shadow: none;
   transition: background 0.2s, transform 0.1s;
 }
 .draft-controls .btn:hover,
 .draft-controls .btn:focus {
   background: var(--uab-grey-dark);
 }
-.draft-controls .btn svg {
+.draft-controls .btn svg,
+.draft-controls .btn i {
   fill: var(--uab-green-dark);
 }
 .draft-controls span {
@@ -194,7 +193,8 @@ body {
 .btn-more-options:focus {
   background: var(--uab-grey-dark);
 }
-.btn-more-options svg {
+.btn-more-options svg,
+.btn-more-options i {
   fill: var(--uab-green-dark);
 }
 .more-options {
@@ -276,12 +276,27 @@ body {
 .extra-actions.collapsed {
   max-height: 0;
 }
-/* layout: two columns of auto-width buttons */
+/* 2-column auto-width grid of buttons */
 .extra-actions {
   display: grid;
   grid-template-columns: repeat(2, max-content);
   gap: 1rem;
   margin-top: 1rem;
+}
+/* Grey style for more actions buttons */
+.extra-actions .btn {
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
+  box-shadow: none;
+}
+.extra-actions .btn:hover,
+.extra-actions .btn:focus {
+  background: var(--uab-grey-dark);
+}
+.extra-actions .btn svg,
+.extra-actions .btn i {
+  fill: var(--uab-green-dark);
 }
 
 /* 12. Preview Section */
@@ -371,9 +386,7 @@ body {
   animation: spin 0.6s linear infinite;
   margin-right: 0.5rem;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 .btn.loading .spinner {
   display: inline-block;
 }
@@ -402,7 +415,7 @@ body {
   text-align: center;
 }
 
-/* 17. Onboarding Tour (if used) */
+/* 17. Onboarding Tour */
 .tour-overlay {
   position: fixed;
   inset: 0;
