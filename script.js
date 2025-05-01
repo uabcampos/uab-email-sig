@@ -10,7 +10,9 @@ function debounce(fn, delay = 300) {
 }
 
 // DOM helper
-function el(id) { return document.getElementById(id); }
+function el(id) {
+  return document.getElementById(id);
+}
 
 // ------------ Persistence & Draft ------------
 
@@ -289,25 +291,29 @@ function toggleVersion(isStd) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Restore fields
-  ['name','credentials','title','department','school','division',
-   'room','street','city-state','zip','email','pronouns']
-    .forEach(restore);
+  [
+    'name','credentials','title',
+    'department','school','division',
+    'room','street','city-state','zip',
+    'email','pronouns'
+  ].forEach(restore);
 
   // Initial preview
   updateSignaturePreview();
 
   // Bind inputs
   const debounced = debounce(updateSignaturePreview);
-  ['name','credentials','title','department','school','division',
-   'room','street','city-state','zip','email','pronouns']
-    .forEach(id => {
-      const f = el(id);
-      if (!f) return;
-      f.addEventListener('input', () => {
-        validateField(f);
-        debounced();
-      });
+  [
+    'name','credentials','title','department','school','division',
+    'room','street','city-state','zip','email','pronouns'
+  ].forEach(id => {
+    const f = el(id);
+    if (!f) return;
+    f.addEventListener('input', () => {
+      validateField(f);
+      debounced();
     });
+  });
 
   // Checkboxes
   ['phone-office-enable','phone-mobile-enable']
@@ -319,78 +325,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Draft controls
   saveDraftBtn.addEventListener('click', () => {
-    ['name','credentials','title','department','school','division',
-     'room','street','city-state','zip','email','pronouns']
-      .forEach(id => persist(id, el(id).value.trim()));
+    [
+      'name','credentials','title','department','school','division',
+      'room','street','city-state','zip','email','pronouns'
+    ].forEach(id => persist(id, el(id).value.trim()));
   });
   clearDraftBtn.addEventListener('click', () => {
-    clearAllPersistence(); resetToDefaults();
+    clearAllPersistence();
+    resetToDefaults();
     lastSavedEl.textContent = 'Last saved: never';
   });
 
-  // More-actions panel
+  // More-options toggle
   el('more-options-toggle').addEventListener('click', () => {
     const mo = el('more-options');
-    const c  = mo.classList.toggle('collapsed');
-    el('more-options-toggle').textContent = c ? 'More options ▼' : 'Less options ▲';
+    const collapsed = mo.classList.toggle('collapsed');
+    el('more-options-toggle').textContent = collapsed ? 'More options ▼' : 'Less options ▲';
   });
 
-  // Insert preview titles
-  const pc = document.querySelector('.preview-card');
-  const df = pc.querySelector('.desktop-frame');
-  const mf = pc.querySelector('.mobile-frame');
-
-  const dt = document.createElement('h3');
-  dt.className = 'preview-title';
-  dt.textContent = 'Desktop Preview';
-  df.parentNode.insertBefore(dt, df);
-
-  const mt = document.createElement('h3');
-  mt.className = 'preview-title';
-  mt.textContent = 'Mobile Preview';
-  mf.parentNode.insertBefore(mt, mf);
+  // Insert preview titles if not already present
+  // (HTML now includes them)
 
   // Primary actions
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
 
-  // Toggle More actions
+  // More Actions panel
   const primaryRow = el('copy-button').parentNode;
-  const toggle = document.createElement('button');
-  toggle.id = 'toggle-actions';
-  toggle.className = 'btn-toggle-actions';
-  toggle.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>
-    </svg>
-    More actions
-  `;
-  primaryRow.after(toggle);
-
-  // Extra-actions container
-  const extra = document.createElement('div');
-  extra.id = 'extra-actions';
-  extra.className = 'extra-actions';
-  [
-    'copy-html-button',
-    'download-png-button',
-    'download-html-button',
-    'download-oft-button',
-    'show-qr-button',
-    'reset-button'
-  ].forEach(id => {
-    const b = el(id);
-    if (b) extra.appendChild(b);
-  });
-  toggle.after(extra);
-
-  toggle.addEventListener('click', () => {
-    const expanded = extra.classList.toggle('expanded');
-    toggle.querySelector('svg').innerHTML = expanded
-      ? '<polyline points="4,10 8,6 12,10" stroke="currentColor" fill="none" stroke-width="2"/>'
-      : '<polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>';
-    toggle.childNodes[1].nodeValue = expanded ? ' Fewer actions' : ' More actions';
-  });
+  const toggle = document.getElementById('toggle-actions');
+  const extra = document.getElementById('extra-actions');
 
   // Bind secondary actions
   el('copy-html-button').addEventListener('click', copyHTML);
@@ -400,14 +363,23 @@ document.addEventListener('DOMContentLoaded', () => {
   el('show-qr-button').addEventListener('click', showQRCode);
   el('reset-button').addEventListener('click', resetToDefaults);
 
-  // QR modal injection
+  // Toggle behavior for extra-actions
+  toggle.addEventListener('click', () => {
+    const expanded = extra.classList.toggle('expanded');
+    toggle.querySelector('svg').innerHTML = expanded
+      ? '<polyline points="4,10 8,6 12,10" stroke="currentColor" fill="none" stroke-width="2"/>'
+      : '<polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>';
+    toggle.childNodes[1].nodeValue = expanded ? ' Fewer actions' : ' More actions';
+  });
+
+  // QR modal
   document.body.insertAdjacentHTML('beforeend', `
     <div id="qr-modal" class="qr-modal" onclick="hideQRCode()">
-      <div class="qr-content"><img alt="QR code for signature" /></div>
+      <div class="qr-content"><img alt="QR code for signature"/></div>
     </div>
   `);
 
-  // Onboarding tour (unchanged)...
+  // Onboarding tour (unchanged)
 
   // Final init
   toggleVersion(true);
