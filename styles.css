@@ -316,6 +316,12 @@ input.valid {
 .btn-download:hover { background: #f1b600; }
 .btn-download-png { background: #2196F3; color: #fff; }
 .btn-download-png:hover { background: #1976D2; }
+.btn-download-html { background: #ddd; color: #333; }
+.btn-download-html:hover { background: #ccc; }
+.btn-download-oft { background: #ddd; color: #333; }
+.btn-download-oft:hover { background: #ccc; }
+.btn-qr { background: var(--uab-light-green); color: #fff; }
+.btn-qr:hover { background: var(--uab-dark-green); }
 .btn-reset { background: #eee; color: #333; }
 .btn-reset:hover { background: var(--uab-gray-light); }
 
@@ -325,7 +331,72 @@ input.valid {
   outline-offset: 2px;
 }
 
-/* 14. Instructions & Footer */
+/* 14. Mobile‐first preview carousel & fixed action bar */
+@media (max-width: 768px) {
+  .preview-split {
+    display: block;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .preview-frame {
+    scroll-snap-align: start;
+    min-width: 100%;
+  }
+  .button-container {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    padding: 0.5rem;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    z-index: 100;
+    justify-content: space-around;
+  }
+  body {
+    padding-bottom: 4rem;
+  }
+}
+
+/* 15. QR code modal */
+.qr-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+.qr-modal.active {
+  display: flex;
+}
+.qr-content {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* 16. Onboarding tour overlay */
+.tour-overlay {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  text-align:center;
+  padding:1rem;
+}
+.tour-overlay.active { display:flex; }
+.tour-step {
+  max-width: 320px;
+}
+.tour-controls button {
+  margin: 0.5rem;
+}
+
+/* 17. Instructions & Footer */
 .instructions {
   margin-top: 1.5rem;
   font-size: 0.9rem;
