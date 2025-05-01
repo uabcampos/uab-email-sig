@@ -53,19 +53,23 @@
         <div id="school-error" class="error-message"></div>
 
         <label for="division">Division</label>
-        <input type="text" id="division" required placeholder="Division of General Internal Medicine & Population Science" />
+        <input type="text" id="division" required placeholder="Division of General Internal Medicine &amp; Population Science" />
         <div id="division-error" class="error-message"></div>
-      
+      </fieldset>
 
-        <label for="website">Website URL</label>
-        <div class="website-lookup">
+      <!-- Website Lookup -->
+      <label for="website">Website URL</label>
+      <div class="website-lookup">
         <input type="url" id="website" placeholder="https://..." />
         <button type="button" id="lookup-website" class="btn btn-lookup">
-        <span>Lookup URL</span>
-        <i data-feather="search"></i>
+          <span>Lookup URL</span><i data-feather="search"></i>
         </button>
-        </div>
-        </fieldset>
+      </div>
+      <div id="website-error" class="error-message"></div>
+      <!-- New explanatory note -->
+      <p class="field-note">
+        This is an automated attempt to fetch your division’s page URL—please verify and adjust to the most accurate URL.
+      </p>
 
       <!-- Title / Role -->
       <label for="title">Title / Role</label>
@@ -155,22 +159,22 @@
         <span>More actions</span><i data-feather="chevron-down"></i>
       </button>
       <div id="extra-actions" class="extra-actions collapsed">
-        <button id="copy-html-button" class="btn btn-copy-html">
+        <button id="copy-html-button" class="btn">
           <span>Copy HTML</span><i data-feather="code"></i>
         </button>
-        <button id="download-png-button" class="btn btn-download-png">
+        <button id="download-png-button" class="btn">
           <span>Download PNG</span><i data-feather="image"></i>
         </button>
-        <button id="download-html-button" class="btn btn-download-html">
+        <button id="download-html-button" class="btn">
           <span>Download HTML</span><i data-feather="file-text"></i>
         </button>
-        <button id="download-oft-button" class="btn btn-download-oft">
+        <button id="download-oft-button" class="btn">
           <span>Download OFT</span><i data-feather="mail"></i>
         </button>
-        <button id="show-qr-button" class="btn btn-qr">
+        <button id="show-qr-button" class="btn">
           <span>Show QR</span><i data-feather="qrcode"></i>
         </button>
-        <button id="reset-button" class="btn btn-reset">
+        <button id="reset-button" class="btn">
           <span>Reset</span><i data-feather="refresh-cw"></i>
         </button>
       </div>
