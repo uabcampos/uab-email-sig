@@ -356,17 +356,18 @@ function resetToDefaults() {
 }
 
 function updateSignaturePreview() {
-  [
-    'name','credentials','title','department','school','division',
-    'room','street','city-state','zip','email','pronouns','website'
-  ].forEach(id => persist(id, (el(id)?.value || '').trim()));
+  // Persist all editable fields
+  ['name','credentials','title','department','school','division',
+   'room','street','city-state','zip','email','pronouns','website']
+    .forEach(id => persist(id, (el(id)?.value || '').trim()));
 
+  // Grab values (fallbacks only for those you want defaults on)
   const name      = el('name').value.trim() || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim() || 'Program Director II';
   const dept      = el('department').value.trim() || 'Department of Medicine';
   const school    = el('school').value.trim() || 'Heersink School of Medicine';
-  const division  = el('division').value.trim();
+  const division  = el('division').value.trim(); // optional
   const room      = el('room').value.trim() || 'MT634';
   const street    = el('street').value.trim() || '1717 11th Avenue South';
   const cityState = el('city-state').value.trim() || 'Birmingham, AL';
@@ -374,17 +375,20 @@ function updateSignaturePreview() {
   const email     = el('email').value.trim() || 'you@uabmc.edu';
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
+  // Phone formatting
   const phones = [];
   if (el('phone-office-enable').checked) phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
   if (el('phone-mobile-enable').checked) phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
   const phoneLine = phones.join(', ');
 
+  // Determine URL href/text
   let href = el('website').value.trim() || 'https://uab.edu/medicine/gimaps';
   if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
   const text = href.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
   const isStd = el('btn-standard').classList.contains('active');
 
+  // Build the inner HTML
   let inner = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
     inner += `${dept} | ${school}`;
@@ -398,6 +402,7 @@ function updateSignaturePreview() {
   inner += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
   inner += `<a href="${href}" target="_blank">${text}</a>`;
 
+  // Wrap in Arial styling
   const wrapperStart = `<div style="font-family:Arial, sans-serif; font-size:12px; line-height:1.2;">`;
   const wrapperEnd   = `</div>`;
 
