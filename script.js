@@ -14,14 +14,25 @@ function el(id) {
   return document.getElementById(id);
 }
 
-// Persist & restore fields
+// Draft & persistence elements
+const lastSavedEl   = el('last-saved');
+const saveDraftBtn  = el('save-draft');
+const clearDraftBtn = el('clear-draft');
+
+// Override persist to update timestamp
 function persist(id, val) {
   localStorage.setItem(`siggen:${id}`, val);
+  const now = new Date();
+  lastSavedEl.textContent = `Last saved: ${now.toLocaleTimeString()}`;
 }
+
+// Restore from localStorage
 function restore(id) {
   const v = localStorage.getItem(`siggen:${id}`);
   if (v !== null) el(id).value = v;
 }
+
+// Clear all persisted keys
 function clearAllPersistence() {
   Object.keys(localStorage)
     .filter(k => k.startsWith('siggen:'))
@@ -36,7 +47,7 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Generate RTF content from HTML preview
+// Generate RTF content
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
@@ -73,7 +84,7 @@ function showMsg(id) {
   setTimeout(() => { msg.style.display = 'none'; }, 2000);
 }
 
-// Copy signature (rich HTML + text) to clipboard
+// Copy rich HTML+text to clipboard
 async function copyToClipboard() {
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
@@ -110,14 +121,14 @@ async function copyToClipboard() {
   document.body.removeChild(tmp);
 }
 
-// Copy raw HTML to clipboard
+// Copy raw HTML
 function copyHTML() {
   navigator.clipboard.writeText(el('signature-preview').innerHTML)
     .then(() => showMsg('copy-html-success'))
     .catch(() => alert('Copy HTML failed.'));
 }
 
-// Download RTF file
+// Download RTF
 async function downloadRTF() {
   try {
     const rtf = await generateRTFContent();
@@ -135,22 +146,20 @@ async function downloadRTF() {
   }
 }
 
-// Lazy-load html2canvas for PNG export
+// Lazy-load html2canvas and download PNG
 let html2canvasPromise = null;
 function loadHtml2canvas() {
   if (!html2canvasPromise) {
     html2canvasPromise = new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      s.onload = () => resolve(window.html2canvas || window.html2canvas);
+      s.onload = () => resolve(window.html2canvas);
       s.onerror = reject;
       document.body.appendChild(s);
     });
   }
   return html2canvasPromise;
 }
-
-// Download PNG of the signature preview
 async function downloadPNG() {
   try {
     await loadHtml2canvas();
@@ -171,7 +180,7 @@ async function downloadPNG() {
   }
 }
 
-// Reset form and preview to defaults
+// Reset form to defaults
 function resetToDefaults() {
   clearAllPersistence();
   [
@@ -186,9 +195,8 @@ function resetToDefaults() {
   updateSignaturePreview();
 }
 
-// Update live preview (desktop + mobile)
+// Build live preview
 function updateSignaturePreview() {
-  // Persist inputs
   [
     'name','credentials','title',
     'department','school','division',
@@ -196,7 +204,6 @@ function updateSignaturePreview() {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(id => persist(id, el(id).value.trim()));
 
-  // Gather values or defaults
   const name      = el('name').value.trim() || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim() || 'Program Director II';
@@ -239,7 +246,7 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
-// Toggle between Standard and Abbreviated versions
+// Toggle version
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
@@ -262,7 +269,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Initialize on page load
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
   // Restore persisted values
   [
@@ -272,9 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
+  // Debounced preview
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
-  // Bind input & validation events
+  // Inline validation binding
   [
     'name','credentials','title',
     'department','school','division',
@@ -283,17 +291,42 @@ document.addEventListener('DOMContentLoaded', () => {
   ].forEach(id => {
     const f = el(id);
     if (!f) return;
-    f.addEventListener('input', debouncedUpdate);
-    f.addEventListener('blur', () => validateField(f));
+    f.addEventListener('input', () => {
+      validateField(f);
+      debouncedUpdate();
+    });
   });
 
   // Checkbox toggles
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
-  // Version toggle buttons
+  // Version toggles
   el('btn-standard')?.addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated')?.addEventListener('click', () => toggleVersion(false));
+
+  // Draft controls
+  saveDraftBtn.addEventListener('click', () => {
+    [
+      'name','credentials','title',
+      'department','school','division',
+      'room','street','city-state','zip',
+      'phone-office','phone-mobile','email','pronouns'
+    ].forEach(id => persist(id, el(id).value.trim()));
+  });
+  clearDraftBtn.addEventListener('click', () => {
+    clearAllPersistence();
+    resetToDefaults();
+    lastSavedEl.textContent = 'Last saved: never';
+  });
+
+  // More options toggle
+  const moreToggle = el('more-options-toggle');
+  const moreOpts   = el('more-options');
+  moreToggle.addEventListener('click', () => {
+    const isCollapsed = moreOpts.classList.toggle('collapsed');
+    moreToggle.textContent = isCollapsed ? 'More options ▼' : 'Less options ▲';
+  });
 
   // Action buttons
   el('copy-button')?.addEventListener('click', copyToClipboard);
@@ -302,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
   el('download-png-button')?.addEventListener('click', downloadPNG);
   el('reset-button')?.addEventListener('click', resetToDefaults);
 
-  // Kick off initial render
+  // Initial render
   toggleVersion(true);
   updateSignaturePreview();
 });
