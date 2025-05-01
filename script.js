@@ -9,12 +9,12 @@ function debounce(fn, delay = 300) {
   };
 }
 
-// DOM helper
+// DOM shortcut
 function el(id) {
   return document.getElementById(id);
 }
 
-// ------------ Persistence & Draft ------------
+// ------------ Persistence & Draft Management ------------
 
 const lastSavedEl   = el('last-saved');
 const saveDraftBtn  = el('save-draft');
@@ -36,7 +36,7 @@ function clearAllPersistence() {
     .forEach(k => localStorage.removeItem(k));
 }
 
-// ------------ URL Deep-Linking for QR ------------
+// ------------ URL Deep-Linking & QR ------------
 
 function buildDeepLink() {
   const params = new URLSearchParams();
@@ -47,9 +47,12 @@ function buildDeepLink() {
     'email','pronouns','website'
   ].forEach(id => {
     const fld = el(id);
-    if (fld && fld.value) params.set(id, fld.value);
+    if (fld && fld.value) {
+      params.set(id, fld.value);
+    }
   });
 
+  // Phone toggles + numbers
   const officeEnabled = el('phone-office-enable').checked;
   params.set('phoneOfficeEnabled', officeEnabled);
   if (officeEnabled) {
@@ -61,6 +64,7 @@ function buildDeepLink() {
     params.set('phoneMobileNumber', el('phone-mobile').value.trim());
   }
 
+  // Version
   params.set('version',
     el('btn-standard').classList.contains('active') ? 'standard' : 'abbr'
   );
@@ -79,14 +83,14 @@ function restoreFromQuery() {
     if (params.has(id)) el(id).value = params.get(id);
   });
 
-  const officeEnabled = params.get('phoneOfficeEnabled') === 'true';
-  el('phone-office-enable').checked = officeEnabled;
-  if (officeEnabled && params.has('phoneOfficeNumber')) {
+  const oe = params.get('phoneOfficeEnabled') === 'true';
+  el('phone-office-enable').checked = oe;
+  if (oe && params.has('phoneOfficeNumber')) {
     el('phone-office').value = params.get('phoneOfficeNumber');
   }
-  const mobileEnabled = params.get('phoneMobileEnabled') === 'true';
-  el('phone-mobile-enable').checked = mobileEnabled;
-  if (mobileEnabled && params.has('phoneMobileNumber')) {
+  const me = params.get('phoneMobileEnabled') === 'true';
+  el('phone-mobile-enable').checked = me;
+  if (me && params.has('phoneMobileNumber')) {
     el('phone-mobile').value = params.get('phoneMobileNumber');
   }
 
@@ -96,7 +100,7 @@ function restoreFromQuery() {
   }
 }
 
-// ------------ Formatting & Generation ------------
+// ------------ Formatting & Signature Generation ------------
 
 function formatPhoneNumber(num) {
   const d = (num || '').replace(/\D/g, '');
@@ -110,28 +114,30 @@ function decodedHTML() {
 }
 
 async function generateRTFContent() {
-  const raw   = decodedHTML();
+  const raw = decodedHTML();
   const lines = raw.split('<br>').map(l => l.trim()).filter(Boolean);
-  const p1    = '\\line ';
-  const body  = lines.slice(0,-1).map(line =>
+
+  const part1 = '\\line ';
+  const body = lines.slice(0, -1).map(line =>
     line
       .replace(/<strong.*?>(.*?)<\/strong>/, '{\\b\\cf1 $1}')
       .replace(/<a href="mailto:(.*?)">(.*?)<\/a>/,
                '{\\field{\\*\\fldinst{HYPERLINK "mailto:$1"}}{\\fldrslt $2}}')
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
-  const p2    = body + '\\line ';
+  const part2 = body + '\\line ';
   const urlLine = lines.slice(-1)[0]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,
              '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
-  const p3 = '\\line ' + urlLine;
+  const part3 = '\\line ' + urlLine;
 
   return [
     '{\\rtf1\\ansi\\deff0',
     '{\\colortbl ;\\red26\\green86\\blue50;}',
     '{\\fonttbl{\\f0 Arial;}}',
-    '\\fs24', p1, p2, p3,
+    '\\fs24',
+    part1, part2, part3,
     '}'
   ].join('\n');
 }
@@ -143,7 +149,7 @@ ${decodedHTML()}
 </body></html>`;
 }
 
-// ------------ Feedback, Copy & Download ------------
+// ------------ Copy & Download Actions ------------
 
 function giveFeedback(btn) {
   btn.classList.add('loading');
@@ -155,6 +161,7 @@ async function copyToClipboard() {
   const tmp = document.createElement('div');
   tmp.innerHTML = decodedHTML();
   document.body.appendChild(tmp);
+
   try {
     await navigator.clipboard.write([
       new ClipboardItem({
@@ -171,14 +178,14 @@ async function copyToClipboard() {
     document.execCommand('copy');
     sel.removeAllRanges();
   }
-  document.body.removeChild(tmp);
+
+  tmp.remove();
   giveFeedback(btn);
 }
 
 function copyHTML() {
   const btn = el('copy-html-button');
-  navigator.clipboard.writeText(decodedHTML())
-    .catch(() => alert('Copy HTML failed.'));
+  navigator.clipboard.writeText(decodedHTML()).catch(() => alert('Copy HTML failed.'));
   giveFeedback(btn);
 }
 
@@ -186,14 +193,14 @@ async function downloadRTF() {
   const btn = el('download-button');
   giveFeedback(btn);
   try {
-    const rtf  = await generateRTFContent();
+    const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
     a.download = 'signature.rtf';
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    a.remove();
     URL.revokeObjectURL(a.href);
   } catch {
     alert('RTF download failed.');
@@ -201,17 +208,17 @@ async function downloadRTF() {
 }
 
 async function downloadOFTTemplate() {
-  const btn  = el('download-oft-button');
+  const btn = el('download-oft-button');
   giveFeedback(btn);
   try {
-    const rtf  = await generateRTFContent();
+    const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/vnd.ms-outlook' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
     a.download = 'signature.oft';
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    a.remove();
     URL.revokeObjectURL(a.href);
   } catch {
     alert('OFT download failed.');
@@ -219,15 +226,15 @@ async function downloadOFTTemplate() {
 }
 
 function downloadHTMLTemplate() {
-  const btn  = el('download-html-button');
+  const btn = el('download-html-button');
   giveFeedback(btn);
   const blob = new Blob([generateHTMLSignature()], { type: 'text/html' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = 'signature.html';
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+  a.remove();
   URL.revokeObjectURL(a.href);
 }
 
@@ -236,8 +243,8 @@ function loadHtml2canvas() {
   if (!html2canvasPromise) {
     html2canvasPromise = new Promise((res, rej) => {
       const s = document.createElement('script');
-      s.src   = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      s.onload  = () => res(window.html2canvas);
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = () => res(window.html2canvas);
       s.onerror = rej;
       document.body.appendChild(s);
     });
@@ -250,14 +257,14 @@ async function downloadPNG() {
   giveFeedback(btn);
   try {
     const html2canvas = await loadHtml2canvas();
-    const canvas      = await html2canvas(el('signature-preview'), { backgroundColor: null });
+    const canvas = await html2canvas(el('signature-preview'), { backgroundColor: null });
     canvas.toBlob(blob => {
       const a = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
+      a.href = URL.createObjectURL(blob);
       a.download = 'signature.png';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      a.remove();
       URL.revokeObjectURL(a.href);
     });
   } catch {
@@ -273,42 +280,77 @@ function showQRCode() {
   img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
   qrModal.classList.add('active');
 }
+
 function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
 
-// ------------ Website Lookup via DuckDuckGo ------------
-// (unchanged lookupWebsite function here)
+// ------------ Website Lookup (DuckDuckGo) ------------
 
-// ------------ Reset & Preview ------------
+async function lookupWebsite() {
+  // use division if present, otherwise department
+  let text = el('division').value.trim() || el('department').value.trim();
+  if (!text) {
+    alert('Please enter a Division or Department name first.');
+    return;
+  }
+  text = text.replace(/&/g, 'and');
+  const query = `Home "${text}" site:uab.edu`;
+  const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+
+  try {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const html = await fetch(proxyUrl).then(r => {
+      if (!r.ok) throw new Error('Network error');
+      return r.text();
+    });
+
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    let link = doc.querySelector('a.result__a')?.href;
+    if (link && link.includes('/l/?uddg=')) {
+      const u = new URL(link);
+      const d = u.searchParams.get('uddg');
+      if (d) link = decodeURIComponent(d);
+    }
+
+    if (link) {
+      el('website').value = link;
+    } else {
+      alert('No result found; please paste URL manually.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Lookup failed; please paste URL manually.');
+  }
+}
+
+// ------------ Reset & Live Preview ------------
 
 function resetToDefaults() {
   clearAllPersistence();
   [
-    'name','credentials','title',
-    'department','school','division',
-    'room','street','city-state','zip',
-    'email','pronouns','website'
+    'name','credentials','title','department','school','division',
+    'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => {
-    if (el(id)) el(id).value = '';
+    const fld = el(id);
+    if (fld) fld.value = '';
   });
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id).checked = false);
+
   el('btn-standard').classList.add('active');
   el('btn-abbreviated').classList.remove('active');
   updateSignaturePreview();
 }
 
 function updateSignaturePreview() {
-  // Persist fields
+  // persist
   [
-    'name','credentials','title',
-    'department','school','division',
-    'room','street','city-state','zip',
-    'email','pronouns','website'
+    'name','credentials','title','department','school','division',
+    'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => persist(id, (el(id)?.value || '').trim()));
 
-  // Values
+  // gather values
   const name      = el('name').value.trim() || 'John Doe';
   const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
   const title     = el('title').value.trim() || 'Program Director II';
@@ -323,20 +365,22 @@ function updateSignaturePreview() {
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
 
   const phones = [];
-  if (el('phone-office-enable').checked)
+  if (el('phone-office-enable').checked) {
     phones.push(`O: ${formatPhoneNumber(el('phone-office').value)}`);
-  if (el('phone-mobile-enable').checked)
+  }
+  if (el('phone-mobile-enable').checked) {
     phones.push(`M: ${formatPhoneNumber(el('phone-mobile').value)}`);
+  }
   const phoneLine = phones.join(', ');
 
-  // Determine href & text for URL
+  // href/text for website link
   let href = el('website').value.trim() || 'https://uab.edu/medicine/gimaps';
   if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
   const text = href.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
   const isStd = el('btn-standard').classList.contains('active');
 
-  // Build HTML
+  // build HTML
   let html = `<strong style="color:#1A5632;">${name}${creds} | ${title}</strong><br>`;
   if (isStd) {
     html += `${dept} | ${school}`;
@@ -346,7 +390,9 @@ function updateSignaturePreview() {
   } else {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
-  if (phoneLine) html += `${phoneLine} | `;
+  if (phoneLine) {
+    html += `${phoneLine} | `;
+  }
   html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
   html += `<a href="${href}" target="_blank">${text}</a>`;
 
@@ -354,45 +400,56 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
-// ------------ Init ------------
+// ------------ Initialization ------------
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.feather) feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
 
-  // Restore saved or query values
+  // Restore inputs
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
   ].forEach(restore);
-  if (typeof restoreFromQuery === 'function') restoreFromQuery();
 
-  // QR modal
+  // Restore from query-string
+  restoreFromQuery();
+
+  // Inject QR modal
   document.body.insertAdjacentHTML('beforeend', `
     <div id="qr-modal" class="qr-modal" role="dialog" aria-modal="true">
       <div class="qr-content">
-        <img alt="QR code"/>
-        <p>Scan to open on mobile with data filled.</p>
+        <img alt="QR code for signature" />
+        <p>Scan to open on mobile with your info pre-filled.</p>
       </div>
     </div>
   `);
   el('qr-modal').addEventListener('click', hideQRCode);
   el('qr-modal').querySelector('.qr-content').addEventListener('click', e => e.stopPropagation());
 
+  // Initial preview
   updateSignaturePreview();
 
+  // Live validation + preview
   const deb = debounce(updateSignaturePreview);
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => {
     const f = el(id);
-    if (f) f.addEventListener('input', () => { validateField(f); deb(); });
+    if (f) {
+      f.addEventListener('input', () => {
+        validateField(f);
+        deb();
+      });
+    }
   });
 
-  ['phone-office-enable','phone-mobile-enable'].forEach(id =>
-    el(id).addEventListener('change', updateSignaturePreview)
-  );
+  // Phone toggles
+  ['phone-office-enable','phone-mobile-enable'].forEach(id => {
+    el(id).addEventListener('change', updateSignaturePreview);
+  });
 
+  // Version buttons
   el('btn-standard').addEventListener('click', () => {
     el('btn-standard').classList.add('active');
     el('btn-abbreviated').classList.remove('active');
@@ -404,9 +461,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSignaturePreview();
   });
 
+  // Draft buttons
   saveDraftBtn.addEventListener('click', () => {
-    ['name','credentials','title','department','school','division','room','street','city-state','zip','email','pronouns','website']
-      .forEach(id => persist(id, el(id).value.trim()));
+    [
+      'name','credentials','title','department','school','division',
+      'room','street','city-state','zip','email','pronouns','website'
+    ].forEach(id => persist(id, el(id).value.trim()));
   });
   clearDraftBtn.addEventListener('click', () => {
     clearAllPersistence();
@@ -414,6 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lastSavedEl.textContent = 'Last saved: never';
   });
 
+  // More-options toggle
   el('more-options-toggle').addEventListener('click', () => {
     const panel = el('more-options');
     const btn   = el('more-options-toggle');
@@ -422,11 +483,20 @@ document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
   });
 
+  // Website lookup
   el('lookup-website').addEventListener('click', lookupWebsite);
 
+  // Copy / download / QR / reset
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
+  el('copy-html-button').addEventListener('click', copyHTML);
+  el('download-png-button').addEventListener('click', downloadPNG);
+  el('download-html-button').addEventListener('click', downloadHTMLTemplate);
+  el('download-oft-button').addEventListener('click', downloadOFTTemplate);
+  el('show-qr-button').addEventListener('click', showQRCode);
+  el('reset-button').addEventListener('click', resetToDefaults);
 
+  // More-actions toggle
   const moreToggle = el('toggle-actions');
   const extraPanel = el('extra-actions');
   extraPanel.classList.add('collapsed');
@@ -435,11 +505,4 @@ document.addEventListener('DOMContentLoaded', () => {
     moreToggle.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
-
-  el('copy-html-button').addEventListener('click', copyHTML);
-  el('download-png-button').addEventListener('click', downloadPNG);
-  el('download-html-button').addEventListener('click', downloadHTMLTemplate);
-  el('download-oft-button').addEventListener('click', downloadOFTTemplate);
-  el('show-qr-button').addEventListener('click', showQRCode);
-  el('reset-button').addEventListener('click', resetToDefaults);
 });
