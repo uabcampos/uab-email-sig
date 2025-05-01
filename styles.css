@@ -4,17 +4,18 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
 
 :root {
-  --uab-green:       #1A5632;
-  --uab-green-dark:  #16482F;
-  --uab-gold:        #FDB913;
-  --uab-gold-dark:   #E0A00E;
-  --uab-gray-light:  #E6E6E6;
-  --uab-bg:          #F5F5F5;
-  --btn-height:      3rem;
-  --btn-radius:      0.5rem;
-  --btn-padding:     0 1.5rem;
-  --shadow:          rgba(0,0,0,0.05);
-  --font-sans:       'PT Sans', Arial, sans-serif;
+  --uab-green:        #1A5632;
+  --uab-green-dark:   #16482F;     /* ~10% darker */
+  --uab-grey-light:   #F5F5F5;
+  --uab-grey-mid:     #E6E6E6;
+  --uab-grey-dark:    #E0E0E0;
+  --font-sans:        'PT Sans', Arial, sans-serif;
+  --btn-height:       3rem;
+  --btn-padding:      0 2rem;
+  --btn-radius:       0.5rem;
+  --card-radius:      8px;
+  --shadow-light:     rgba(0,0,0,0.03);
+  --shadow-md:        rgba(0,0,0,0.05);
 }
 
 * {
@@ -25,9 +26,9 @@
 
 body {
   font-family: var(--font-sans);
-  background: var(--uab-bg);
+  background: var(--uab-grey-light);
   color: #333;
-  line-height: 1.4;
+  line-height: 1.5;
   padding: 1rem;
 }
 
@@ -38,7 +39,8 @@ body {
   align-items: center;
   background: #fff;
   padding: 1rem 2rem;
-  border-bottom: 4px solid var(--uab-gold);
+  border-bottom: 4px solid var(--uab-green);
+  box-shadow: 0 2px 6px var(--shadow-light);
 }
 .page-title h1 {
   font-size: 2rem;
@@ -51,19 +53,22 @@ body {
   gap: 0.5rem;
   height: var(--btn-height);
   padding: var(--btn-padding);
-  background: var(--uab-green);
-  color: #fff;
-  border: none;
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: var(--btn-radius);
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
 }
-.version-selection .version-button:hover,
-.version-selection .version-button:focus {
-  background: var(--uab-green-dark);
-}
 .version-selection .version-button.active {
-  box-shadow: 0 2px 6px var(--shadow);
+  background: var(--uab-green);
+  color: #fff;
+  border-color: var(--uab-green);
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+.version-selection .version-button:not(.active):hover,
+.version-selection .version-button:not(.active):focus {
+  background: var(--uab-grey-dark);
 }
 
 /* 3. Layout & Container */
@@ -75,17 +80,15 @@ body {
   margin: 2rem auto;
 }
 @media (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
+  .container { grid-template-columns: 1fr; }
 }
 
 /* 4. Card Component */
 .card {
   background: #fff;
-  border-radius: 8px;
+  border-radius: var(--card-radius);
   padding: 1.5rem;
-  box-shadow: 0 4px 12px var(--shadow);
+  box-shadow: 0 4px 12px var(--shadow-light);
 }
 
 /* 5. Draft Controls */
@@ -98,6 +101,7 @@ body {
 .draft-controls .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   height: var(--btn-height);
   padding: var(--btn-padding);
@@ -107,14 +111,14 @@ body {
   border-radius: var(--btn-radius);
   cursor: pointer;
   font-weight: 700;
-  box-shadow: 0 2px 6px var(--shadow);
+  box-shadow: 0 2px 6px var(--shadow-light);
   transition: background 0.2s, transform 0.1s;
 }
 .draft-controls .btn:hover,
 .draft-controls .btn:focus {
   background: var(--uab-green-dark);
 }
-.last-saved {
+.draft-controls span {
   margin-left: auto;
   font-size: 0.9rem;
   color: #555;
@@ -123,33 +127,34 @@ body {
 /* 6. Form Fields */
 .form-card label {
   display: block;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   font-weight: 700;
   color: var(--uab-green-dark);
 }
 .form-card input,
 .form-card select {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
-  border: 1px solid var(--uab-gray-light);
+  padding: 0.75rem;
+  margin-top: 0.25rem;
+  border: 1px solid var(--uab-grey-mid);
   border-radius: 4px;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 .form-card input:focus,
 .form-card select:focus {
-  outline: 2px solid var(--uab-green);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26,86,50,0.2);
 }
 .error-message {
   color: #c00;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   min-height: 1em;
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 /* 7. Organization Fieldset */
 .org-group {
-  border: 1px solid var(--uab-gray-light);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: 4px;
   padding: 1rem;
   margin-top: 1rem;
@@ -164,20 +169,22 @@ body {
 .btn-more-options {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-top: 1rem;
   height: var(--btn-height);
   padding: var(--btn-padding);
-  background: var(--uab-green);
-  color: #fff;
-  border: none;
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: var(--btn-radius);
   cursor: pointer;
+  font-weight: 700;
   transition: background 0.2s, transform 0.1s;
 }
 .btn-more-options:hover,
 .btn-more-options:focus {
-  background: var(--uab-green-dark);
+  background: var(--uab-grey-dark);
 }
 .more-options {
   overflow: hidden;
@@ -187,11 +194,12 @@ body {
   max-height: 0;
 }
 
-/* 9. Split-Tone Button Base */
+/* 9. Base Button Style */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   height: var(--btn-height);
   padding: var(--btn-padding);
   background: var(--uab-green);
@@ -199,6 +207,7 @@ body {
   border: none;
   border-radius: var(--btn-radius);
   cursor: pointer;
+  font-weight: 700;
   white-space: nowrap;
   transition: background 0.2s, transform 0.1s;
 }
@@ -212,30 +221,34 @@ body {
   height: 1.2rem;
 }
 
-/* 10. Primary Actions */
-.btn-copy,
-.btn-download {
-  margin-top: 1rem;
+/* 10. Primary Actions Row */
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* 11. More Actions Toggle & Panel */
 .btn-toggle-actions {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-top: 1rem;
   height: var(--btn-height);
   padding: var(--btn-padding);
-  background: var(--uab-green);
-  color: #fff;
-  border: none;
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: var(--btn-radius);
   cursor: pointer;
+  font-weight: 700;
   transition: background 0.2s, transform 0.1s;
 }
 .btn-toggle-actions:hover,
 .btn-toggle-actions:focus {
-  background: var(--uab-green-dark);
+  background: var(--uab-grey-dark);
 }
 .extra-actions {
   overflow: hidden;
@@ -244,7 +257,7 @@ body {
 .extra-actions.collapsed {
   max-height: 0;
 }
-/* layout two columns */
+/* grid of two columns */
 .extra-actions {
   display: grid;
   grid-template-columns: repeat(2, max-content);
@@ -270,17 +283,22 @@ body {
   flex-direction: column;
 }
 .preview-title {
-  font-size: 1.2rem;
-  font-weight: 700;
+  display: inline-block;
+  background: rgba(26,86,50,0.1);
   color: var(--uab-green-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
   margin-bottom: 0.5rem;
 }
 .preview-frame {
   background: #fff;
-  border: 1px solid var(--uab-gray-light);
+  border: 1px solid var(--uab-grey-mid);
   border-radius: 4px;
   padding: 1rem;
-  box-shadow: 0 2px 6px var(--shadow);
+  box-shadow: 0 2px 6px var(--shadow-light);
   min-height: 6rem;
   position: relative;
 }
@@ -296,15 +314,18 @@ body {
   border-radius: 2px;
 }
 
-/* 13. Instructions */
+/* 13. Instructions Panel */
 .instructions {
   margin-top: 1.5rem;
-  color: #555;
+  background: #E6F4EE;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  color: #333;
   font-size: 0.9rem;
 }
 .instructions h3 {
-  font-weight: 700;
   color: var(--uab-green-dark);
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
@@ -312,27 +333,26 @@ body {
 .footer-card {
   max-width: 1000px;
   margin: 2rem auto 1rem;
-  background: #eee;
-  padding: 1rem 1.5rem;
+  background: #fff;
+  border: 1px solid var(--uab-grey-mid);
   border-radius: 4px;
+  padding: 1rem 1.5rem;
   text-align: center;
   font-size: 0.9rem;
 }
 
-/* 15. Spinner */
+/* 15. Spinner (for download) */
 .spinner {
   display: none;
   width: 1rem;
   height: 1rem;
   border: 2px solid #ccc;
-  border-top-color: var(--uab-green-dark);
+  border-top-color: #16482F;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   margin-right: 0.5rem;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 .btn.loading .spinner {
   display: inline-block;
 }
@@ -360,7 +380,7 @@ body {
   text-align: center;
 }
 
-/* 17. Onboarding Tour */
+/* 17. Onboarding Tour (if used) */
 .tour-overlay {
   position: fixed;
   inset: 0;
