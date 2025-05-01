@@ -38,8 +38,6 @@ function clearAllPersistence() {
 
 function buildDeepLink() {
   const params = new URLSearchParams();
-
-  // Core text fields
   [
     'name','credentials','title',
     'department','school','division',
@@ -50,20 +48,17 @@ function buildDeepLink() {
     if (fld && fld.value) params.set(id, fld.value);
   });
 
-  // Phone checkboxes & numbers
   const officeEnabled = el('phone-office-enable').checked;
   params.set('phoneOfficeEnabled', officeEnabled);
   if (officeEnabled) {
     params.set('phoneOfficeNumber', el('phone-office').value.trim());
   }
-
   const mobileEnabled = el('phone-mobile-enable').checked;
   params.set('phoneMobileEnabled', mobileEnabled);
   if (mobileEnabled) {
     params.set('phoneMobileNumber', el('phone-mobile').value.trim());
   }
 
-  // Version
   params.set('version',
     el('btn-standard').classList.contains('active') ? 'standard' : 'abbr'
   );
@@ -73,8 +68,6 @@ function buildDeepLink() {
 
 function restoreFromQuery() {
   const params = new URLSearchParams(location.search);
-
-  // Core text fields
   [
     'name','credentials','title',
     'department','school','division',
@@ -84,20 +77,17 @@ function restoreFromQuery() {
     if (params.has(id)) el(id).value = params.get(id);
   });
 
-  // Phone: restore enabled + number
   const officeEnabled = params.get('phoneOfficeEnabled') === 'true';
   el('phone-office-enable').checked = officeEnabled;
   if (officeEnabled && params.has('phoneOfficeNumber')) {
     el('phone-office').value = params.get('phoneOfficeNumber');
   }
-
   const mobileEnabled = params.get('phoneMobileEnabled') === 'true';
   el('phone-mobile-enable').checked = mobileEnabled;
   if (mobileEnabled && params.has('phoneMobileNumber')) {
     el('phone-mobile').value = params.get('phoneMobileNumber');
   }
 
-  // Version toggle
   if (params.get('version') === 'abbr') {
     el('btn-standard').classList.remove('active');
     el('btn-abbreviated').classList.add('active');
@@ -120,7 +110,6 @@ function decodedHTML() {
 async function generateRTFContent() {
   const raw = decodedHTML();
   const lines = raw.split('<br>').map(l => l.trim()).filter(Boolean);
-
   const p1 = '\\line ';
   const body = lines.slice(0,-1).map(line =>
     line
@@ -140,8 +129,7 @@ async function generateRTFContent() {
     '{\\rtf1\\ansi\\deff0',
     '{\\colortbl ;\\red26\\green86\\blue50;}',
     '{\\fonttbl{\\f0 Arial;}}',
-    '\\fs24',
-    p1, p2, p3,
+    '\\fs24', p1, p2, p3,
     '}'
   ].join('\n');
 }
@@ -165,7 +153,6 @@ async function copyToClipboard() {
   const tmp = document.createElement('div');
   tmp.innerHTML = decodedHTML();
   document.body.appendChild(tmp);
-
   try {
     await navigator.clipboard.write([
       new ClipboardItem({
@@ -182,7 +169,6 @@ async function copyToClipboard() {
     document.execCommand('copy');
     sel.removeAllRanges();
   }
-
   document.body.removeChild(tmp);
   giveFeedback(btn);
 }
@@ -195,52 +181,43 @@ function copyHTML() {
 }
 
 async function downloadRTF() {
-  const btn = el('download-button');
-  giveFeedback(btn);
+  const btn = el('download-button'); giveFeedback(btn);
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/rtf' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
     a.download = 'signature.rtf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(a.href);
   } catch {
     alert('RTF download failed.');
   }
 }
 
 async function downloadOFTTemplate() {
-  const btn = el('download-oft-button');
-  giveFeedback(btn);
+  const btn = el('download-oft-button'); giveFeedback(btn);
   try {
     const rtf = await generateRTFContent();
     const blob = new Blob([rtf], { type: 'application/vnd.ms-outlook' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
     a.download = 'signature.oft';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(a.href);
   } catch {
     alert('OFT download failed.');
   }
 }
 
 function downloadHTMLTemplate() {
-  const btn = el('download-html-button');
-  giveFeedback(btn);
+  const btn = el('download-html-button'); giveFeedback(btn);
   const blob = new Blob([generateHTMLSignature()], { type: 'text/html' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = 'signature.html';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(a.href);
 }
 
 let html2canvasPromise = null;
@@ -258,19 +235,16 @@ function loadHtml2canvas() {
 }
 
 async function downloadPNG() {
-  const btn = el('download-png-button');
-  giveFeedback(btn);
+  const btn = el('download-png-button'); giveFeedback(btn);
   try {
     const html2canvas = await loadHtml2canvas();
     const canvas = await html2canvas(el('signature-preview'), { backgroundColor: null });
     canvas.toBlob(blob => {
       const a = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
+      a.href = URL.createObjectURL(blob);
       a.download = 'signature.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);  
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(a.href);
     });
   } catch {
     alert('PNG download failed.');
@@ -281,11 +255,10 @@ async function downloadPNG() {
 
 function showQRCode() {
   const qrModal = el('qr-modal');
-  const img     = qrModal.querySelector('img');
+  const img = qrModal.querySelector('img');
   img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
   qrModal.classList.add('active');
 }
-
 function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
@@ -298,23 +271,25 @@ async function lookupWebsite() {
     alert('Please enter a Division name first.');
     return;
   }
-
-  // Build exact-match query
-  const quoted   = `"${division}"`;
-  const queryStr = `${quoted} site:uab.edu`;
+  // Replace & with "and", prepend "Home"
+  const divAnd = division.replace(/&/g, 'and');
+  const queryStr = `Home "${divAnd}" site:uab.edu`;
   const ddgSearch = `https://duckduckgo.com/html/?q=${encodeURIComponent(queryStr)}`;
 
   try {
-    // Use AllOrigins to bypass CORS
     const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(ddgSearch);
-    const html     = await fetch(proxyUrl).then(r => {
+    const html = await fetch(proxyUrl).then(r => {
       if (!r.ok) throw new Error('Network response was not ok');
       return r.text();
     });
 
-    // Parse first result
-    const doc  = new DOMParser().parseFromString(html, 'text/html');
-    const link = doc.querySelector('a.result__a')?.href;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    let link = doc.querySelector('a.result__a')?.href;
+    if (link && link.includes('/l/?uddg=')) {
+      const u = new URL(link);
+      const uddg = u.searchParams.get('uddg');
+      if (uddg) link = decodeURIComponent(uddg);
+    }
 
     if (link) {
       el('website').value = link;
@@ -355,19 +330,19 @@ function updateSignaturePreview() {
     'email','pronouns','website'
   ].forEach(id => persist(id, (el(id)?.value || '').trim()));
 
-  const name      = el('name').value.trim() || 'John Doe';
-  const creds     = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
-  const title     = el('title').value.trim() || 'Program Director II';
-  const dept      = el('department').value.trim() || 'Department of Medicine';
-  const school    = el('school').value.trim() || 'Heersink School of Medicine';
-  const division  = el('division').value.trim() || 'Division of General Internal Medicine & Population Science';
-  const room      = el('room').value.trim() || 'MT634';
-  const street    = el('street').value.trim() || '1717 11th Avenue South';
-  const cityState = el('city-state').value.trim() || 'Birmingham, AL';
-  const zip       = el('zip').value.trim() || '35294-4410';
-  const email     = el('email').value.trim() || 'you@uabmc.edu';
-  const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
-  const website   = el('website').value.trim() ? `<br><a href="${el('website').value.trim()}" target="_blank">${el('website').value.trim()}</a>` : '';
+  const name     = el('name').value.trim() || 'John Doe';
+  const creds    = el('credentials').value.trim() ? `, ${el('credentials').value.trim()}` : '';
+  const title    = el('title').value.trim() || 'Program Director II';
+  const dept     = el('department').value.trim() || 'Department of Medicine';
+  const school   = el('school').value.trim() || 'Heersink School of Medicine';
+  const division = el('division').value.trim() || 'Division of General Internal Medicine and Population Science';
+  const room     = el('room').value.trim() || 'MT634';
+  const street   = el('street').value.trim() || '1717 11th Avenue South';
+  const citySt   = el('city-state').value.trim() || 'Birmingham, AL';
+  const zip      = el('zip').value.trim() || '35294-4410';
+  const email    = el('email').value.trim() || 'you@uabmc.edu';
+  const pronouns = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
+  const website  = el('website').value.trim() ? `<br><a href="${el('website').value.trim()}" target="_blank">${el('website').value.trim()}</a>` : '';
 
   const phones = [];
   if (el('phone-office-enable').checked)
@@ -383,7 +358,7 @@ function updateSignaturePreview() {
   if (isStd) {
     html += `${dept} | ${school}<br>${division}<br>`;
     html += `UAB | The University of Alabama at Birmingham<br>`;
-    html += `${room} | ${street} | ${cityState} ${zip}<br>`;
+    html += `${room} | ${street} | ${citySt} ${zip}<br>`;
   } else {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
@@ -398,23 +373,15 @@ function updateSignaturePreview() {
 // ------------ Init on DOMContentLoaded ------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Feather icons
-  if (window.feather) {
-    feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
-  }
+  if (window.feather) feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
 
-  // 1) Restore from localStorage (draft)
   [
-    'name','credentials','title',
-    'department','school','division',
-    'room','street','city-state','zip',
-    'email','pronouns','website'
+    'name','credentials','title','department','school','division',
+    'room','street','city-state','zip','email','pronouns','website'
   ].forEach(restore);
 
-  // 2) Override via URL deep-link
   restoreFromQuery();
 
-  // Inject QR modal and set up events
   document.body.insertAdjacentHTML('beforeend', `
     <div id="qr-modal" class="qr-modal" role="dialog" aria-modal="true">
       <div class="qr-content">
@@ -425,32 +392,26 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
   `);
-  const qrModal   = el('qr-modal');
+  const qrModal = el('qr-modal');
   const qrContent = qrModal.querySelector('.qr-content');
   qrModal.addEventListener('click', hideQRCode);
   qrContent.addEventListener('click', e => e.stopPropagation());
 
-  // Initial render
   updateSignaturePreview();
 
-  // Input listeners
   const deb = debounce(updateSignaturePreview);
   [
     'name','credentials','title','department','school','division',
     'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => {
     const f = el(id);
-    if (f) f.addEventListener('input', () => {
-      validateField(f);
-      deb();
-    });
+    if (f) f.addEventListener('input', () => { validateField(f); deb(); });
   });
 
-  // Phone toggles
-  ['phone-office-enable','phone-mobile-enable']
-    .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
+  ['phone-office-enable','phone-mobile-enable'].forEach(id =>
+    el(id)?.addEventListener('change', updateSignaturePreview)
+  );
 
-  // Version toggles
   el('btn-standard').addEventListener('click', () => {
     el('btn-standard').classList.add('active');
     el('btn-abbreviated').classList.remove('active');
@@ -462,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSignaturePreview();
   });
 
-  // Draft controls
   saveDraftBtn.addEventListener('click', () => {
     [
       'name','credentials','title','department','school','division',
@@ -475,35 +435,28 @@ document.addEventListener('DOMContentLoaded', () => {
     lastSavedEl.textContent = 'Last saved: never';
   });
 
-  // More options toggle
   el('more-options-toggle').addEventListener('click', () => {
     const panel = el('more-options');
-    const btn   = el('more-options-toggle');
+    const btn = el('more-options-toggle');
     const collapsed = panel.classList.toggle('collapsed');
-    const ico = btn.querySelector('i[data-feather]');
-    ico.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
+    btn.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
 
-  // Website lookup button
   el('lookup-website').addEventListener('click', lookupWebsite);
 
-  // Primary actions
   el('copy-button').addEventListener('click', copyToClipboard);
   el('download-button').addEventListener('click', downloadRTF);
 
-  // More actions toggle
   const moreToggle = el('toggle-actions');
   const extraPanel = el('extra-actions');
   extraPanel.classList.add('collapsed');
   moreToggle.addEventListener('click', () => {
     const collapsed = extraPanel.classList.toggle('collapsed');
-    const ico = moreToggle.querySelector('i[data-feather]');
-    ico.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
+    moreToggle.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
 
-  // Secondary actions
   el('copy-html-button').addEventListener('click', copyHTML);
   el('download-png-button').addEventListener('click', downloadPNG);
   el('download-html-button').addEventListener('click', downloadHTMLTemplate);
