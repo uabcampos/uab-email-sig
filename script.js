@@ -75,6 +75,15 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
+// Generate HTML signature
+function generateHTMLSignature() {
+  const sig = el('signature-preview').innerHTML;
+  return `<!DOCTYPE html>
+<html><body style="font-family:Arial, sans-serif; font-size:12px;">
+${sig}
+</body></html>`;
+}
+
 // Give feedback on copy
 function giveFeedback(btn) {
   btn.classList.add('feedback');
@@ -139,6 +148,39 @@ async function downloadRTF() {
   btn.classList.remove('loading');
 }
 
+// Download HTML template
+function downloadHTMLTemplate() {
+  const btn = el('download-html-button');
+  btn.classList.add('loading');
+  const blob = new Blob([generateHTMLSignature()], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'signature.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  btn.classList.remove('loading');
+}
+
+// Download OFT template
+async function downloadOFTTemplate() {
+  const btn = el('download-oft-button');
+  btn.classList.add('loading');
+  try {
+    const rtf = await generateRTFContent();
+    const blob = new Blob([rtf], { type: 'application/vnd.ms-outlook' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'signature.oft';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch {
+    alert('OFT download failed.');
+  }
+  btn.classList.remove('loading');
+}
+
 // Lazy-load html2canvas and download PNG
 let html2canvasPromise = null;
 function loadHtml2canvas() {
@@ -174,6 +216,18 @@ async function downloadPNG() {
     alert('PNG download failed.');
   }
   btn.classList.remove('loading');
+}
+
+// Show QR code
+function showQRCode() {
+  const qrModal = el('qr-modal');
+  const img = qrModal.querySelector('img');
+  const data = encodeURIComponent(generateHTMLSignature());
+  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${data}`;
+  qrModal.classList.add('active');
+}
+function hideQRCode() {
+  el('qr-modal').classList.remove('active');
 }
 
 // Reset form
@@ -247,25 +301,9 @@ function toggleVersion(isStandard) {
   updateSignaturePreview();
 }
 
-// Keyboard shortcuts
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey||e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    copyToClipboard();
-  }
-  if ((e.ctrlKey||e.metaKey) && e.key === 'd') {
-    e.preventDefault();
-    downloadRTF();
-  }
-  if (e.key === 'Escape') {
-    e.preventDefault();
-    resetToDefaults();
-  }
-});
-
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore persisted
+  // Restore persisted values
   [
     'name','credentials','title',
     'department','school','division',
@@ -273,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
-  // Debounced preview
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
   // Inline validation and preview binding
@@ -322,12 +359,51 @@ document.addEventListener('DOMContentLoaded', () => {
     moreToggle.textContent = isCollapsed ? 'More options ▼' : 'Less options ▲';
   });
 
-  // Action buttons
-  el('copy-button')?.addEventListener('click', copyToClipboard);
-  el('copy-html-button')?.addEventListener('click', copyHTML);
-  el('download-button')?.addEventListener('click', downloadRTF);
-  el('download-png-button')?.addEventListener('click', downloadPNG);
-  el('reset-button')?.addEventListener('click', resetToDefaults);
+  // Integration buttons injection
+  const actions = el('download-button').parentNode;
+  const htmlBtn = document.createElement('button');
+  htmlBtn.id = 'download-html-button';
+  htmlBtn.className = 'btn btn-download-html';
+  htmlBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download HTML</span>';
+  htmlBtn.addEventListener('click', downloadHTMLTemplate);
+  actions.appendChild(htmlBtn);
+
+  const oftBtn = document.createElement('button');
+  oftBtn.id = 'download-oft-button';
+  oftBtn.className = 'btn btn-download-oft';
+  oftBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download OFT</span>';
+  oftBtn.addEventListener('click', downloadOFTTemplate);
+  actions.appendChild(oftBtn);
+
+  const qrBtn = document.createElement('button');
+  qrBtn.id = 'show-qr-button';
+  qrBtn.className = 'btn btn-qr';
+  qrBtn.textContent = 'Show QR';
+  qrBtn.addEventListener('click', showQRCode);
+  actions.appendChild(qrBtn);
+
+  // Inject QR modal
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="qr-modal" class="qr-modal" onclick="hideQRCode()">
+      <div class="qr-content"><img alt="QR code for signature"/></div>
+    </div>
+  `);
+
+  // Onboarding tour
+  if (!localStorage.getItem('siggen:tourSkipped')) {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="tour-overlay" class="tour-overlay">
+        <div class="tour-step">
+          <p class="tour-text"></p>
+          <div class="tour-controls">
+            <button id="tour-next" class="btn btn-copy">Next</button>
+            <button id="tour-end" class="btn btn-copy">Done</button>
+          </div>
+        </div>
+      </div>
+    `);
+    startTour();
+  }
 
   // Initial render
   toggleVersion(true);
