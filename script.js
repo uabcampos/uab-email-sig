@@ -31,8 +31,6 @@ function restore(id) {
   const v = localStorage.getItem(`siggen:${id}`);
   if (v !== null) el(id).value = v;
 }
-
-// Clear all persisted keys
 function clearAllPersistence() {
   Object.keys(localStorage)
     .filter(k => k.startsWith('siggen:'))
@@ -47,7 +45,7 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Generate RTF content
+// Generate RTF content from HTML preview
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
@@ -84,7 +82,7 @@ function showMsg(id) {
   setTimeout(() => { msg.style.display = 'none'; }, 2000);
 }
 
-// Copy rich HTML+text to clipboard
+// Copy signature (rich HTML + text) to clipboard
 async function copyToClipboard() {
   const html = el('signature-preview').innerHTML;
   const tmp  = document.createElement('div');
@@ -121,7 +119,7 @@ async function copyToClipboard() {
   document.body.removeChild(tmp);
 }
 
-// Copy raw HTML
+// Copy raw HTML to clipboard
 function copyHTML() {
   navigator.clipboard.writeText(el('signature-preview').innerHTML)
     .then(() => showMsg('copy-html-success'))
@@ -228,12 +226,11 @@ function updateSignaturePreview() {
   let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
 
   if (isStd) {
-    html +=
-      `${dept}<br>` +
-      `${school}<br>` +
-      `${division}<br>` +
-      `UAB | The University of Alabama at Birmingham<br>` +
-      `${room} | ${street} | ${cityState} ${zip}<br>`;
+    // department and school on same line now:
+    html += `${dept} | ${school}<br>`;
+    html += `${division}<br>`;
+    html += `UAB | The University of Alabama at Birmingham<br>`;
+    html += `${room} | ${street} | ${cityState} ${zip}<br>`;
   } else {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
@@ -246,7 +243,7 @@ function updateSignaturePreview() {
   el('mobile-preview').innerHTML    = html;
 }
 
-// Toggle version
+// Toggle between versions
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
@@ -271,7 +268,7 @@ document.addEventListener('keydown', e => {
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore persisted values
+  // Restore persisted
   [
     'name','credentials','title',
     'department','school','division',
@@ -279,10 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
-  // Debounced preview
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
-  // Inline validation binding
+  // Bind inline validation & preview
   [
     'name','credentials','title',
     'department','school','division',
