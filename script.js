@@ -270,7 +270,7 @@ async function downloadPNG() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
+      URL.revokeObjectURL(a.href);  
     });
   } catch {
     alert('PNG download failed.');
@@ -293,19 +293,29 @@ function hideQRCode() {
 // ------------ Website Lookup ------------
 
 function lookupWebsite() {
-  const dept     = el('department').value.trim();
-  const school   = el('school').value.trim();
   const division = el('division').value.trim();
+  if (!division) {
+    alert('Please enter a Division name first.');
+    return;
+  }
 
-  // Exact‐match phrases plus site restriction
-  const parts = [];
-  if (dept)     parts.push(`"${dept}"`);
-  if (school)   parts.push(`"${school}"`);
-  if (division) parts.push(`"${division}"`);
-  parts.push('site:uab.edu');
+  // Build exact-match query
+  const quoted = `"${division}"`;
+  let queryStr = quoted;
 
-  const query = encodeURIComponent(parts.join(' '));
-  window.open(`https://duckduckgo.com/?q=${query}`, '_blank');
+  // If "&" present, add OR version with "and"
+  if (division.includes('&')) {
+    const alt = division.replace(/&/g, 'and');
+    queryStr += ` OR "${alt}"`;
+  }
+
+  // Restrict to UAB domain
+  queryStr += ' site:uab.edu';
+
+  window.open(
+    `https://duckduckgo.com/?q=${encodeURIComponent(queryStr)}`,
+    '_blank'
+  );
 }
 
 // ------------ Reset & Preview ------------
