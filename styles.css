@@ -4,15 +4,17 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
 
 :root {
-  --uab-green:        #1A5632;
-  --uab-green-dark:   #004225;
-  --uab-gold:         #FDB913;
-  --uab-gold-dark:    #E0A00E;
-  --uab-gray-light:   #E6E6E6;
-  --uab-bg:           #F5F5F5;
-  --button-height:    3rem;
-  --button-radius:    0.5rem;
-  --font-sans:        'PT Sans', Arial, sans-serif;
+  --uab-green:       #1A5632;
+  --uab-green-dark:  #16482F;
+  --uab-gold:        #FDB913;
+  --uab-gold-dark:   #E0A00E;
+  --uab-gray-light:  #E6E6E6;
+  --uab-bg:          #F5F5F5;
+  --btn-height:      3rem;
+  --btn-radius:      0.5rem;
+  --btn-padding:     0 1.5rem;
+  --shadow:          rgba(0,0,0,0.05);
+  --font-sans:       'PT Sans', Arial, sans-serif;
 }
 
 * {
@@ -47,21 +49,21 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  height: var(--button-height);
-  padding: 0 1rem;
-  font-weight: 700;
-  border: none;
-  border-radius: var(--button-radius);
-  background: #000;
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  background: var(--uab-green);
   color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s, transform 0.1s;
 }
-.version-button:not(.active):hover {
-  opacity: 0.8;
+.version-selection .version-button:hover,
+.version-selection .version-button:focus {
+  background: var(--uab-green-dark);
 }
-.version-button.active {
-  background: #222;
+.version-selection .version-button.active {
+  box-shadow: 0 2px 6px var(--shadow);
 }
 
 /* 3. Layout & Container */
@@ -83,7 +85,7 @@ body {
   background: #fff;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 /* 5. Draft Controls */
@@ -97,18 +99,20 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #eee;
-  color: #333;
-  padding: 0 1rem;
-  height: var(--button-height);
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  background: var(--uab-green);
+  color: #fff;
   border: none;
-  border-radius: var(--button-radius);
+  border-radius: var(--btn-radius);
   cursor: pointer;
   font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px var(--shadow);
+  transition: background 0.2s, transform 0.1s;
 }
-.draft-controls .btn:hover {
-  background: var(--uab-gray-light);
+.draft-controls .btn:hover,
+.draft-controls .btn:focus {
+  background: var(--uab-green-dark);
 }
 .last-saved {
   margin-left: auto;
@@ -134,8 +138,7 @@ body {
 }
 .form-card input:focus,
 .form-card select:focus {
-  border-color: var(--uab-green);
-  outline: none;
+  outline: 2px solid var(--uab-green);
 }
 .error-message {
   color: #c00;
@@ -157,22 +160,24 @@ body {
   padding: 0 0.5rem;
 }
 
-/* 8. More Options Panel */
+/* 8. More Options Toggle & Panel */
 .btn-more-options {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
-  padding: 0 1rem;
-  height: var(--button-height);
-  background: #fff;
-  border: 1px solid var(--uab-gray-light);
-  border-radius: var(--button-radius);
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  background: var(--uab-green);
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: background 0.2s, transform 0.1s;
 }
-.btn-more-options:hover {
-  opacity: 0.8;
+.btn-more-options:hover,
+.btn-more-options:focus {
+  background: var(--uab-green-dark);
 }
 .more-options {
   overflow: hidden;
@@ -181,77 +186,73 @@ body {
 .more-options.collapsed {
   max-height: 0;
 }
-.more-options label {
-  margin-top: 1rem;
-  display: block;
-}
-.more-options input[type="text"] {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
-  border: 1px solid var(--uab-gray-light);
-  border-radius: 4px;
-}
 
-/* 9. Inline Validation */
-label.valid::after {
-  content: '✓';
-  color: var(--uab-green);
-  margin-left: 0.5rem;
-  animation: fadeInCheck 0.3s ease;
-}
-@keyframes fadeInCheck {
-  from { opacity: 0; transform: translateX(-5px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-input.invalid {
-  border-color: #c00 !important;
-}
-input.valid {
-  border-color: var(--uab-green) !important;
-}
-
-/* 10. Split-Tone Button Base */
+/* 9. Split-Tone Button Base */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
-  height: var(--button-height);
-  font-weight: 700;
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  background: var(--uab-green);
   color: #fff;
   border: none;
-  border-radius: var(--button-radius);
+  border-radius: var(--btn-radius);
   cursor: pointer;
   white-space: nowrap;
-  transition: transform 0.1s;
+  transition: background 0.2s, transform 0.1s;
 }
-.btn:hover {
-  transform: translateY(-2px);
+.btn:hover,
+.btn:focus {
+  background: var(--uab-green-dark);
 }
 .btn svg {
+  fill: #fff;
   width: 1.2rem;
   height: 1.2rem;
-  flex-shrink: 0;
 }
 
-/* 11. Primary Actions */
-.btn-copy {
-  background: linear-gradient(to right, var(--uab-green) 70%, var(--uab-green-dark) 70%);
-}
+/* 10. Primary Actions */
+.btn-copy,
 .btn-download {
-  background: linear-gradient(to right, var(--uab-gold) 70%, var(--uab-gold-dark) 70%);
+  margin-top: 1rem;
 }
 
-/* 12. Secondary Variants */
-.btn-copy-html    { background: linear-gradient( to right, #666 70%, #444 70% ); }
-.btn-download-png  { background: linear-gradient( to right, #2196F3 70%, #1976D2 70% ); }
-.btn-download-html { background: linear-gradient( to right, #888 70%, #666 70% ); }
-.btn-download-oft  { background: linear-gradient( to right, #888 70%, #666 70% ); }
-.btn-qr            { background: linear-gradient( to right, var(--uab-green) 70%, var(--uab-green-dark) 70% ); }
-.btn-reset         { background: linear-gradient( to right, #ccc 70%, #aaa 70% ); }
+/* 11. More Actions Toggle & Panel */
+.btn-toggle-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  background: var(--uab-green);
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-toggle-actions:hover,
+.btn-toggle-actions:focus {
+  background: var(--uab-green-dark);
+}
+.extra-actions {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.extra-actions.collapsed {
+  max-height: 0;
+}
+/* layout two columns */
+.extra-actions {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 1rem;
+  margin-top: 1rem;
+}
 
-/* 13. Preview Section */
+/* 12. Preview Section */
 .preview-split {
   display: flex;
   gap: 1rem;
@@ -261,16 +262,12 @@ input.valid {
 @media (max-width: 768px) {
   .preview-split {
     display: block;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
   }
 }
 .preview-item {
+  flex: 1 1 45%;
   display: flex;
   flex-direction: column;
-  flex: 1 1 45%;
-  min-width: 200px;
 }
 .preview-title {
   font-size: 1.2rem;
@@ -283,7 +280,7 @@ input.valid {
   border: 1px solid var(--uab-gray-light);
   border-radius: 4px;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px var(--shadow);
   min-height: 6rem;
   position: relative;
 }
@@ -299,23 +296,7 @@ input.valid {
   border-radius: 2px;
 }
 
-/* 14. Action Panels */
-/* Primary row */
-.button-container {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-top: 1.5rem;
-}
-/* More actions: grid of 2 columns */
-.extra-actions {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* 15. Instructions & Footer */
+/* 13. Instructions */
 .instructions {
   margin-top: 1.5rem;
   color: #555;
@@ -326,6 +307,8 @@ input.valid {
   color: var(--uab-green-dark);
   margin-bottom: 0.5rem;
 }
+
+/* 14. Footer */
 .footer-card {
   max-width: 1000px;
   margin: 2rem auto 1rem;
@@ -336,7 +319,7 @@ input.valid {
   font-size: 0.9rem;
 }
 
-/* 16. Spinner for downloads */
+/* 15. Spinner */
 .spinner {
   display: none;
   width: 1rem;
@@ -358,7 +341,7 @@ input.valid {
   display: none;
 }
 
-/* 17. QR Modal */
+/* 16. QR Modal */
 .qr-modal {
   display: none;
   position: fixed;
@@ -377,7 +360,7 @@ input.valid {
   text-align: center;
 }
 
-/* 18. Onboarding Tour (if implemented) */
+/* 17. Onboarding Tour */
 .tour-overlay {
   position: fixed;
   inset: 0;
