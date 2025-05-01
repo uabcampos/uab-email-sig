@@ -25,41 +25,19 @@ body {
   font-family: var(--font-sans);
   color: #333;
   line-height: 1.5;
-  padding: 0;
+  padding: 1rem;
 }
 
 /*———————————————————————————————
-  2. Global Header Bar
-———————————————————————————————*/
-.site-header {
-  background: var(--uab-dark-green);
-  color: #fff;
-  padding: 0.75rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.9rem;
-}
-
-.site-header a {
-  color: #fff;
-  text-decoration: none;
-}
-
-.site-header a:hover {
-  text-decoration: underline;
-}
-
-/*———————————————————————————————
-  3. Page Title & Version Toggle
+  2. Page Title & Version Toggle
 ———————————————————————————————*/
 .page-title {
-  padding: 2rem;
+  background: #fff;
+  padding: 1.5rem 2rem;
   border-bottom: 4px solid var(--uab-gold);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
 }
 
 .page-title h1 {
@@ -68,11 +46,7 @@ body {
   font-weight: 700;
 }
 
-.version-selection {
-  text-align: right;
-}
-
-.version-button {
+.version-selection .version-button {
   font-family: var(--font-sans);
   font-weight: 700;
   border: 2px solid var(--uab-dark-green);
@@ -96,7 +70,7 @@ body {
 }
 
 /*———————————————————————————————
-  4. Layout & Container
+  3. Layout & Container
 ———————————————————————————————*/
 .container {
   display: grid;
@@ -114,7 +88,7 @@ body {
 }
 
 /*———————————————————————————————
-  5. Card Component
+  4. Card Component
 ———————————————————————————————*/
 .card {
   background: #fff;
@@ -124,7 +98,7 @@ body {
 }
 
 /*———————————————————————————————
-  6. Form Card (Left Column)
+  5. Form Card (Left Column)
 ———————————————————————————————*/
 .form-card label {
   display: block;
@@ -163,71 +137,100 @@ body {
   min-height: 1.2em;
 }
 
+/* highlight invalid inputs */
+input.invalid {
+  border-color: #C00 !important;
+  box-shadow: 0 0 0 2px rgba(255,0,0,0.2);
+}
+
 /*———————————————————————————————
-  7. Preview Card (Right Column)
+  6. Preview Card (Right Column)
 ———————————————————————————————*/
 .preview-card h2 {
   margin-bottom: 0.75rem;
   color: var(--uab-light-green);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 #preview-wrapper {
   background: #fff;
-  color: var(--uab-light-green);
   border: 1px solid var(--uab-gray-light);
   border-radius: 4px;
   padding: 1rem;
   min-height: 240px;
   overflow: auto;
-}
-
-/* Copy & Download Buttons */
-.button-container {
-  margin-top: 1rem;
-}
-
-.button-container button {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-}
-
-#copy-button {
-  background: var(--uab-light-green);
-  color: #fff;
-  margin-right: 1rem;
-}
-
-#copy-button:hover {
-  background: var(--uab-dark-green);
-}
-
-#download-button {
-  background: var(--uab-gold);
-  color: var(--uab-dark-green);
-}
-
-#download-button:hover {
-  opacity: 0.9;
-}
-
-#copy-success {
-  display: none;
-  margin-left: 0.5rem;
   color: var(--uab-light-green);
-  font-weight: 700;
-  font-size: 0.9rem;
 }
 
 /*———————————————————————————————
-  8. Instructions & Footer Card
+  7. Buttons
+———————————————————————————————*/
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Green Copy button */
+.btn-copy {
+  background: var(--uab-light-green);
+  color: #fff;
+}
+.btn-copy:hover {
+  background: var(--uab-dark-green);
+}
+
+/* Gray Copy HTML button */
+.btn-copy-html {
+  background: #eee;
+  color: #333;
+}
+.btn-copy-html:hover {
+  background: var(--uab-gray-light);
+}
+
+/* Gold Download button */
+.btn-download {
+  background: var(--uab-gold);
+  color: var(--uab-dark-green);
+}
+.btn-download:hover {
+  background: #f1b600;
+}
+
+/* Light Reset button */
+.btn-reset {
+  background: #eee;
+  color: #333;
+}
+.btn-reset:hover {
+  background: var(--uab-gray-light);
+}
+
+/*———————————————————————————————
+  8. Success Messages
+———————————————————————————————*/
+.copy-msg {
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  color: var(--uab-light-green);
+  font-weight: bold;
+}
+
+/*———————————————————————————————
+  9. Instructions & Footer Card
 ———————————————————————————————*/
 .instructions {
   margin-top: 2rem;
@@ -242,24 +245,12 @@ body {
 }
 
 .footer-card {
-  grid-column: 1 / -1;
+  max-width: 1200px;
+  margin: 2rem auto;
   background: var(--uab-gray-light);
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 1rem;
-  margin-top: 1.5rem;
+  padding: 1rem 2rem;
   font-size: 0.85rem;
   color: #333;
-}
-
-.version-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #666;
-}
-
-/* highlight invalid inputs */
-input.invalid {
-  border-color: #C00 !important;
-  box-shadow: 0 0 0 2px rgba(255,0,0,0.2);
 }
