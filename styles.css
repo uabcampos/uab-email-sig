@@ -404,3 +404,18 @@ body {
 .tour-controls button {
   margin: 0.5rem;
 }
+
+/* Override draft-control buttons to be grey like secondary version toggle */
+.draft-controls .btn {
+  background: var(--uab-grey-light);
+  color: var(--uab-green-dark);
+  border: 1px solid var(--uab-grey-mid);
+  box-shadow: none;
+}
+.draft-controls .btn svg {
+  fill: var(--uab-green-dark);
+}
+.draft-controls .btn:hover,
+.draft-controls .btn:focus {
+  background: var(--uab-grey-mid);
+}
