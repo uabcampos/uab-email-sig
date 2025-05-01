@@ -115,7 +115,7 @@ body {
   margin-left: auto;
 }
 
-/* 6. Form Card – tighter vertical rhythm */
+/* 6. Form */
 .form-card label {
   display: block;
   margin-top: 0.75rem;
@@ -123,8 +123,7 @@ body {
   font-weight: 700;
   color: var(--uab-dark-green);
 }
-.form-card input[type="text"],
-.form-card input[type="email"],
+.form-card input,
 .form-card select {
   width: 100%;
   padding: 0.5rem;
@@ -139,10 +138,6 @@ body {
   border-color: var(--uab-light-green);
   outline: none;
 }
-.form-card input[type="checkbox"] {
-  margin-right: 0.4rem;
-  transform: scale(1.05);
-}
 .error-message {
   color: #C00;
   font-size: 0.8rem;
@@ -150,7 +145,7 @@ body {
   min-height: 1em;
 }
 
-/* 7. Organization fieldset */
+/* 7. Organization group */
 .org-group {
   border: 1px solid var(--uab-gray-light);
   border-radius: 4px;
@@ -164,28 +159,17 @@ body {
   font-size: 0.95rem;
 }
 
-/* 8. More options collapse */
-.more-options {
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.more-options.collapsed {
-  max-height: 0;
-}
-
-/* 9. Inline validation animations */
-@keyframes fadeInCheck {
-  from { opacity: 0; transform: translateX(-5px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
+/* 8. Inline validation */
 label.valid::after {
   content: '✓';
   color: var(--uab-light-green);
   margin-left: 0.3rem;
   animation: fadeInCheck 0.3s ease;
 }
-
-/* 10. Valid/invalid inputs */
+@keyframes fadeInCheck {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 input.invalid {
   border-color: #C00 !important;
 }
@@ -193,31 +177,33 @@ input.valid {
   border-color: var(--uab-light-green) !important;
 }
 
-/* 11. Preview Titles */
-.preview-card .preview-title {
-  display: block;
-  margin-bottom: 0.75rem;
-  color: var(--uab-dark-green);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-/* 12. Preview Split */
+/* 9. Preview Split & Items */
 .preview-split {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 45%;
+  min-width: 200px;
+}
+.preview-title {
+  margin-bottom: 0.75rem;
+  color: var(--uab-dark-green);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
 .preview-frame {
   background: #fff;
   border: 1px solid var(--uab-gray-light);
   border-radius: 8px;
   padding: 1rem;
-  flex: 1 1 45%;
-  min-width: 200px;
   box-shadow: 0 2px 6px var(--uab-button-shadow);
   position: relative;
+  flex: 1;
 }
 .mobile-frame::before {
   content: '';
@@ -230,13 +216,8 @@ input.valid {
   background: #666;
   border-radius: 2px;
 }
-#mobile-preview {
-  background: #fff;
-  padding: 0.5rem;
-  overflow-wrap: break-word;
-}
 
-/* 13. Buttons – equal height, modern style */
+/* 10. Buttons – equal height, modern style */
 .button-container {
   display: flex;
   gap: 1rem;
@@ -259,7 +240,7 @@ input.valid {
   transform: translateY(-1px);
 }
 
-/* 14. Primary button variants */
+/* 11. Primary button variants */
 .btn-copy {
   background: var(--uab-light-green);
   color: #fff;
@@ -275,7 +256,7 @@ input.valid {
   background: #f1b600;
 }
 
-/* 15. Toggle More Actions */
+/* 12. Toggle More Actions */
 .btn-toggle-actions {
   display: inline-flex;
   align-items: center;
@@ -298,7 +279,7 @@ input.valid {
   fill: currentColor;
 }
 
-/* 16. Extra Actions row */
+/* 13. Extra Actions row */
 .extra-actions {
   display: flex;
   gap: 1rem;
@@ -315,7 +296,7 @@ input.valid {
   height: 3.5rem;
 }
 
-/* 17. Secondary button variants */
+/* 14. Secondary button variants */
 .btn-copy-html    { background: #eee;             color: #333; }
 .btn-copy-html:hover    { background: var(--uab-gray-light); }
 .btn-download-png  { background: #2196F3;          color: #fff; }
@@ -329,7 +310,7 @@ input.valid {
 .btn-reset         { background: #eee;             color: #333; }
 .btn-reset:hover         { background: var(--uab-gray-light); }
 
-/* 18. Spinner & feedback */
+/* 15. Spinner & feedback */
 .spinner {
   display: none;
   width: 16px;
@@ -363,7 +344,7 @@ input.valid {
   display: none;
 }
 
-/* 19. Mobile adjustments */
+/* 16. Mobile adjustments */
 @media (max-width: 768px) {
   .preview-split {
     display: block;
@@ -391,7 +372,7 @@ input.valid {
   }
 }
 
-/* 20. QR Modal */
+/* 17. QR Modal */
 .qr-modal {
   display: none;
   position: fixed;
@@ -410,7 +391,7 @@ input.valid {
   text-align: center;
 }
 
-/* 21. Onboarding Tour */
+/* 18. Onboarding Tour */
 .tour-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -435,7 +416,7 @@ input.valid {
   margin: 0.5rem;
 }
 
-/* 22. Instructions & Footer */
+/* 19. Instructions & Footer */
 .instructions {
   margin-top: 1.5rem;
   font-size: 0.9rem;
