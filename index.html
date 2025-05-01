@@ -22,11 +22,11 @@
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Content Grid -->
   <main class="container">
-    <!-- Form Section -->
+    <!-- LEFT COLUMN: FORM (60%) -->
     <section class="card form-card">
-      <!-- Draft Controls -->
+      <!-- 1. Draft Controls -->
       <div class="draft-controls">
         <button id="save-draft" class="btn">
           <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 5h14v14H5z"/></svg>
@@ -39,10 +39,14 @@
         <span id="last-saved">Last saved: never</span>
       </div>
 
-      <!-- Organization Group -->
+      <!-- 2. Name -->
+      <label for="name">Name</label>
+      <input type="text" id="name" required placeholder="John Doe" />
+      <div id="name-error" class="error-message"></div>
+
+      <!-- 3. Organization Group -->
       <fieldset class="org-group">
         <legend>Organization</legend>
-
         <label for="department">Department</label>
         <input type="text" id="department" required placeholder="Department of Medicine" />
         <div id="department-error" class="error-message"></div>
@@ -56,12 +60,37 @@
         <div id="division-error" class="error-message"></div>
       </fieldset>
 
-      <!-- Name -->
-      <label for="name">Name</label>
-      <input type="text" id="name" required placeholder="John Doe" />
-      <div id="name-error" class="error-message"></div>
+      <!-- 4. Title / Role -->
+      <label for="title">Title / Role</label>
+      <input type="text" id="title" required placeholder="Program Director II" />
+      <div id="title-error" class="error-message"></div>
 
-      <!-- More Options Toggle -->
+      <!-- 5. Room -->
+      <label for="room">Room</label>
+      <input type="text" id="room" required placeholder="MT634" />
+      <div id="room-error" class="error-message"></div>
+
+      <!-- 6. Street Address -->
+      <label for="street">Street Address</label>
+      <input type="text" id="street" required placeholder="1717 11th Avenue South" />
+      <div id="street-error" class="error-message"></div>
+
+      <!-- 7. City, State -->
+      <label for="city-state">City, State</label>
+      <input type="text" id="city-state" required placeholder="Birmingham, AL" />
+      <div id="city-state-error" class="error-message"></div>
+
+      <!-- 8. ZIP Code -->
+      <label for="zip">ZIP Code</label>
+      <input type="text" id="zip" required placeholder="35294-4410" />
+      <div id="zip-error" class="error-message"></div>
+
+      <!-- 9. Email Address -->
+      <label for="email">Email Address</label>
+      <input type="email" id="email" required placeholder="you@uabmc.edu" />
+      <div id="email-error" class="error-message"></div>
+
+      <!-- 10. More Options ▼ -->
       <button id="more-options-toggle" class="btn-more-options">
         <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
         More options
@@ -85,36 +114,21 @@
         </label>
         <input type="text" id="phone-mobile" placeholder="205.555.1234" />
       </div>
+    </section>
 
-      <!-- Title / Role -->
-      <label for="title">Title / Role</label>
-      <input type="text" id="title" required placeholder="Program Director II" />
-      <div id="title-error" class="error-message"></div>
-
-      <!-- Room -->
-      <label for="room">Room</label>
-      <input type="text" id="room" required placeholder="MT634" />
-      <div id="room-error" class="error-message"></div>
-
-      <!-- Street Address -->
-      <label for="street">Street Address</label>
-      <input type="text" id="street" required placeholder="1717 11th Avenue South" />
-      <div id="street-error" class="error-message"></div>
-
-      <!-- City, State -->
-      <label for="city-state">City, State</label>
-      <input type="text" id="city-state" required placeholder="Birmingham, AL" />
-      <div id="city-state-error" class="error-message"></div>
-
-      <!-- ZIP Code -->
-      <label for="zip">ZIP Code</label>
-      <input type="text" id="zip" required placeholder="35294-4410" />
-      <div id="zip-error" class="error-message"></div>
-
-      <!-- Email -->
-      <label for="email">Email Address</label>
-      <input type="email" id="email" required placeholder="you@uabmc.edu" />
-      <div id="email-error" class="error-message"></div>
+    <!-- RIGHT COLUMN: PREVIEWS & ACTIONS (40%) -->
+    <section class="card preview-card">
+      <h2>Signature Previews</h2>
+      <div class="preview-split">
+        <div class="preview-item">
+          <h3 class="preview-title">Desktop Preview</h3>
+          <div class="preview-frame desktop-frame" id="signature-preview"></div>
+        </div>
+        <div class="preview-item">
+          <h3 class="preview-title">Mobile Preview</h3>
+          <div class="preview-frame mobile-frame" id="mobile-preview"></div>
+        </div>
+      </div>
 
       <!-- Primary Action Buttons -->
       <div class="button-container">
@@ -128,8 +142,12 @@
         </button>
       </div>
 
-      <!-- More Actions Panel (starts hidden) -->
-      <div class="button-container extra-actions" id="extra-actions">
+      <!-- More Actions ▼ -->
+      <button id="toggle-actions" class="btn-toggle-actions">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
+        More actions
+      </button>
+      <div id="extra-actions" class="extra-actions">
         <button id="copy-html-button" class="btn btn-copy-html">
           <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4z"/></svg>
           <span>Copy HTML</span>
@@ -155,21 +173,6 @@
           <span>Reset</span>
         </button>
       </div>
-    </section>
-
-    <!-- Preview Section -->
-    <section class="card preview-card">
-      <h2>Signature Previews</h2>
-      <div class="preview-split">
-        <div class="preview-item">
-          <h3 class="preview-title">Desktop Preview</h3>
-          <div class="preview-frame desktop-frame" id="signature-preview"></div>
-        </div>
-        <div class="preview-item">
-          <h3 class="preview-title">Mobile Preview</h3>
-          <div class="preview-frame mobile-frame" id="mobile-preview"></div>
-        </div>
-      </div>
 
       <!-- Instructions -->
       <div class="instructions">
@@ -190,7 +193,6 @@
     </a>.
   </footer>
 
-  <!-- Scripts -->
   <script src="validation.js"></script>
   <script src="script.js"></script>
 </body>
