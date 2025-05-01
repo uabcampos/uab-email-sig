@@ -311,12 +311,12 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
-  // *** Explicit initial preview render ***
+  // Initial preview render
   updateSignaturePreview();
 
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
-  // Inline validation and preview binding
+  // Inline validation & preview binding
   [
     'name','credentials','title',
     'department','school','division',
@@ -364,25 +364,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Integration buttons injection
   const actions = el('download-button').parentNode;
-  // HTML
+
+  // HTML button with SVG
   const htmlBtn = document.createElement('button');
   htmlBtn.id = 'download-html-button';
   htmlBtn.className = 'btn btn-download-html';
-  htmlBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download HTML</span>';
+  htmlBtn.innerHTML = `
+    <span class="spinner"></span>
+    <svg width="16" height="16" viewBox="0 0 16 16">
+      <text x="2" y="12" font-family="monospace" font-size="12" fill="currentColor">&lt;/&gt;</text>
+    </svg>
+    <span class="btn-text">Download HTML</span>`;
   htmlBtn.addEventListener('click', downloadHTMLTemplate);
   actions.appendChild(htmlBtn);
-  // OFT
+
+  // OFT button with SVG
   const oftBtn = document.createElement('button');
   oftBtn.id = 'download-oft-button';
   oftBtn.className = 'btn btn-download-oft';
-  oftBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download OFT</span>';
+  oftBtn.innerHTML = `
+    <span class="spinner"></span>
+    <svg width="16" height="16" viewBox="0 0 16 16">
+      <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" fill="none"/>
+      <polyline points="3,5 8,10 13,5" stroke="currentColor" fill="none"/>
+    </svg>
+    <span class="btn-text">Download OFT</span>`;
   oftBtn.addEventListener('click', downloadOFTTemplate);
   actions.appendChild(oftBtn);
-  // QR
+
+  // QR button with SVG
   const qrBtn = document.createElement('button');
   qrBtn.id = 'show-qr-button';
   qrBtn.className = 'btn btn-qr';
-  qrBtn.textContent = 'Show QR';
+  qrBtn.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 16 16">
+      <rect x="2" y="2" width="4" height="4" fill="currentColor"/>
+      <rect x="10" y="2" width="4" height="4" fill="currentColor"/>
+      <rect x="2" y="10" width="4" height="4" fill="currentColor"/>
+      <rect x="8" y="8" width="2" height="2" fill="currentColor"/>
+      <rect x="12" y="12" width="2" height="2" fill="currentColor"/>
+    </svg>
+    <span class="btn-text">Show QR</span>`;
   qrBtn.addEventListener('click', showQRCode);
   actions.appendChild(qrBtn);
 
@@ -392,6 +414,35 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="qr-content"><img alt="QR code for signature"/></div>
     </div>
   `);
+
+  // Extra actions container
+  const toggleActions = document.createElement('button');
+  toggleActions.id = 'toggle-actions';
+  toggleActions.className = 'btn-toggle-actions';
+  toggleActions.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 16 16">
+      <polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>
+    </svg>
+    More actions`;
+  actions.appendChild(toggleActions);
+
+  const extra = document.createElement('div');
+  extra.id = 'extra-actions';
+  extra.className = 'extra-actions collapsed';
+  ['copy-html-button','download-png-button','download-html-button','download-oft-button','show-qr-button','reset-button']
+    .forEach(id => {
+      const btn = el(id);
+      if (btn) extra.appendChild(btn);
+    });
+  actions.appendChild(extra);
+
+  toggleActions.addEventListener('click', () => {
+    const isCollapsed = extra.classList.toggle('collapsed');
+    toggleActions.querySelector('svg').innerHTML = isCollapsed
+      ? '<polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>'
+      : '<polyline points="4,10 8,6 12,10" stroke="currentColor" fill="none" stroke-width="2"/>';
+    toggleActions.childNodes[1].nodeValue = isCollapsed ? ' More actions' : ' Fewer actions';
+  });
 
   // Onboarding tour
   if (!localStorage.getItem('siggen:tourSkipped')) {
@@ -408,4 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
     `);
     startTour();
   }
+
+  // Final initialization
+  toggleVersion(true);
+  updateSignaturePreview();
 });
