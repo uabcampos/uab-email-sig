@@ -84,7 +84,7 @@ ${sig}
 </body></html>`;
 }
 
-// Give feedback on copy
+// Feedback utility
 function giveFeedback(btn) {
   btn.classList.add('feedback');
   setTimeout(() => btn.classList.remove('feedback'), 2000);
@@ -119,7 +119,7 @@ async function copyToClipboard() {
   giveFeedback(btn);
 }
 
-// Copy HTML
+// Copy raw HTML
 function copyHTML() {
   const btn = el('copy-html-button');
   navigator.clipboard.writeText(el('signature-preview').innerHTML)
@@ -127,7 +127,7 @@ function copyHTML() {
   giveFeedback(btn);
 }
 
-// Download RTF with spinner
+// Download RTF
 async function downloadRTF() {
   const btn = el('download-button');
   btn.classList.add('loading');
@@ -181,7 +181,7 @@ async function downloadOFTTemplate() {
   btn.classList.remove('loading');
 }
 
-// Lazy-load html2canvas and download PNG
+// Download PNG
 let html2canvasPromise = null;
 function loadHtml2canvas() {
   if (!html2canvasPromise) {
@@ -218,7 +218,7 @@ async function downloadPNG() {
   btn.classList.remove('loading');
 }
 
-// Show QR code
+// QR code modal
 function showQRCode() {
   const qrModal = el('qr-modal');
   const img = qrModal.querySelector('img');
@@ -311,6 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     'phone-office','phone-mobile','email','pronouns'
   ].forEach(restore);
 
+  // *** Explicit initial preview render ***
+  updateSignaturePreview();
+
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
   // Inline validation and preview binding
@@ -361,20 +364,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Integration buttons injection
   const actions = el('download-button').parentNode;
+  // HTML
   const htmlBtn = document.createElement('button');
   htmlBtn.id = 'download-html-button';
   htmlBtn.className = 'btn btn-download-html';
   htmlBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download HTML</span>';
   htmlBtn.addEventListener('click', downloadHTMLTemplate);
   actions.appendChild(htmlBtn);
-
+  // OFT
   const oftBtn = document.createElement('button');
   oftBtn.id = 'download-oft-button';
   oftBtn.className = 'btn btn-download-oft';
   oftBtn.innerHTML = '<span class="spinner"></span><span class="btn-text">Download OFT</span>';
   oftBtn.addEventListener('click', downloadOFTTemplate);
   actions.appendChild(oftBtn);
-
+  // QR
   const qrBtn = document.createElement('button');
   qrBtn.id = 'show-qr-button';
   qrBtn.className = 'btn btn-qr';
@@ -404,8 +408,4 @@ document.addEventListener('DOMContentLoaded', () => {
     `);
     startTour();
   }
-
-  // Initial render
-  toggleVersion(true);
-  updateSignaturePreview();
 });
