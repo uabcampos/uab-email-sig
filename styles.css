@@ -216,6 +216,13 @@ input.valid {
   padding: 0.75rem;
   overflow: auto;
 }
+/* Preview titles */
+.preview-card h3.preview-title {
+  margin: 0.5rem 0 0.25rem;
+  color: var(--uab-dark-green);
+  font-size: 1rem;
+  font-weight: 700;
+}
 .desktop-frame {
   flex: 1 1 60%;
   min-width: 250px;
@@ -313,7 +320,7 @@ input.valid {
 .btn-download { background: var(--uab-gold); color: var(--uab-dark-green); }
 .btn-download:hover { background: #f1b600; }
 
-/* Secondary variants (moved into extra-actions) */
+/* Secondary variants */
 .btn-copy-html { background: #eee; color: #333; }
 .btn-copy-html:hover { background: var(--uab-gray-light); }
 .btn-download-png { background: #2196F3; color: #fff; }
@@ -333,7 +340,7 @@ input.valid {
   outline-offset: 2px;
 }
 
-/* 14. Mobile‐first preview carousel & fixed action bar */
+/* 14. Mobile‐first preview carousel & fixed bar */
 @media (max-width: 768px) {
   .preview-split {
     display: block;
@@ -341,10 +348,7 @@ input.valid {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
-  .preview-frame {
-    scroll-snap-align: start;
-    min-width: 100%;
-  }
+  .preview-frame { scroll-snap-align: start; min-width: 100%; }
   .button-container {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -354,9 +358,7 @@ input.valid {
     z-index: 100;
     justify-content: space-around;
   }
-  body {
-    padding-bottom: 4rem;
-  }
+  body { padding-bottom: 4rem; }
 }
 
 /* 15. Extra Actions collapse */
@@ -364,9 +366,7 @@ input.valid {
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
-.extra-actions.collapsed {
-  max-height: 0;
-}
+.extra-actions.collapsed { max-height: 0; }
 .extra-actions:not(.collapsed) {
   max-height: 500px;
   margin-top: 0.5rem;
@@ -382,18 +382,19 @@ input.valid {
 /* 16. More actions toggle */
 .btn-toggle-actions {
   background: transparent;
-  border: none;
+  border: 1px solid var(--uab-gray-light);
   color: var(--uab-dark-green);
   font-size: 0.9rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
   margin-top: 0.5rem;
+  transition: background 0.2s;
 }
-.btn-toggle-actions svg {
-  margin-right: 0.4rem;
-  fill: currentColor;
-}
+.btn-toggle-actions:hover { background: var(--uab-gray-light); }
+.btn-toggle-actions svg { margin-right: 0.4rem; }
 
 /* 17. QR code modal */
 .qr-modal {
@@ -404,9 +405,7 @@ input.valid {
   align-items: center;
   justify-content: center;
 }
-.qr-modal.active {
-  display: flex;
-}
+.qr-modal.active { display: flex; }
 .qr-content {
   background: #fff;
   padding: 1rem;
@@ -427,12 +426,8 @@ input.valid {
   padding:1rem;
 }
 .tour-overlay.active { display:flex; }
-.tour-step {
-  max-width: 320px;
-}
-.tour-controls button {
-  margin: 0.5rem;
-}
+.tour-step { max-width: 320px; }
+.tour-controls button { margin: 0.5rem; }
 
 /* 19. Instructions & Footer */
 .instructions {
