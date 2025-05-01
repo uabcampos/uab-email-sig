@@ -290,9 +290,9 @@ function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
 
-// ------------ Website Lookup ------------
+// ------------ Website Lookup via DuckDuckGo HTML parsing ------------
 
-function lookupWebsite() {
+async function lookupWebsite() {
   const division = el('division').value.trim();
   if (!division) {
     alert('Please enter a Division name first.');
@@ -300,22 +300,31 @@ function lookupWebsite() {
   }
 
   // Build exact-match query
-  const quoted = `"${division}"`;
-  let queryStr = quoted;
+  const quoted   = `"${division}"`;
+  const queryStr = `${quoted} site:uab.edu`;
+  const ddgSearch = `https://duckduckgo.com/html/?q=${encodeURIComponent(queryStr)}`;
 
-  // If "&" present, add OR version with "and"
-  if (division.includes('&')) {
-    const alt = division.replace(/&/g, 'and');
-    queryStr += ` OR "${alt}"`;
+  try {
+    // Use AllOrigins to bypass CORS
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(ddgSearch);
+    const html     = await fetch(proxyUrl).then(r => {
+      if (!r.ok) throw new Error('Network response was not ok');
+      return r.text();
+    });
+
+    // Parse first result
+    const doc  = new DOMParser().parseFromString(html, 'text/html');
+    const link = doc.querySelector('a.result__a')?.href;
+
+    if (link) {
+      el('website').value = link;
+    } else {
+      alert('No site found. Paste one manually.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Lookup failed. Paste URL manually.');
   }
-
-  // Restrict to UAB domain
-  queryStr += ' site:uab.edu';
-
-  window.open(
-    `https://duckduckgo.com/?q=${encodeURIComponent(queryStr)}`,
-    '_blank'
-  );
 }
 
 // ------------ Reset & Preview ------------
