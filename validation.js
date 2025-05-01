@@ -1,61 +1,63 @@
 // validation.js
 
-// Function to validate individual fields
+// Validate individual field on input
 function validateField(field) {
     clearError(field);
 
-    // Required check
     if (field.hasAttribute('required') && !field.value.trim()) {
         displayError(field, 'This field is required.');
-        field.classList.add('invalid');
-        return;
+    } else {
+        switch (field.id) {
+            case 'city-state':
+                validateCityState(field);
+                break;
+            case 'zip':
+                validateZipCode(field);
+                break;
+            case 'email':
+                validateEmail(field);
+                break;
+            case 'phone-office':
+            case 'phone-mobile':
+                validatePhoneNumber(field);
+                break;
+            default:
+                break;
+        }
     }
 
-    // Specific format checks
-    switch (field.id) {
-        case 'city-state':
-            validateCityState(field);
-            break;
-        case 'zip':
-            validateZipCode(field);
-            break;
-        case 'email':
-            validateEmail(field);
-            break;
-        case 'phone-office':
-        case 'phone-mobile':
-            validatePhoneNumber(field);
-            break;
-        default:
-            break;
-    }
-
-    if (!field.classList.contains('invalid')) {
-        field.classList.remove('invalid');
+    // Toggle valid/invalid classes and checkmark on label
+    const label = document.querySelector(`label[for="${field.id}"]`);
+    if (field.classList.contains('invalid')) {
+        field.classList.remove('valid');
+        label && label.classList.remove('valid');
+    } else {
+        field.classList.add('valid');
+        label && label.classList.add('valid');
     }
 }
 
-// Clear previous error
+// Clear error message
 function clearError(field) {
     const err = document.getElementById(`${field.id}-error`);
     if (err) {
-        err.innerText = '';
+        err.textContent = '';
         err.style.display = 'none';
     }
     field.classList.remove('invalid');
 }
 
-// Display error
+// Display error message
 function displayError(field, msg) {
     const err = document.getElementById(`${field.id}-error`);
     if (err) {
-        err.innerText = msg;
+        err.textContent = msg;
         err.style.display = 'block';
     }
     field.classList.add('invalid');
 }
 
-// City, State format: "City, ST"
+// City, State validation
 function validateCityState(field) {
     const re = /^[A-Za-z\s]+,\s*[A-Z]{2}$/;
     if (!re.test(field.value.trim())) {
@@ -63,7 +65,7 @@ function validateCityState(field) {
     }
 }
 
-// ZIP: 5 or 5-4
+// ZIP code validation
 function validateZipCode(field) {
     const re = /^\d{5}(-\d{4})?$/;
     if (!re.test(field.value.trim())) {
@@ -71,7 +73,7 @@ function validateZipCode(field) {
     }
 }
 
-// Email: uab.edu or uabmc.edu
+// Email validation
 function validateEmail(field) {
     const re = /^[A-Za-z0-9._%+-]+@(uab\.edu|uabmc\.edu)$/;
     if (!re.test(field.value.trim())) {
@@ -79,15 +81,18 @@ function validateEmail(field) {
     }
 }
 
-// Phone: 7 or 10 digits
+// Phone number validation
 function validatePhoneNumber(field) {
     const digits = field.value.replace(/\D/g, '');
-    if (!(/^\d{7}$/.test(digits) || /^\d{10}$/.test(digits))) {
+    if (!(digits.length === 7 || digits.length === 10)) {
         displayError(field, 'Enter a valid 7 or 10 digit phone number.');
     }
 }
 
-// Validate all required on load
+// Validate all required fields (on load)
 function validateAllRequiredFields() {
     document.querySelectorAll('[required]').forEach(f => validateField(f));
 }
+
+// Expose for script.js
+window.validateField = validateField;
