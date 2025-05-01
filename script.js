@@ -44,7 +44,7 @@ function buildDeepLink() {
     'name','credentials','title',
     'department','school','division',
     'room','street','city-state','zip',
-    'email','pronouns'
+    'email','pronouns','website'
   ].forEach(id => {
     const fld = el(id);
     if (fld && fld.value) params.set(id, fld.value);
@@ -79,7 +79,7 @@ function restoreFromQuery() {
     'name','credentials','title',
     'department','school','division',
     'room','street','city-state','zip',
-    'email','pronouns'
+    'email','pronouns','website'
   ].forEach(id => {
     if (params.has(id)) el(id).value = params.get(id);
   });
@@ -290,6 +290,31 @@ function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
 
+// ------------ Website Lookup ------------
+
+async function lookupWebsite() {
+  const dept     = el('department').value.trim();
+  const school   = el('school').value.trim();
+  const division = el('division').value.trim();
+  const query    = `${dept} ${school} ${division} site:uab.edu`;
+
+  try {
+    const resp = await fetch(
+      `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`
+    );
+    const data = await resp.json();
+    const url = data.AbstractURL || data.RelatedTopics[0]?.FirstURL || '';
+    if (url) {
+      el('website').value = url;
+    } else {
+      alert('No site found. Please enter a URL manually.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Lookup failed. Check your connection.');
+  }
+}
+
 // ------------ Reset & Preview ------------
 
 function resetToDefaults() {
@@ -298,7 +323,7 @@ function resetToDefaults() {
     'name','credentials','title',
     'department','school','division',
     'room','street','city-state','zip',
-    'email','pronouns'
+    'email','pronouns','website'
   ].forEach(id => {
     const fld = el(id);
     if (fld) fld.value = '';
@@ -315,7 +340,7 @@ function updateSignaturePreview() {
     'name','credentials','title',
     'department','school','division',
     'room','street','city-state','zip',
-    'email','pronouns'
+    'email','pronouns','website'
   ].forEach(id => persist(id, (el(id)?.value || '').trim()));
 
   const name      = el('name').value.trim() || 'John Doe';
@@ -330,6 +355,7 @@ function updateSignaturePreview() {
   const zip       = el('zip').value.trim() || '35294-4410';
   const email     = el('email').value.trim() || 'you@uabmc.edu';
   const pronouns  = el('pronouns').value.trim() ? `<br>Pronouns: ${el('pronouns').value.trim()}` : '';
+  const website   = el('website').value.trim() ? `<br><a href="${el('website').value.trim()}" target="_blank">${el('website').value.trim()}</a>` : '';
 
   const phones = [];
   if (el('phone-office-enable').checked)
@@ -350,7 +376,7 @@ function updateSignaturePreview() {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
   if (phoneLine) html += `${phoneLine} | `;
-  html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
+  html += `<a href="mailto:${email}">${email}</a>${pronouns}${website}<br><br>`;
   html += `<a href="https://${url}" target="_blank">${url}</a>`;
 
   el('signature-preview').innerHTML = html;
@@ -370,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'name','credentials','title',
     'department','school','division',
     'room','street','city-state','zip',
-    'email','pronouns'
+    'email','pronouns','website'
   ].forEach(restore);
 
   // 2) Override via URL deep-link
@@ -399,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const deb = debounce(updateSignaturePreview);
   [
     'name','credentials','title','department','school','division',
-    'room','street','city-state','zip','email','pronouns'
+    'room','street','city-state','zip','email','pronouns','website'
   ].forEach(id => {
     const f = el(id);
     if (f) f.addEventListener('input', () => {
@@ -428,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
   saveDraftBtn.addEventListener('click', () => {
     [
       'name','credentials','title','department','school','division',
-      'room','street','city-state','zip','email','pronouns'
+      'room','street','city-state','zip','email','pronouns','website'
     ].forEach(id => persist(id, el(id).value.trim()));
   });
   clearDraftBtn.addEventListener('click', () => {
@@ -446,6 +472,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ico.dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
   });
+
+  // Website lookup button
+  el('lookup-website').addEventListener('click', lookupWebsite);
 
   // Primary actions
   el('copy-button').addEventListener('click', copyToClipboard);
