@@ -9,35 +9,35 @@ function debounce(fn, delay) {
   };
 }
 
-// DOM helper
+// Short DOM lookup
 function el(id) {
   return document.getElementById(id);
 }
 
-// Draft & persistence elements
+// ------------ Persistence & Draft Management ------------ //
+
 const lastSavedEl   = el('last-saved');
 const saveDraftBtn  = el('save-draft');
 const clearDraftBtn = el('clear-draft');
 
-// Override persist to update timestamp
 function persist(id, val) {
   localStorage.setItem(`siggen:${id}`, val);
-  const now = new Date();
-  lastSavedEl.textContent = `Last saved: ${now.toLocaleTimeString()}`;
+  lastSavedEl.textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
 }
 
-// Restore from localStorage
 function restore(id) {
   const v = localStorage.getItem(`siggen:${id}`);
   if (v !== null) el(id).value = v;
 }
+
 function clearAllPersistence() {
   Object.keys(localStorage)
     .filter(k => k.startsWith('siggen:'))
     .forEach(k => localStorage.removeItem(k));
 }
 
-// Format phone number
+// ------------ Formatting Helpers ------------ //
+
 function formatPhoneNumber(num) {
   const d = (num || '').replace(/\D/g, '');
   if (d.length === 7) return `205.${d.slice(0,3)}.${d.slice(3)}`;
@@ -45,7 +45,8 @@ function formatPhoneNumber(num) {
   return num;
 }
 
-// Generate RTF content
+// ------------ Signature Generation ------------ //
+
 async function generateRTFContent() {
   const html = el('signature-preview').innerHTML;
   const lines = html.split('<br>').map(l => l.trim()).filter(Boolean);
@@ -59,7 +60,7 @@ async function generateRTFContent() {
       .replace(/<\/?[^>]+>/g, '')
   ).join('\\line ');
   const p2 = body + '\\line ';
-  const urlLine = lines[lines.length - 1]
+  const urlLine = lines.slice(-1)[0]
     .replace(/<a href="(.*?)".*?>(.*?)<\/a>/,
              '{\\field{\\*\\fldinst{HYPERLINK "$1"}}{\\fldrslt $2}}')
     .replace(/<\/?[^>]+>/g, '');
@@ -75,7 +76,6 @@ async function generateRTFContent() {
   ].join('\n');
 }
 
-// Generate HTML signature
 function generateHTMLSignature() {
   const sig = el('signature-preview').innerHTML;
   return `<!DOCTYPE html>
@@ -84,19 +84,18 @@ ${sig}
 </body></html>`;
 }
 
-// Feedback utility
+// ------------ Feedback & Copy/Download ------------ //
+
 function giveFeedback(btn) {
   btn.classList.add('feedback');
   setTimeout(() => btn.classList.remove('feedback'), 2000);
 }
 
-// Copy signature
 async function copyToClipboard() {
   const btn = el('copy-button');
-  const html = el('signature-preview').innerHTML;
-  const tmp  = document.createElement('div');
+  const tmp = document.createElement('div');
   tmp.style.color = '#1E6B52';
-  tmp.innerHTML = html;
+  tmp.innerHTML = el('signature-preview').innerHTML;
   document.body.appendChild(tmp);
 
   try {
@@ -119,7 +118,6 @@ async function copyToClipboard() {
   giveFeedback(btn);
 }
 
-// Copy raw HTML
 function copyHTML() {
   const btn = el('copy-html-button');
   navigator.clipboard.writeText(el('signature-preview').innerHTML)
@@ -127,7 +125,6 @@ function copyHTML() {
   giveFeedback(btn);
 }
 
-// Download RTF
 async function downloadRTF() {
   const btn = el('download-button');
   btn.classList.add('loading');
@@ -148,7 +145,6 @@ async function downloadRTF() {
   btn.classList.remove('loading');
 }
 
-// Download HTML template
 function downloadHTMLTemplate() {
   const btn = el('download-html-button');
   btn.classList.add('loading');
@@ -162,7 +158,6 @@ function downloadHTMLTemplate() {
   btn.classList.remove('loading');
 }
 
-// Download OFT template
 async function downloadOFTTemplate() {
   const btn = el('download-oft-button');
   btn.classList.add('loading');
@@ -181,20 +176,21 @@ async function downloadOFTTemplate() {
   btn.classList.remove('loading');
 }
 
-// Download PNG
+// PNG Download via html2canvas
 let html2canvasPromise = null;
 function loadHtml2canvas() {
   if (!html2canvasPromise) {
-    html2canvasPromise = new Promise((resolve, reject) => {
+    html2canvasPromise = new Promise((res, rej) => {
       const s = document.createElement('script');
       s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      s.onload = () => resolve(window.html2canvas);
-      s.onerror = reject;
+      s.onload = () => res(window.html2canvas);
+      s.onerror = rej;
       document.body.appendChild(s);
     });
   }
   return html2canvasPromise;
 }
+
 async function downloadPNG() {
   const btn = el('download-png-button');
   btn.classList.add('loading');
@@ -218,19 +214,19 @@ async function downloadPNG() {
   btn.classList.remove('loading');
 }
 
-// QR code modal
+// QR Code
 function showQRCode() {
-  const qrModal = el('qr-modal');
-  const img = qrModal.querySelector('img');
-  const data = encodeURIComponent(generateHTMLSignature());
-  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${data}`;
-  qrModal.classList.add('active');
+  const m = el('qr-modal');
+  const img = m.querySelector('img');
+  img.src = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(generateHTMLSignature())}`;
+  m.classList.add('active');
 }
 function hideQRCode() {
   el('qr-modal').classList.remove('active');
 }
 
-// Reset form
+// ------------ Form Reset ------------ //
+
 function resetToDefaults() {
   clearAllPersistence();
   [
@@ -245,7 +241,8 @@ function resetToDefaults() {
   updateSignaturePreview();
 }
 
-// Build live preview
+// ------------ Live Preview ------------ //
+
 function updateSignaturePreview() {
   [
     'name','credentials','title',
@@ -276,7 +273,6 @@ function updateSignaturePreview() {
   const url   = 'uab.edu/medicine/gimaps';
 
   let html = `<strong style="color:#1E6B52;">${name}${creds} | ${title}</strong><br>`;
-
   if (isStd) {
     html += `${dept} | ${school}<br>`;
     html += `${division}<br>`;
@@ -285,25 +281,26 @@ function updateSignaturePreview() {
   } else {
     html += `UAB | The University of Alabama at Birmingham<br>`;
   }
-
   if (phoneLine) html += `${phoneLine} | `;
-  html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>` +
-          `<a href="https://${url}" target="_blank">${url}</a>`;
+  html += `<a href="mailto:${email}">${email}</a>${pronouns}<br><br>`;
+  html += `<a href="https://${url}" target="_blank">${url}</a>`;
 
   el('signature-preview').innerHTML = html;
   el('mobile-preview').innerHTML    = html;
 }
 
-// Toggle version
+// ------------ Version Toggle ------------ //
+
 function toggleVersion(isStandard) {
   el('btn-standard').classList.toggle('active', isStandard);
   el('btn-abbreviated').classList.toggle('active', !isStandard);
   updateSignaturePreview();
 }
 
-// Initialize on load
+// ------------ Initialize ------------ //
+
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore persisted values
+  // Restore all persisted
   [
     'name','credentials','title',
     'department','school','division',
@@ -316,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const debouncedUpdate = debounce(updateSignaturePreview, 300);
 
-  // Inline validation & preview binding
+  // Bind inline validation & preview update
   [
     'name','credentials','title',
     'department','school','division',
@@ -331,11 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Checkbox toggles
+  // Checkboxes
   ['phone-office-enable','phone-mobile-enable']
     .forEach(id => el(id)?.addEventListener('change', updateSignaturePreview));
 
-  // Version toggles
+  // Version buttons
   el('btn-standard')?.addEventListener('click', () => toggleVersion(true));
   el('btn-abbreviated')?.addEventListener('click', () => toggleVersion(false));
 
@@ -354,59 +351,45 @@ document.addEventListener('DOMContentLoaded', () => {
     lastSavedEl.textContent = 'Last saved: never';
   });
 
-  // More options toggle
-  const moreToggle = el('more-options-toggle');
-  const moreOpts   = el('more-options');
-  moreToggle.addEventListener('click', () => {
-    const isCollapsed = moreOpts.classList.toggle('collapsed');
-    moreToggle.textContent = isCollapsed ? 'More options ▼' : 'Less options ▲';
+  // More-options panel
+  el('more-options-toggle').addEventListener('click', () => {
+    const mo = el('more-options');
+    const collapsed = mo.classList.toggle('collapsed');
+    el('more-options-toggle').textContent = collapsed ? 'More options ▼' : 'Less options ▲';
   });
 
-  // Integration buttons injection
-  const actions = el('download-button').parentNode;
+  // Inject preview titles
+  const pc = document.querySelector('.preview-card');
+  const df = pc.querySelector('.desktop-frame');
+  const mf = pc.querySelector('.mobile-frame');
 
-  // HTML button with SVG
-  const htmlBtn = document.createElement('button');
-  htmlBtn.id = 'download-html-button';
-  htmlBtn.className = 'btn btn-download-html';
-  htmlBtn.innerHTML = `
-    <span class="spinner"></span>
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <text x="2" y="12" font-family="monospace" font-size="12" fill="currentColor">&lt;/&gt;</text>
-    </svg>
-    <span class="btn-text">Download HTML</span>`;
-  htmlBtn.addEventListener('click', downloadHTMLTemplate);
-  actions.appendChild(htmlBtn);
+  const dt = document.createElement('h3');
+  dt.className = 'preview-title';
+  dt.textContent = 'Desktop Preview';
+  df.parentNode.insertBefore(dt, df);
 
-  // OFT button with SVG
-  const oftBtn = document.createElement('button');
-  oftBtn.id = 'download-oft-button';
-  oftBtn.className = 'btn btn-download-oft';
-  oftBtn.innerHTML = `
-    <span class="spinner"></span>
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" fill="none"/>
-      <polyline points="3,5 8,10 13,5" stroke="currentColor" fill="none"/>
-    </svg>
-    <span class="btn-text">Download OFT</span>`;
-  oftBtn.addEventListener('click', downloadOFTTemplate);
-  actions.appendChild(oftBtn);
+  const mt = document.createElement('h3');
+  mt.className = 'preview-title';
+  mt.textContent = 'Mobile Preview';
+  mf.parentNode.insertBefore(mt, mf);
 
-  // QR button with SVG
-  const qrBtn = document.createElement('button');
-  qrBtn.id = 'show-qr-button';
-  qrBtn.className = 'btn btn-qr';
-  qrBtn.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <rect x="2" y="2" width="4" height="4" fill="currentColor"/>
-      <rect x="10" y="2" width="4" height="4" fill="currentColor"/>
-      <rect x="2" y="10" width="4" height="4" fill="currentColor"/>
-      <rect x="8" y="8" width="2" height="2" fill="currentColor"/>
-      <rect x="12" y="12" width="2" height="2" fill="currentColor"/>
-    </svg>
-    <span class="btn-text">Show QR</span>`;
-  qrBtn.addEventListener('click', showQRCode);
-  actions.appendChild(qrBtn);
+  // Integration buttons already in HTML: copy-button, download-button
+
+  // Inject secondary integration buttons
+  const actions = el('copy-button').parentNode;
+
+  // Copy HTML
+  el('copy-html-button').addEventListener('click', copyHTML);
+  // Download PNG
+  el('download-png-button').addEventListener('click', downloadPNG);
+  // Download HTML
+  el('download-html-button').addEventListener('click', downloadHTMLTemplate);
+  // Download OFT
+  el('download-oft-button').addEventListener('click', downloadOFTTemplate);
+  // Show QR
+  el('show-qr-button').addEventListener('click', showQRCode);
+  // Reset
+  el('reset-button').addEventListener('click', resetToDefaults);
 
   // Inject QR modal
   document.body.insertAdjacentHTML('beforeend', `
@@ -415,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `);
 
-  // Extra actions container
+  // “More actions” toggle & extra-actions panel
   const toggleActions = document.createElement('button');
   toggleActions.id = 'toggle-actions';
   toggleActions.className = 'btn-toggle-actions';
@@ -423,25 +406,32 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg width="16" height="16" viewBox="0 0 16 16">
       <polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>
     </svg>
-    More actions`;
-  actions.appendChild(toggleActions);
+    More actions
+  `;
+  actions.after(toggleActions);
 
   const extra = document.createElement('div');
   extra.id = 'extra-actions';
   extra.className = 'extra-actions collapsed';
-  ['copy-html-button','download-png-button','download-html-button','download-oft-button','show-qr-button','reset-button']
-    .forEach(id => {
-      const btn = el(id);
-      if (btn) extra.appendChild(btn);
-    });
-  actions.appendChild(extra);
+  [
+    'copy-html-button',
+    'download-png-button',
+    'download-html-button',
+    'download-oft-button',
+    'show-qr-button',
+    'reset-button'
+  ].forEach(id => {
+    const btn = el(id);
+    if (btn) extra.appendChild(btn);
+  });
+  toggleActions.after(extra);
 
   toggleActions.addEventListener('click', () => {
-    const isCollapsed = extra.classList.toggle('collapsed');
-    toggleActions.querySelector('svg').innerHTML = isCollapsed
+    const collapsed = extra.classList.toggle('collapsed');
+    toggleActions.querySelector('svg').innerHTML = collapsed
       ? '<polyline points="4,6 8,10 12,6" stroke="currentColor" fill="none" stroke-width="2"/>'
       : '<polyline points="4,10 8,6 12,10" stroke="currentColor" fill="none" stroke-width="2"/>';
-    toggleActions.childNodes[1].nodeValue = isCollapsed ? ' More actions' : ' Fewer actions';
+    toggleActions.childNodes[1].nodeValue = collapsed ? ' More actions' : ' Fewer actions';
   });
 
   // Onboarding tour
@@ -452,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p class="tour-text"></p>
           <div class="tour-controls">
             <button id="tour-next" class="btn btn-copy">Next</button>
-            <button id="tour-end" class="btn btn-copy">Done</button>
+            <button id='tour-end' class='btn btn-copy'>Done</button>
           </div>
         </div>
       </div>
@@ -460,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startTour();
   }
 
-  // Final initialization
+  // Final init
   toggleVersion(true);
   updateSignaturePreview();
 });
