@@ -87,7 +87,7 @@ function validateField(field) {
   }
 }
 
-// Validate all required and enabled phone fields
+// Validate all required and enabled phone fields;
 // Returns overall validity
 function validateAllRequiredFields() {
   let allValid = true;
@@ -103,7 +103,7 @@ function validateAllRequiredFields() {
     const box   = document.getElementById(`${id}-enable`);
     if (box && box.checked) {
       if (!validatePhoneNumber(field)) allValid = false;
-    } else {
+    } else if (field) {
       clearError(field);
     }
   });
@@ -112,8 +112,12 @@ function validateAllRequiredFields() {
 }
 
 // Attach blur listeners for inline validation on all inputs
+// Also run a full validation pass on page load to highlight empty/invalid fields immediately
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input').forEach(input => {
     input.addEventListener('blur', () => validateField(input));
   });
+
+  // Immediately highlight any missing/invalid fields on load
+  validateAllRequiredFields();
 });
