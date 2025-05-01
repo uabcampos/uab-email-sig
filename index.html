@@ -14,11 +14,11 @@
     <div class="version-selection">
       <button id="btn-standard" class="version-button active">
         <span>Standard</span>
-        <i data-feather="check-circle"></i>
+        <i data-feather="file-text"></i>
       </button>
       <button id="btn-abbreviated" class="version-button">
         <span>Abbreviated</span>
-        <i data-feather="circle"></i>
+        <i data-feather="file"></i>
       </button>
     </div>
   </header>
@@ -168,7 +168,7 @@
         </button>
         <button id="show-qr-button" class="btn btn-qr">
           <span>Show QR</span>
-          <i data-feather="qr-code"></i>
+          <i data-feather="qrcode"></i>
         </button>
         <button id="reset-button" class="btn btn-reset">
           <span>Reset</span>
@@ -197,5 +197,10 @@
 
   <script src="validation.js"></script>
   <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
+    });
+  </script>
 </body>
 </html>
