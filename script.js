@@ -266,14 +266,15 @@ function hideQRCode() {
 // ------------ Website Lookup via DuckDuckGo HTML parsing ------------
 
 async function lookupWebsite() {
-  const division = el('division').value.trim();
-  if (!division) {
-    alert('Please enter a Division name first.');
+  // use division if present, otherwise fallback to department
+  let text = el('division').value.trim() || el('department').value.trim();
+  if (!text) {
+    alert('Please enter a Division or Department name first.');
     return;
   }
-  // Replace & with "and", prepend "Home"
-  const divAnd = division.replace(/&/g, 'and');
-  const queryStr = `Home "${divAnd}" site:uab.edu`;
+  // replace & with "and", prepend "Home"
+  text = text.replace(/&/g, 'and');
+  const queryStr = `Home "${text}" site:uab.edu`;
   const ddgSearch = `https://duckduckgo.com/html/?q=${encodeURIComponent(queryStr)}`;
 
   try {
@@ -437,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   el('more-options-toggle').addEventListener('click', () => {
     const panel = el('more-options');
-    const btn = el('more-options-toggle');
+    const btn   = el('more-options-toggle');
     const collapsed = panel.classList.toggle('collapsed');
     btn.querySelector('i[data-feather]').dataset.feather = collapsed ? 'chevron-down' : 'chevron-up';
     feather.replace();
