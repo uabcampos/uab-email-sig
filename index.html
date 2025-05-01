@@ -12,29 +12,29 @@
     <h1>UAB Email Signature Generator</h1>
     <div class="version-selection">
       <button id="btn-standard" class="version-button active">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Standard
+        <span>Standard</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
       <button id="btn-abbreviated" class="version-button">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Abbreviated
+        <span>Abbreviated</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- Main Content Grid -->
+  <!-- Main Content -->
   <main class="container">
-    <!-- LEFT COLUMN: FORM (60%) -->
+    <!-- Left Column: Form (60%) -->
     <section class="card form-card">
-      <!-- 1. Draft Controls -->
+      <!-- Draft Controls -->
       <div class="draft-controls">
         <button id="save-draft" class="btn">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 5h14v14H5z"/></svg>
-          Save draft
+          <span>Save draft</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/></svg>
         </button>
         <button id="clear-draft" class="btn">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          Clear draft
+          <span>Clear draft</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
         <span id="last-saved">Last saved: never</span>
       </div>
@@ -90,10 +90,10 @@
       <input type="email" id="email" required placeholder="you@uabmc.edu" />
       <div id="email-error" class="error-message"></div>
 
-      <!-- 10. More Options ▼ -->
+      <!-- 10. More Options Toggle -->
       <button id="more-options-toggle" class="btn-more-options">
-        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
-        More options
+        <span>More options</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <div id="more-options" class="more-options collapsed">
         <label for="credentials">Credentials</label>
@@ -116,7 +116,7 @@
       </div>
     </section>
 
-    <!-- RIGHT COLUMN: PREVIEWS & ACTIONS (40%) -->
+    <!-- Right Column: Preview & Actions (40%) -->
     <section class="card preview-card">
       <h2>Signature Previews</h2>
       <div class="preview-split">
@@ -133,44 +133,44 @@
       <!-- Primary Action Buttons -->
       <div class="button-container">
         <button id="copy-button" class="btn btn-copy">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5h8v14H8z"/></svg>
           <span>Copy</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h8v14H8z"/></svg>
         </button>
         <button id="download-button" class="btn btn-download">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
           <span>Download RTF</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         </button>
       </div>
 
-      <!-- More Actions ▼ -->
+      <!-- More Actions Toggle -->
       <button id="toggle-actions" class="btn-toggle-actions">
-        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
-        More actions
+        <span>More actions</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </button>
-      <div id="extra-actions" class="extra-actions">
+      <div id="extra-actions" class="extra-actions collapsed">
         <button id="copy-html-button" class="btn btn-copy-html">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4z"/></svg>
           <span>Copy HTML</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>
         </button>
         <button id="download-png-button" class="btn btn-download-png">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2v20M2 12h20"/></svg>
           <span>Download PNG</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20"/></svg>
         </button>
         <button id="download-html-button" class="btn btn-download-html">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 4h14v16H5z"/></svg>
           <span>Download HTML</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/></svg>
         </button>
         <button id="download-oft-button" class="btn btn-download-oft">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4z"/></svg>
           <span>Download OFT</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>
         </button>
         <button id="show-qr-button" class="btn btn-qr">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/></svg>
           <span>Show QR</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/></svg>
         </button>
         <button id="reset-button" class="btn btn-reset">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 4l14 14M19 4L5 18"/></svg>
           <span>Reset</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l14 14M19 4L5 18"/></svg>
         </button>
       </div>
 
