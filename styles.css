@@ -439,3 +439,27 @@ body {
 .tour-controls button {
   margin: 0.5rem;
 }
+
+/* Make phone‐toggle a flex row */
+.phone-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Label (with checkbox) takes only the space it needs */
+.phone-toggle > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--uab-green-dark);
+  white-space: nowrap;
+}
+
+/* Phone number input fills the remaining space */
+.phone-toggle > input[type="text"] {
+  flex: 1 1 auto;
+  margin: 0;
+}
