@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UAB Email Signature Generator</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
   <!-- Page Header -->
@@ -13,11 +14,11 @@
     <div class="version-selection">
       <button id="btn-standard" class="version-button active">
         <span>Standard</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <i data-feather="check-circle"></i>
       </button>
       <button id="btn-abbreviated" class="version-button">
         <span>Abbreviated</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <i data-feather="circle"></i>
       </button>
     </div>
   </header>
@@ -26,15 +27,15 @@
   <main class="container">
     <!-- Left Column: Form (60%) -->
     <section class="card form-card">
-      <!-- Draft Controls -->
+      <!-- 1. Draft Controls -->
       <div class="draft-controls">
         <button id="save-draft" class="btn">
           <span>Save draft</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/></svg>
+          <i data-feather="save"></i>
         </button>
         <button id="clear-draft" class="btn">
           <span>Clear draft</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          <i data-feather="trash-2"></i>
         </button>
         <span id="last-saved">Last saved: never</span>
       </div>
@@ -47,6 +48,7 @@
       <!-- 3. Organization Group -->
       <fieldset class="org-group">
         <legend>Organization</legend>
+
         <label for="department">Department</label>
         <input type="text" id="department" required placeholder="Department of Medicine" />
         <div id="department-error" class="error-message"></div>
@@ -93,7 +95,7 @@
       <!-- 10. More Options Toggle -->
       <button id="more-options-toggle" class="btn-more-options">
         <span>More options</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <i data-feather="chevron-down"></i>
       </button>
       <div id="more-options" class="more-options collapsed">
         <label for="credentials">Credentials</label>
@@ -134,43 +136,43 @@
       <div class="button-container">
         <button id="copy-button" class="btn btn-copy">
           <span>Copy</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h8v14H8z"/></svg>
+          <i data-feather="clipboard"></i>
         </button>
         <button id="download-button" class="btn btn-download">
           <span>Download RTF</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <i data-feather="download"></i>
         </button>
       </div>
 
       <!-- More Actions Toggle -->
       <button id="toggle-actions" class="btn-toggle-actions">
         <span>More actions</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <i data-feather="chevron-down"></i>
       </button>
       <div id="extra-actions" class="extra-actions collapsed">
         <button id="copy-html-button" class="btn btn-copy-html">
           <span>Copy HTML</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>
+          <i data-feather="code"></i>
         </button>
         <button id="download-png-button" class="btn btn-download-png">
           <span>Download PNG</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20"/></svg>
+          <i data-feather="image"></i>
         </button>
         <button id="download-html-button" class="btn btn-download-html">
           <span>Download HTML</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/></svg>
+          <i data-feather="file-text"></i>
         </button>
         <button id="download-oft-button" class="btn btn-download-oft">
           <span>Download OFT</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/></svg>
+          <i data-feather="mail"></i>
         </button>
         <button id="show-qr-button" class="btn btn-qr">
           <span>Show QR</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/></svg>
+          <i data-feather="qr-code"></i>
         </button>
         <button id="reset-button" class="btn btn-reset">
           <span>Reset</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l14 14M19 4L5 18"/></svg>
+          <i data-feather="refresh-cw"></i>
         </button>
       </div>
 
