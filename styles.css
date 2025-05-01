@@ -89,7 +89,32 @@ body {
   padding: 1rem;
 }
 
-/* 5. Form Card – tighter vertical rhythm */
+/* 5. Draft Controls */
+.draft-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.btn-save-draft, .btn-clear-draft {
+  background: #eee;
+  color: #333;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.btn-save-draft:hover, .btn-clear-draft:hover {
+  background: var(--uab-gray-light);
+}
+.last-saved {
+  font-size: 0.85rem;
+  color: #555;
+  margin-left: auto;
+}
+
+/* 6. Form Card – tighter vertical rhythm */
 .form-card label {
   display: block;
   margin-top: 0.75rem;
@@ -121,48 +146,63 @@ body {
   margin-top: 0.2rem;
   min-height: 1em;
 }
+
+/* 7. Organization fieldset */
+.org-group {
+  border: 1px solid var(--uab-gray-light);
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+}
+.org-group legend {
+  font-weight: 700;
+  color: var(--uab-dark-green);
+  padding: 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+/* 8. More options collapse */
+.more-options {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.more-options.collapsed {
+  max-height: 0;
+}
+.more-options:not(.collapsed) {
+  max-height: 500px;
+}
+.btn-more-options {
+  display: inline-block;
+  margin: 0.75rem 0 0.2rem;
+  background: transparent;
+  border: none;
+  color: var(--uab-dark-green);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* 9. Inline validation animations */
+@keyframes fadeInCheck {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+label.valid::after {
+  content: '✓';
+  color: var(--uab-light-green);
+  margin-left: 0.3rem;
+  animation: fadeInCheck 0.3s ease;
+}
+
+/* Valid/invalid inputs */
 input.invalid {
   border-color: #C00 !important;
-  box-shadow: 0 0 0 2px rgba(255,0,0,0.2);
+}
+input.valid {
+  border-color: var(--uab-light-green) !important;
 }
 
-/* 6. Tooltip */
-.tooltip {
-  display: inline-block;
-  margin-left: 0.2rem;
-  color: var(--uab-dark-green);
-  background: var(--uab-gray-light);
-  border-radius: 50%;
-  width: 0.9rem;
-  height: 0.9rem;
-  line-height: 0.9rem;
-  text-align: center;
-  font-size: 0.8rem;
-  cursor: help;
-  position: relative;
-}
-.tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: 1.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  z-index: 10;
-}
-.tooltip:hover::after,
-.tooltip:focus::after {
-  opacity: 1;
-}
-
-/* 7. Preview Split */
+/* 10. Preview Split */
 .preview-split {
   display: flex;
   gap: 1.5rem;
@@ -191,7 +231,6 @@ input.invalid {
 }
 .mobile-frame::before {
   content: '';
-  display: block;
   position: absolute;
   top: 0.4rem;
   left: calc(50% - 20px);
@@ -206,7 +245,7 @@ input.invalid {
   overflow-wrap: break-word;
 }
 
-/* 8. Buttons */
+/* 11. Buttons */
 .button-container {
   display: flex;
   flex-wrap: wrap;
@@ -265,13 +304,13 @@ input.invalid {
   background: var(--uab-gray-light);
 }
 
-/* 9. Focus Styles */
+/* 12. Focus Styles */
 :focus {
   outline: 2px solid var(--uab-gold) !important;
   outline-offset: 2px;
 }
 
-/* 10. Success Messages */
+/* 13. Success Messages */
 .copy-msg {
   font-size: 0.85rem;
   margin-left: 0.4rem;
@@ -279,7 +318,7 @@ input.invalid {
   font-weight: bold;
 }
 
-/* 11. Instructions & Footer */
+/* 14. Instructions & Footer */
 .instructions {
   margin-top: 1.5rem;
   font-size: 0.9rem;
