@@ -282,7 +282,6 @@ async function downloadPNG() {
 function showQRCode() {
   const qrModal = el('qr-modal');
   const img     = qrModal.querySelector('img');
-  // use QuickChart.io for robust QR generation
   img.src = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(buildDeepLink())}`;
   qrModal.classList.add('active');
 }
@@ -366,7 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
     feather.replace({ 'stroke-width': 2, width: 20, height: 20 });
   }
 
-  // Restore from URL query (for deep‐link mobile handoff)
+  // 1) Restore from localStorage (draft)
+  [
+    'name','credentials','title',
+    'department','school','division',
+    'room','street','city-state','zip',
+    'email','pronouns'
+  ].forEach(restore);
+
+  // 2) Override via URL deep-link
   restoreFromQuery();
 
   // Inject QR modal and set up events
@@ -384,14 +391,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const qrContent = qrModal.querySelector('.qr-content');
   qrModal.addEventListener('click', hideQRCode);
   qrContent.addEventListener('click', e => e.stopPropagation());
-
-  // Restore persisted fields
-  [
-    'name','credentials','title',
-    'department','school','division',
-    'room','street','city-state','zip',
-    'email','pronouns'
-  ].forEach(restore);
 
   // Initial render
   updateSignaturePreview();
