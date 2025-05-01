@@ -194,7 +194,7 @@ label.valid::after {
   animation: fadeInCheck 0.3s ease;
 }
 
-/* Valid/invalid inputs */
+/* 10. Valid/invalid inputs */
 input.invalid {
   border-color: #C00 !important;
 }
@@ -202,7 +202,7 @@ input.valid {
   border-color: var(--uab-light-green) !important;
 }
 
-/* 10. Preview Split */
+/* 11. Preview Split */
 .preview-split {
   display: flex;
   gap: 1.5rem;
@@ -245,7 +245,7 @@ input.valid {
   overflow-wrap: break-word;
 }
 
-/* 11. Buttons */
+/* 12. Buttons */
 .button-container {
   display: flex;
   flex-wrap: wrap;
@@ -263,59 +263,66 @@ input.valid {
   cursor: pointer;
   transition: background 0.2s;
   font-size: 0.9rem;
+  position: relative;
 }
 .btn svg {
   margin-right: 0.4rem;
   fill: currentColor;
 }
-.btn-copy {
-  background: var(--uab-light-green);
-  color: #fff;
+
+/* Feedback icon */
+.feedback-icon {
+  display: none;
+  font-size: 1rem;
+  margin-right: 0.4rem;
+  color: var(--uab-light-green);
 }
-.btn-copy:hover {
-  background: var(--uab-dark-green);
+.btn.feedback .feedback-icon {
+  display: inline-block;
 }
-.btn-copy-html {
-  background: #eee;
-  color: #333;
-}
-.btn-copy-html:hover {
-  background: var(--uab-gray-light);
-}
-.btn-download {
-  background: var(--uab-gold);
-  color: var(--uab-dark-green);
-}
-.btn-download:hover {
-  background: #f1b600;
-}
-.btn-download-png {
-  background: #2196F3;
-  color: #fff;
-}
-.btn-download-png:hover {
-  background: #1976D2;
-}
-.btn-reset {
-  background: #eee;
-  color: #333;
-}
-.btn-reset:hover {
-  background: var(--uab-gray-light);
+.btn.feedback .btn-text,
+.btn.feedback svg {
+  display: none;
 }
 
-/* 12. Focus Styles */
+/* Spinner */
+.spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: var(--uab-dark-green);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 0.4rem;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.btn.loading .spinner {
+  display: inline-block;
+}
+.btn.loading .btn-text,
+.btn.loading svg {
+  display: none;
+}
+
+/* Button variants */
+.btn-copy { background: var(--uab-light-green); color: #fff; }
+.btn-copy:hover { background: var(--uab-dark-green); }
+.btn-copy-html { background: #eee; color: #333; }
+.btn-copy-html:hover { background: var(--uab-gray-light); }
+.btn-download { background: var(--uab-gold); color: var(--uab-dark-green); }
+.btn-download:hover { background: #f1b600; }
+.btn-download-png { background: #2196F3; color: #fff; }
+.btn-download-png:hover { background: #1976D2; }
+.btn-reset { background: #eee; color: #333; }
+.btn-reset:hover { background: var(--uab-gray-light); }
+
+/* 13. Focus Styles */
 :focus {
   outline: 2px solid var(--uab-gold) !important;
   outline-offset: 2px;
-}
-
-/* 13. Success Messages */
-.copy-msg {
-  font-size: 0.85rem;
-  margin-left: 0.4rem;
-  color: var(--uab-light-green);
-  font-weight: bold;
 }
 
 /* 14. Instructions & Footer */
