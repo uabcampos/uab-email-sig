@@ -257,3 +257,9 @@ body {
   margin-bottom: 0.5rem;
   color: #666;
 }
+
+/* highlight invalid inputs */
+input.invalid {
+  border-color: #C00 !important;
+  box-shadow: 0 0 0 2px rgba(255,0,0,0.2);
+}
